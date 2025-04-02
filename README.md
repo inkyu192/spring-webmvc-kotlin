@@ -1,7 +1,7 @@
 ## 개발 환경
 - **Language & Framework:** Kotlin, Spring Web MVC, Spring Security, Spring Data JPA, QueryDSL
 - **Database:** PostgreSQL, Redis
-- **Test & Tools:** Kotest, Mockito, Docker, Docker Compose, Gradle
+- **Test & Tools:** Kotest, MockK, Docker, Docker Compose, Gradle
 
 ---
 
