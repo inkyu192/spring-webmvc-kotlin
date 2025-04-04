@@ -1,8 +1,5 @@
 package spring.webmvc.infrastructure.persistence
 
-import com.querydsl.core.types.Order
-import com.querydsl.core.types.OrderSpecifier
-import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -23,25 +20,21 @@ class ItemQuerydslRepository(
             .where(likeName(name))
             .fetchOne() ?: 0
 
-        val content = jpaQueryFactory
-            .selectFrom(item)
+        val tuples = jpaQueryFactory
+            .select(item, orderItem.count)
+            .from(item)
+            .leftJoin(orderItem).on(item.id.eq(orderItem.item.id))
             .where(likeName(name))
-            .orderBy(createOrderSpecifier())
+            .groupBy(item.id)
+            .orderBy(orderItem.count.desc())
             .limit(pageable.pageSize.toLong())
             .offset(pageable.offset)
             .fetch()
 
+        val content = tuples.map { it.get(0, Item::class.java) }
+
         return PageImpl(content, pageable, count)
     }
 
-    private fun likeName(name: String?) = name.takeIf { !it.isNullOrBlank() }?.let { item.name.like("%$it%") }
-
-    private fun createOrderSpecifier() =
-        OrderSpecifier(
-            Order.DESC,
-            JPAExpressions
-                .select(orderItem.count)
-                .from(orderItem)
-                .where(orderItem.item.id.eq(item.id))
-        )
+    private fun likeName(name: String?) = name.takeIf { it.isNullOrBlank().not() }?.let { item.name.like("%$it%") }
 }
