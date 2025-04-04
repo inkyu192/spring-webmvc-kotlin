@@ -20,11 +20,9 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = extractToken(request)
-
-        if (!token.isNullOrBlank()) {
-            SecurityContextHolder.getContext().authentication = createAuthentication(token)
-        }
+        extractToken(request)
+            ?.let { createAuthentication(it) }
+            ?.also { SecurityContextHolder.getContext().authentication = it }
 
         filterChain.doFilter(request, response)
     }
@@ -33,6 +31,7 @@ class JwtAuthenticationFilter(
         request.getHeader(HttpHeaders.AUTHORIZATION)
             ?.takeIf { it.startsWith("Bearer ") }
             ?.removePrefix("Bearer ")
+            ?.trim()
 
     private fun createAuthentication(token: String): Authentication {
         val claims = jwtTokenProvider.parseAccessToken(token)

@@ -9,7 +9,7 @@ class RequestLockService(
     private val requestLockRepository: RequestLockRepository
 ) {
     fun validate(memberId: Long, method: String, uri: String) {
-        if (!requestLockRepository.setIfAbsent(memberId, method, uri)) {
+        if (requestLockRepository.setIfAbsent(memberId, method, uri).not()) {
             throw DuplicateRequestException(memberId, method, uri)
         }
     }

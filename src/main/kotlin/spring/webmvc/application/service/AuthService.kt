@@ -57,9 +57,8 @@ class AuthService(
         val member = memberRepository.findByIdOrNull(requestMemberId)
             ?: throw EntityNotFoundException(Member::class.java, requestMemberId)
 
-        val refreshToken = tokenRepository.findByIdOrNull(requestMemberId)
-            ?.refreshToken
-            ?.takeIf { tokenRequest.refreshToken == it }
+        val token = tokenRepository.findByIdOrNull(requestMemberId)
+            ?.takeIf { tokenRequest.refreshToken == it.refreshToken }
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
 
         return TokenResponse(
@@ -67,7 +66,7 @@ class AuthService(
                 memberId = checkNotNull(member.id),
                 permissions = getPermissions(member),
             ),
-            refreshToken = refreshToken,
+            refreshToken = token.refreshToken,
         )
     }
 

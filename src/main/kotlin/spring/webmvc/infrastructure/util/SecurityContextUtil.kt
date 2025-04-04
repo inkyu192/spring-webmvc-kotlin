@@ -7,7 +7,7 @@ object SecurityContextUtil {
     fun getMemberId(): Long {
         val authentication = SecurityContextHolder.getContext().authentication
 
-        if (authentication == null || !authentication.isAuthenticated) {
+        if (authentication == null || authentication.isAuthenticated.not()) {
             throw BadCredentialsException("인증되지 않은 사용자입니다.")
         }
 
