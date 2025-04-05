@@ -1,5 +1,5 @@
 ## 개발 환경
-- **Language & Framework:** Kotlin, Spring Web MVC, Spring Security, Spring Data JPA, QueryDSL
+- **Language & Framework:** Kotlin, Spring Web MVC, Spring Security, Spring Data JPA, QueryDSL, Spring REST Docs
 - **Database:** PostgreSQL, Redis
 - **Test & Tools:** Kotest, MockK, Docker, Docker Compose, Gradle
 
@@ -29,6 +29,22 @@ services:
 ```
 
 ---
+
+## API 문서
+- 이 프로젝트는 **Spring REST Docs**를 사용하여 API 문서를 생성합니다.
+- 먼저 빌드를 수행해야 문서가 생성됩니다.
+
+```bash
+./gradlew build
+```
+- 서버 실행 시 아래 경로에서 문서를 확인할 수 있습니다.
+
+```text
+http://localhost:8080/docs/index.html
+```
+
+---
+
 ## 아키텍처
 ```sh
 ┌── application  # 애플리케이션 계층  
