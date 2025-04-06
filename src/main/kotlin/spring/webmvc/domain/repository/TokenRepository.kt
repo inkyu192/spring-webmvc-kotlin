@@ -1,8 +1,6 @@
 package spring.webmvc.domain.repository
 
-import spring.webmvc.domain.model.entity.Token
-
 interface TokenRepository {
-    fun findByIdOrNull(id: Long): Token?
-    fun save(token: Token): Token
+    fun findByMemberIdOrNull(memberId: Long): String?
+    fun save(memberId: Long, token: String): String
 }

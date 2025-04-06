@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.entity.Token
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.TokenRepository
 import spring.webmvc.infrastructure.config.security.JwtTokenProvider
@@ -38,10 +37,8 @@ class AuthService(
         val refreshToken = jwtTokenProvider.createRefreshToken()
 
         tokenRepository.save(
-            Token.create(
-                memberId = memberId,
-                refreshToken = refreshToken,
-            )
+            memberId = memberId,
+            token = refreshToken,
         )
 
         return TokenResponse(
@@ -57,8 +54,8 @@ class AuthService(
         val member = memberRepository.findByIdOrNull(requestMemberId)
             ?: throw EntityNotFoundException(Member::class.java, requestMemberId)
 
-        val token = tokenRepository.findByIdOrNull(requestMemberId)
-            ?.takeIf { tokenRequest.refreshToken == it.refreshToken }
+        val token = tokenRepository.findByMemberIdOrNull(requestMemberId)
+            ?.takeIf { tokenRequest.refreshToken == it }
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
 
         return TokenResponse(
@@ -66,7 +63,7 @@ class AuthService(
                 memberId = checkNotNull(member.id),
                 permissions = getPermissions(member),
             ),
-            refreshToken = token.refreshToken,
+            refreshToken = token,
         )
     }
 

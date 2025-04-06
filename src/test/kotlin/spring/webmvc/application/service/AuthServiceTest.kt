@@ -12,7 +12,6 @@ import io.mockk.verify
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.entity.Token
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.TokenRepository
 import spring.webmvc.infrastructure.config.security.JwtTokenProvider
@@ -54,17 +53,16 @@ class AuthServiceTest : DescribeSpec({
                 val refreshToken = "refreshToken"
 
                 val member = mockk<Member>(relaxed = true)
-                val token = mockk<Token>(relaxed = true)
 
                 every { memberRepository.findByAccount(any()) } returns member
                 every { passwordEncoder.matches(any(), any()) } returns true
                 every { jwtTokenProvider.createAccessToken(any(), any()) } returns accessToken
                 every { jwtTokenProvider.createRefreshToken() } returns refreshToken
-                every { tokenRepository.save(any()) } returns token
+                every { tokenRepository.save(any(), any()) } returns refreshToken
 
                 val response = authService.login(request)
 
-                verify(exactly = 1) { tokenRepository.save(any()) }
+                verify(exactly = 1) { tokenRepository.save(any(), any()) }
                 response.accessToken shouldBe accessToken
                 response.refreshToken shouldBe refreshToken
             }
@@ -99,13 +97,13 @@ class AuthServiceTest : DescribeSpec({
             it("BadCredentialsException 던진다") {
                 val memberId = 1L
                 val claims = mockk<Claims>()
-                val token = Token.create(memberId, "realRefreshToken")
+                val token = "realRefreshToken"
                 val member = mockk<Member>()
 
                 every { jwtTokenProvider.parseAccessToken(request.accessToken) } returns claims
                 every { jwtTokenProvider.parseRefreshToken(request.refreshToken) } returns mockk()
                 every { claims["memberId"] } returns memberId
-                every { tokenRepository.findByIdOrNull(memberId) } returns token
+                every { tokenRepository.findByMemberIdOrNull(memberId) } returns token
                 every { memberRepository.findByIdOrNull(memberId) } returns member
 
                 shouldThrow<BadCredentialsException> { authService.refreshToken(request) }
@@ -116,13 +114,13 @@ class AuthServiceTest : DescribeSpec({
             it("Access 토큰이 갱신된다") {
                 val memberId = 1L
                 val claims = mockk<Claims>()
-                val token = Token.create(memberId, "refreshToken")
+                val token = "refreshToken"
                 val member = mockk<Member>(relaxed = true)
 
                 every { jwtTokenProvider.parseAccessToken(request.accessToken) } returns claims
                 every { jwtTokenProvider.parseRefreshToken(request.refreshToken) } returns mockk()
                 every { claims["memberId"] } returns memberId
-                every { tokenRepository.findByIdOrNull(memberId) } returns token
+                every { tokenRepository.findByMemberIdOrNull(memberId) } returns token
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every { jwtTokenProvider.createAccessToken(any(), any()) } returns "newAccessToken"
 

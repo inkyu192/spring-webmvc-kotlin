@@ -8,10 +8,10 @@ import java.time.Duration
 class RequestLockRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>
 ) {
-    fun setIfAbsent(memberId: Long, method: String, uri: String): Boolean {
-        val result = redisTemplate.opsForValue()
-            .setIfAbsent("request_lock", "$memberId:$method:$uri", Duration.ofSeconds(1))
+    private fun createKey(memberId: Long, method: String, uri: String) = "request-lock:$memberId:$method:$uri"
 
-        return result == true
-    }
+    fun setIfAbsent(memberId: Long, method: String, uri: String) =
+        createKey(memberId, method, uri).let {
+            redisTemplate.opsForValue().setIfAbsent(it, "1", Duration.ofSeconds(1)) == true
+        }
 }
