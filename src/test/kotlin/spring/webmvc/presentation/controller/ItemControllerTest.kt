@@ -56,15 +56,14 @@ class ItemControllerTest {
             .build()
     }
 
-    private val authorization =
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6MSwicGVybWlzc2lvbnMiOlsiSVRFTV9SRUFERVIiLCJJVEVNX1dSSVRFUiJdLCJpYXQiOjE3NDM0ODUzMzYsImV4cCI6MTc0MzQ4NTkzNn0.tu5bcIGsTtmXy0RmqvKa3H-rWKBn3rB1i1RjPzlkTVs"
+    private val authorization = "Bearer access-token"
 
     @Test
-    fun saveItemTest() {
+    fun saveItem() {
         val request = ItemSaveRequest("상품명", "설명", 1000, 5, Category.ROLE_BOOK)
-        val itemResponse = ItemResponse(1L, "상품명", "설명", 1000, 10, Instant.now())
+        val response = ItemResponse(1L, "상품명", "설명", 1000, 10, Instant.now())
 
-        Mockito.`when`(itemService.saveItem(request)).thenReturn(itemResponse)
+        Mockito.`when`(itemService.saveItem(request)).thenReturn(response)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/items")
@@ -101,9 +100,9 @@ class ItemControllerTest {
     @Test
     fun findItem() {
         val requestId = 1L
-        val itemResponse = ItemResponse(1L, "item1", "description", 1000, 10, Instant.now())
+        val response = ItemResponse(1L, "item1", "description", 1000, 10, Instant.now())
 
-        Mockito.`when`(itemService.findItem(requestId)).thenReturn(itemResponse)
+        Mockito.`when`(itemService.findItem(requestId)).thenReturn(response)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/items/{id}", requestId)
@@ -136,12 +135,12 @@ class ItemControllerTest {
         val pageable = PageRequest.of(0, 10)
         val name = "item"
 
-        val itemResponse = listOf(
+        val response = listOf(
             ItemResponse(1L, "item1", "description", 1000, 10, Instant.now()),
             ItemResponse(2L, "item2", "description", 2000, 20, Instant.now()),
             ItemResponse(3L, "item3", "description", 3000, 30, Instant.now())
         )
-        val page = PageImpl(itemResponse, pageable, itemResponse.size.toLong())
+        val page = PageImpl(response, pageable, response.size.toLong())
 
         Mockito.`when`(itemService.findItems(pageable, name)).thenReturn(page)
 
@@ -205,9 +204,9 @@ class ItemControllerTest {
         val requestId = 1L
 
         val request = ItemSaveRequest("상품명", "설명", 1000, 5, Category.ROLE_BOOK)
-        val itemResponse = ItemResponse(1L, "상품명", "설명", 1000, 10, Instant.now())
+        val response = ItemResponse(1L, "상품명", "설명", 1000, 10, Instant.now())
 
-        Mockito.`when`(itemService.putItem(requestId, request)).thenReturn(Pair(false, itemResponse))
+        Mockito.`when`(itemService.putItem(requestId, request)).thenReturn(Pair(false, response))
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.put("/items/{id}", requestId)
