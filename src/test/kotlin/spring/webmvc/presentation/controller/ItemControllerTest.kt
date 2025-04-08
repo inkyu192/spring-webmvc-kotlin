@@ -15,6 +15,7 @@ import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
+import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
@@ -75,6 +76,8 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-create",
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -112,6 +115,7 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-get",
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -155,6 +159,7 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-list",
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -218,6 +223,8 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-update",
+                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
