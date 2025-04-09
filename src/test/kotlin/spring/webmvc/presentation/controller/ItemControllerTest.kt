@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -26,37 +27,31 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.ItemService
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.infrastructure.config.security.JwtTokenProvider
-import spring.webmvc.infrastructure.util.ResponseWriter
 import spring.webmvc.presentation.dto.request.ItemSaveRequest
 import spring.webmvc.presentation.dto.response.ItemResponse
+import spring.webmvc.presentation.infrastructure.config.WebMvcTestConfig
 import java.time.Instant
 
 @WebMvcTest(ItemController::class)
+@Import(WebMvcTestConfig::class)
 @ExtendWith(RestDocumentationExtension::class)
-class ItemControllerTest {
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
+class ItemControllerTest(
+    @Autowired private val objectMapper: ObjectMapper,
+) {
     @MockitoBean
     private lateinit var itemService: ItemService
-
-    @MockitoBean
-    private lateinit var jwtTokenProvider: JwtTokenProvider
-
-    @MockitoBean
-    private lateinit var responseWriter: ResponseWriter
 
     private lateinit var mockMvc: MockMvc
 
     @BeforeEach
     fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply<DefaultMockMvcBuilder>(MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
-                .operationPreprocessors()
-                .withRequestDefaults(Preprocessors.prettyPrint())
-                .withResponseDefaults(Preprocessors.prettyPrint()))
+            .apply<DefaultMockMvcBuilder>(
+                MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
+                    .operationPreprocessors()
+                    .withRequestDefaults(Preprocessors.prettyPrint())
+                    .withResponseDefaults(Preprocessors.prettyPrint())
+            )
             .build()
     }
 
