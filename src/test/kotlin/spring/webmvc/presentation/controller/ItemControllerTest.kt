@@ -35,8 +35,6 @@ import java.time.Instant
 @WebMvcTest(ItemController::class)
 @ExtendWith(RestDocumentationExtension::class)
 class ItemControllerTest {
-    @Autowired
-    private lateinit var mockMvc: MockMvc
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
@@ -50,10 +48,15 @@ class ItemControllerTest {
     @MockitoBean
     private lateinit var responseWriter: ResponseWriter
 
+    private lateinit var mockMvc: MockMvc
+
     @BeforeEach
     fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply<DefaultMockMvcBuilder>(MockMvcRestDocumentation.documentationConfiguration(restDocumentation))
+            .apply<DefaultMockMvcBuilder>(MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
+                .operationPreprocessors()
+                .withRequestDefaults(Preprocessors.prettyPrint())
+                .withResponseDefaults(Preprocessors.prettyPrint()))
             .build()
     }
 
@@ -76,8 +79,6 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-create",
-                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -115,7 +116,6 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-get",
-                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -159,7 +159,6 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-list",
-                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -223,8 +222,6 @@ class ItemControllerTest {
             .andDo(
                 MockMvcRestDocumentation.document(
                     "item-update",
-                    Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                    Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
