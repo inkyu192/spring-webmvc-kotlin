@@ -13,7 +13,7 @@ import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import spring.webmvc.presentation.exception.handler.AccessDeniedExceptionHandler
 import spring.webmvc.presentation.exception.handler.AuthenticationExceptionHandler
-import spring.webmvc.presentation.exception.handler.ExceptionHandlerFilter
+import spring.webmvc.presentation.exception.handler.JwtExceptionHandler
 
 @EnableMethodSecurity
 @Configuration(proxyBeanMethods = false)
@@ -26,7 +26,7 @@ class SecurityConfig {
         authenticationExceptionHandler: AuthenticationExceptionHandler,
         accessDeniedExceptionHandler: AccessDeniedExceptionHandler,
         jwtAuthenticationFilter: JwtAuthenticationFilter,
-        exceptionHandlerFilter: ExceptionHandlerFilter
+        jwtExceptionHandler: JwtExceptionHandler
     ): SecurityFilterChain = httpSecurity
         .csrf { it.disable() }
         .anonymous { it.disable() }
@@ -41,7 +41,7 @@ class SecurityConfig {
         .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         .cors { it.configurationSource(createCorsConfig(corsProperties)) }
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-        .addFilterBefore(exceptionHandlerFilter, jwtAuthenticationFilter.javaClass)
+        .addFilterBefore(jwtExceptionHandler, jwtAuthenticationFilter.javaClass)
         .build()
 
     private fun createCorsConfig(corsProperties: CorsProperties): CorsConfigurationSource {

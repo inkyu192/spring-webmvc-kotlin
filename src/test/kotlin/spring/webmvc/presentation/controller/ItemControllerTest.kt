@@ -55,8 +55,6 @@ class ItemControllerTest(
             .build()
     }
 
-    private val authorization = "Bearer access-token"
-
     @Test
     fun saveItem() {
         val request = ItemSaveRequest("상품명", "설명", 1000, 5, Category.ROLE_BOOK)
@@ -68,7 +66,7 @@ class ItemControllerTest(
             RestDocumentationRequestBuilders.post("/items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
-                .header("Authorization", authorization)
+                .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isCreated)
             .andDo(
@@ -105,7 +103,7 @@ class ItemControllerTest(
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/items/{id}", requestId)
-                .header("Authorization", authorization)
+                .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andDo(
@@ -145,7 +143,7 @@ class ItemControllerTest(
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/items")
-                .header("Authorization", authorization)
+                .header("Authorization", "Bearer accessToken")
                 .param("page", "0")
                 .param("size", "10")
                 .param("name", name)
@@ -210,7 +208,7 @@ class ItemControllerTest(
         mockMvc.perform(
             RestDocumentationRequestBuilders.put("/items/{id}", requestId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", authorization)
+                .header("Authorization", "Bearer accessToken")
                 .content(objectMapper.writeValueAsString(request))
         )
             .andExpect(MockMvcResultMatchers.status().isOk)
@@ -250,7 +248,7 @@ class ItemControllerTest(
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/items/{id}", requestId)
-                .header("Authorization", authorization)
+                .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent)
             .andDo(

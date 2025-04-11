@@ -34,7 +34,7 @@ class OrderController(
     @PreAuthorize("isAuthenticated()")
     fun findOrder(@PathVariable id: Long) = orderService.findOrder(id)
 
-    @PostMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @RequestLock
     fun cancelOrder(@PathVariable id: Long) = orderService.cancelOrder(id)

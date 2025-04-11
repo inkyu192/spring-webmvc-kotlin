@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.exception
+package spring.webmvc.exception
 
 import io.jsonwebtoken.JwtException
 import io.kotest.core.spec.style.DescribeSpec
@@ -10,13 +10,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
+import spring.webmvc.infrastructure.util.ProblemDetailUtil
 import spring.webmvc.infrastructure.util.ResponseWriter
-import spring.webmvc.presentation.exception.handler.ExceptionHandlerFilter
+import spring.webmvc.presentation.exception.handler.JwtExceptionHandler
+import java.net.URI
 
-class ExceptionHandlerFilterTest : DescribeSpec({
+class JwtExceptionHandlerTest : DescribeSpec({
     val filterChain = mockk<FilterChain>(relaxed = true)
+    val problemDetailUtil = mockk<ProblemDetailUtil>()
     val responseWriter = mockk<ResponseWriter>(relaxed = true)
-    val exceptionHandlerFilter = ExceptionHandlerFilter(responseWriter)
+    val jwtExceptionHandler = JwtExceptionHandler(problemDetailUtil, responseWriter)
     lateinit var request: MockHttpServletRequest
     lateinit var response: MockHttpServletResponse
 
@@ -30,12 +33,17 @@ class ExceptionHandlerFilterTest : DescribeSpec({
             it("UNAUTHORIZED 반환한다") {
                 val status = HttpStatus.UNAUTHORIZED
                 val message = "JwtException"
+                val uri = URI.create("uri")
 
                 every { filterChain.doFilter(request, response) } throws JwtException(message)
+                every { problemDetailUtil.createType(status) } returns uri
 
-                exceptionHandlerFilter.doFilter(request, response, filterChain)
+                val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
+                problemDetail.type = uri
 
-                verify { responseWriter.writeResponse(ProblemDetail.forStatusAndDetail(status, message)) }
+                jwtExceptionHandler.doFilter(request, response, filterChain)
+
+                verify { responseWriter.writeResponse(problemDetail) }
             }
         }
 
@@ -43,12 +51,17 @@ class ExceptionHandlerFilterTest : DescribeSpec({
             it("INTERNAL_SERVER_ERROR 반환한다") {
                 val status = HttpStatus.INTERNAL_SERVER_ERROR
                 val message = "RuntimeException"
+                val uri = URI.create("uri")
 
                 every { filterChain.doFilter(request, response) } throws RuntimeException(message)
+                every { problemDetailUtil.createType(status) } returns uri
 
-                exceptionHandlerFilter.doFilter(request, response, filterChain)
+                val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
+                problemDetail.type = uri
 
-                verify { responseWriter.writeResponse(ProblemDetail.forStatusAndDetail(status, message)) }
+                jwtExceptionHandler.doFilter(request, response, filterChain)
+
+                verify { responseWriter.writeResponse(problemDetail) }
             }
         }
     }

@@ -8,11 +8,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import spring.webmvc.infrastructure.util.ProblemDetailUtil
 import spring.webmvc.infrastructure.util.ResponseWriter
 
 @Component
-class ExceptionHandlerFilter(
-    private val responseWriter: ResponseWriter
+class JwtExceptionHandler(
+    private val problemDetailUtil: ProblemDetailUtil,
+    private val responseWriter: ResponseWriter,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -30,6 +32,10 @@ class ExceptionHandlerFilter(
     }
 
     private fun handleException(status: HttpStatus, message: String?) {
-        responseWriter.writeResponse(ProblemDetail.forStatusAndDetail(status, message))
+        val problemDetail = ProblemDetail.forStatusAndDetail(status, message).apply {
+            type = problemDetailUtil.createType(status)
+        }
+
+        responseWriter.writeResponse(problemDetail)
     }
 }
