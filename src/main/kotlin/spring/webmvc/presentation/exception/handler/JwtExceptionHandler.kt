@@ -24,9 +24,15 @@ class JwtExceptionHandler(
         runCatching { filterChain.doFilter(request, response) }
             .onFailure { throwable ->
                 when (throwable) {
-                    is JwtException -> handleException(HttpStatus.UNAUTHORIZED, throwable.message)
+                    is JwtException -> handleException(
+                        status = HttpStatus.UNAUTHORIZED,
+                        message = throwable.message,
+                    )
 
-                    is Exception -> handleException(HttpStatus.INTERNAL_SERVER_ERROR, throwable.message)
+                    is Exception -> handleException(
+                        status = HttpStatus.INTERNAL_SERVER_ERROR,
+                        message = throwable.message,
+                    )
                 }
             }
     }

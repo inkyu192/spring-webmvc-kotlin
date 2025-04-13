@@ -11,7 +11,7 @@ import java.util.*
 
 @Component
 class JwtTokenProvider(
-    @Value("\${jwt.access-token.key}") accessTokenKey: String,
+    @Value("\${jwt.access-token.key}")accessTokenKey: String,
     @Value("\${jwt.access-token.expiration-duration}") accessTokenExpirationDuration: Duration,
     @Value("\${jwt.refresh-token.key}") refreshTokenKey: String,
     @Value("\${jwt.refresh-token.expiration-duration}") refreshTokenExpirationDuration: Duration,

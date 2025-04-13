@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets
 @Component
 class ResponseWriter(
     private val objectMapper: ObjectMapper,
-    private val response: HttpServletResponse
+    private val response: HttpServletResponse,
 ) {
     fun writeResponse(problemDetail: ProblemDetail) {
         response.status = problemDetail.status

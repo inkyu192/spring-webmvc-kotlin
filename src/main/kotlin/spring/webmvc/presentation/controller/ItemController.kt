@@ -24,7 +24,7 @@ class ItemController(
     @GetMapping
     @PreAuthorize("hasAuthority('ITEM_READER')")
     fun findItems(@PageableDefault pageable: Pageable, @RequestParam(required = false) name: String?) =
-        itemService.findItems(pageable, name)
+        itemService.findItems(pageable = pageable, name = name)
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ITEM_READER')")
@@ -36,7 +36,7 @@ class ItemController(
         @PathVariable id: Long,
         @RequestBody @Validated itemSaveRequest: ItemSaveRequest
     ): ResponseEntity<ItemResponse> {
-        val (isNew, itemResponse) = itemService.putItem(id, itemSaveRequest)
+        val (isNew, itemResponse) = itemService.putItem(id = id, itemSaveRequest = itemSaveRequest)
         val status = if (isNew) HttpStatus.CREATED else HttpStatus.OK
 
         return ResponseEntity.status(status).body(itemResponse)

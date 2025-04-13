@@ -15,13 +15,13 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 @Transactional(readOnly = true)
 class RoleService(
     private val roleRepository: RoleRepository,
-    private val permissionRepository: PermissionRepository
+    private val permissionRepository: PermissionRepository,
 ) {
     @Transactional
     fun saveRole(roleSaveRequest: RoleSaveRequest): RoleResponse {
         val rolePermissions = roleSaveRequest.permissionIds.map {
             val permission = permissionRepository.findByIdOrNull(it)
-                ?: throw EntityNotFoundException(Permission::class.java, it)
+                ?: throw EntityNotFoundException(clazz = Permission::class.java, id = it)
 
             RolePermission.create(permission)
         }
@@ -33,6 +33,6 @@ class RoleService(
             )
         )
 
-        return RoleResponse(role, role.rolePermissions.map { it.permission })
+        return RoleResponse(role = role, permissions = role.rolePermissions.map { it.permission })
     }
 }

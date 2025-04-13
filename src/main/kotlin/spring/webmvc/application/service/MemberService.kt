@@ -28,19 +28,19 @@ class MemberService(
     @Transactional
     fun saveMember(memberSaveRequest: MemberSaveRequest): MemberResponse {
         if (memberRepository.existsByAccount(memberSaveRequest.account)) {
-            throw DuplicateEntityException(Member::class.java, memberSaveRequest.account)
+            throw DuplicateEntityException(clazz = Member::class.java, name = memberSaveRequest.account)
         }
 
         val memberRoles = memberSaveRequest.roleIds.map {
             val role = roleRepository.findByIdOrNull(it)
-                ?: throw EntityNotFoundException(Role::class.java, it)
+                ?: throw EntityNotFoundException(clazz = Role::class.java, id = it)
 
             MemberRole.create(role)
         }
 
         val memberPermissions = memberSaveRequest.permissionIds.map {
             val permission = permissionRepository.findByIdOrNull(it)
-                ?: throw EntityNotFoundException(Permission::class.java, it)
+                ?: throw EntityNotFoundException(clazz = Permission::class.java, id = it)
 
             MemberPermission.create(permission)
         }
@@ -59,10 +59,10 @@ class MemberService(
 
         eventPublisher.publishEvent(
             NotificationEvent(
-                checkNotNull(member.id),
-                "회원가입 완료",
-                "회원가입을 환영합니다!",
-                "/test/123"
+                memberId = checkNotNull(member.id),
+                title = "회원가입 완료",
+                message = "회원가입을 환영합니다!",
+                url = "/test/123"
             )
         )
 
@@ -72,7 +72,7 @@ class MemberService(
     fun findMember(): MemberResponse {
         val memberId = SecurityContextUtil.getMemberId()
         val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(Member::class.java, memberId)
+            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
         return MemberResponse(member)
     }
@@ -81,7 +81,7 @@ class MemberService(
     fun updateMember(memberUpdateRequest: MemberUpdateRequest): MemberResponse {
         val memberId = SecurityContextUtil.getMemberId()
         val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(Member::class.java, memberId)
+            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
         member.update(
             password = passwordEncoder.encode(memberUpdateRequest.password),
@@ -97,7 +97,7 @@ class MemberService(
     fun deleteMember() {
         val memberId = SecurityContextUtil.getMemberId()
         val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(Member::class.java, memberId)
+            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
         memberRepository.delete(member)
     }

@@ -9,6 +9,6 @@ class RequestLockRepositoryAdapter(
     private val redisRepository: RequestLockRedisRepository
 ) : RequestLockRepository {
     override fun setIfAbsent(memberId: Long, method: String, uri: String): Boolean {
-        return redisRepository.setIfAbsent(memberId, method, uri)
+        return redisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri)
     }
 }

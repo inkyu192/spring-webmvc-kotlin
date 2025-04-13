@@ -16,7 +16,7 @@ class OrderRepositoryAdapter(
     private val querydslRepository: OrderQuerydslRepository,
 ) : OrderRepository {
     override fun findAll(pageable: Pageable, memberId: Long?, orderStatus: OrderStatus?) =
-        querydslRepository.findAll(pageable, memberId, orderStatus)
+        querydslRepository.findAll(pageable = pageable, memberId = memberId, orderStatus = orderStatus)
 
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 

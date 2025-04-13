@@ -52,7 +52,7 @@ class AuthService(
         jwtTokenProvider.parseRefreshToken(tokenRequest.refreshToken)
 
         val member = memberRepository.findByIdOrNull(requestMemberId)
-            ?: throw EntityNotFoundException(Member::class.java, requestMemberId)
+            ?: throw EntityNotFoundException(clazz = Member::class.java, id = requestMemberId)
 
         val token = tokenRepository.findByMemberIdOrNull(requestMemberId)
             ?.takeIf { tokenRequest.refreshToken == it }

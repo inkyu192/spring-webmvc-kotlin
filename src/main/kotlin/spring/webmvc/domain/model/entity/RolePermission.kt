@@ -20,7 +20,7 @@ class RolePermission protected constructor(
         protected set
 
     companion object {
-        fun create(permission: Permission) = RolePermission(permission = permission)
+        fun create(permission: Permission) = RolePermission( permission)
     }
 
     fun associateRole(role: Role) {

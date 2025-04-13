@@ -27,13 +27,13 @@ class OrderService(
         val (memberId, city, street, zipcode, requestOrderItems) = orderSaveRequest
 
         val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(Member::class.java, memberId)
+            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
         val orderItems = requestOrderItems.map { orderItem ->
             val item = itemRepository.findByIdOrNull(orderItem.itemId)
-                ?: throw EntityNotFoundException(OrderItem::class.java, orderItem.itemId)
+                ?: throw EntityNotFoundException(clazz = OrderItem::class.java, id = orderItem.itemId)
 
-            OrderItem.create(item, orderItem.count)
+            OrderItem.create(item = item, count = orderItem.count)
         }
 
         val order = orderRepository.save(
@@ -47,17 +47,17 @@ class OrderService(
     }
 
     fun findOrders(
+        pageable: Pageable,
         memberId: Long?,
         orderStatus: OrderStatus?,
-        pageable: Pageable
     ): Page<OrderResponse> {
-        return orderRepository.findAll(pageable, memberId, orderStatus)
+        return orderRepository.findAll(pageable = pageable, memberId = memberId, orderStatus = orderStatus)
             .map(::OrderResponse)
     }
 
     fun findOrder(id: Long): OrderResponse {
         val order = orderRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(Order::class.java, id)
+            ?: throw EntityNotFoundException(clazz = Order::class.java, id = id)
 
         return OrderResponse(order)
     }
@@ -65,7 +65,7 @@ class OrderService(
     @Transactional
     fun cancelOrder(id: Long): OrderResponse {
         val order = orderRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(Order::class.java, id)
+            ?: throw EntityNotFoundException(clazz = Order::class.java, id = id)
 
         order.cancel()
 

@@ -58,7 +58,11 @@ class Item protected constructor(
         val differenceQuantity = this.quantity - quantity
 
         if (differenceQuantity < 0) {
-            throw InsufficientQuantityException(name, quantity, this.quantity)
+            throw InsufficientQuantityException(
+                productName = name,
+                requestedQuantity = quantity,
+                availableStock = this.quantity,
+            )
         }
 
         this.quantity = differenceQuantity

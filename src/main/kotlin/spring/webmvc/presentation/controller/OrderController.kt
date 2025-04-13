@@ -28,7 +28,7 @@ class OrderController(
         @PageableDefault pageable: Pageable,
         @RequestParam(required = false) memberId: Long?,
         @RequestParam(required = false) orderStatus: OrderStatus?,
-    ) = orderService.findOrders(memberId, orderStatus, pageable)
+    ) = orderService.findOrders(pageable = pageable, memberId = memberId, orderStatus = orderStatus)
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
