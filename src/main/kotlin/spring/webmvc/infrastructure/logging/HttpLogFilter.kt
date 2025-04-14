@@ -44,7 +44,12 @@ class HttpLogFilter: OncePerRequestFilter() {
         filterChain.doFilter(requestWrapper, responseWrapper)
         val endTime = System.currentTimeMillis()
 
-        val httpLog = HttpLog(transactionId, requestWrapper, responseWrapper, (endTime - startTime) / 1000.0)
+        val httpLog = HttpLog(
+            transactionId = transactionId,
+            requestWrapper = requestWrapper,
+            responseWrapper = responseWrapper,
+            elapsedTime = (endTime - startTime) / 1000.0
+        )
         httpLog.log()
 
         responseWrapper.copyBodyToResponse()

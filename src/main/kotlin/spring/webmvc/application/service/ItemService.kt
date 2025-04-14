@@ -30,10 +30,10 @@ class ItemService(
     }
 
     fun findItems(pageable: Pageable, name: String?) =
-        itemRepository.findAll(pageable, name).map { ItemResponse(it) }
+        itemRepository.findAll(pageable = pageable, name = name).map { ItemResponse(it) }
 
     fun findItem(id: Long): ItemResponse {
-        val item = itemRepository.findByIdOrNull(id) ?: throw EntityNotFoundException(Item::class.java, id)
+        val item = itemRepository.findByIdOrNull(id) ?: throw EntityNotFoundException(clazz = Item::class.java, id = id)
 
         return ItemResponse(item)
     }
@@ -41,7 +41,7 @@ class ItemService(
     @Transactional
     fun putItem(id: Long, itemSaveRequest: ItemSaveRequest) =
         itemRepository.findByIdOrNull(id)
-            ?.let { false to updateItem(it, itemSaveRequest) }
+            ?.let { false to updateItem(item = it, itemSaveRequest = itemSaveRequest) }
             ?: (true to saveItem(itemSaveRequest))
 
     private fun updateItem(item: Item, itemSaveRequest: ItemSaveRequest): ItemResponse {
@@ -58,7 +58,7 @@ class ItemService(
 
     @Transactional
     fun deleteItem(id: Long) {
-        val item = itemRepository.findByIdOrNull(id) ?: throw EntityNotFoundException(Item::class.java, id)
+        val item = itemRepository.findByIdOrNull(id) ?: throw EntityNotFoundException(clazz = Item::class.java, id = id)
 
         itemRepository.delete(item)
     }

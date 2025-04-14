@@ -24,7 +24,7 @@ class Role protected constructor(
 
     companion object {
         fun create(name: String, rolePermission: List<RolePermission>) =
-            Role(name = name).apply { rolePermission.forEach { associatePermission(it) } }
+            Role(name).apply { rolePermission.forEach { associatePermission(it) } }
     }
 
     fun associatePermission(rolePermission: RolePermission) {

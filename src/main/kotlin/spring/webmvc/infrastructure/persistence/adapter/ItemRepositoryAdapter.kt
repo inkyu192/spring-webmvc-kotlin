@@ -13,8 +13,8 @@ class ItemRepositoryAdapter(
     private val jpaRepository: ItemJpaRepository,
     private val querydslRepository: ItemQuerydslRepository,
 ) : ItemRepository {
-
-    override fun findAll(pageable: Pageable, name: String?) = querydslRepository.findAll(pageable, name)
+    override fun findAll(pageable: Pageable, name: String?) =
+        querydslRepository.findAll(pageable = pageable, name = name)
 
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 

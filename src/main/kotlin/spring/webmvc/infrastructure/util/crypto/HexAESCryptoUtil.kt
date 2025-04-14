@@ -12,13 +12,13 @@ import javax.crypto.spec.SecretKeySpec
 @Component
 class HexAESCryptoUtil(
     @Value("\${crypto.secret-key}")
-    private val SECRET_KEY: String,
+    private val secretKey: String,
     @Value("\${crypto.iv-parameter}")
-    private val IV_PARAMETER: String,
+    private val ivParameter: String,
 ) : CryptoUtil {
     override fun encrypt(plainText: String): String = runCatching {
-        val secretKeySpec = SecretKeySpec(SECRET_KEY.toByteArray(StandardCharsets.UTF_8), "AES")
-        val ivParameterSpec = IvParameterSpec(IV_PARAMETER.toByteArray(StandardCharsets.UTF_8))
+        val secretKeySpec = SecretKeySpec(secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
+        val ivParameterSpec = IvParameterSpec(ivParameter.toByteArray(StandardCharsets.UTF_8))
 
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
             .apply { init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec) }
@@ -29,8 +29,8 @@ class HexAESCryptoUtil(
     }.getOrElse { throw RuntimeException(it) }
 
     override fun decrypt(encryptedText: String): String = runCatching {
-        val secretKeySpec = SecretKeySpec(SECRET_KEY.toByteArray(StandardCharsets.UTF_8), "AES")
-        val ivParameterSpec = IvParameterSpec(IV_PARAMETER.toByteArray(StandardCharsets.UTF_8))
+        val secretKeySpec = SecretKeySpec(secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
+        val ivParameterSpec = IvParameterSpec(ivParameter.toByteArray(StandardCharsets.UTF_8))
 
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
             .apply { init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec) }

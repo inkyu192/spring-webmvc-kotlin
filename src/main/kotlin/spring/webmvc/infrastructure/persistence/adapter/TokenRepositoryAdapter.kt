@@ -10,5 +10,5 @@ class TokenRepositoryAdapter(
 ) : TokenRepository {
     override fun findByMemberIdOrNull(memberId: Long) = redisRepository.findByMemberIdOrNull(memberId)
 
-    override fun save(memberId: Long, token: String) = redisRepository.save(memberId, token)
+    override fun save(memberId: Long, token: String) = redisRepository.save(memberId = memberId, token = token)
 }

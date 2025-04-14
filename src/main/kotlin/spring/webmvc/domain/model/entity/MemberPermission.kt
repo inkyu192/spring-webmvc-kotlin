@@ -20,7 +20,7 @@ class MemberPermission protected constructor(
         protected set
 
     companion object {
-        fun create(permission: Permission) = MemberPermission(permission = permission)
+        fun create(permission: Permission) = MemberPermission(permission)
     }
 
     fun associateMember(member: Member) {

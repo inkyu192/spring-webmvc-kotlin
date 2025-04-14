@@ -34,7 +34,7 @@ class RequestLockAspect(
         val method = httpServletRequest.method
         val memberId = SecurityContextUtil.getMemberId()
 
-        requestLockService.validate(memberId, method, uri)
+        requestLockService.validate(memberId = memberId, method = method, uri = uri)
 
         return joinPoint.proceed()
     }

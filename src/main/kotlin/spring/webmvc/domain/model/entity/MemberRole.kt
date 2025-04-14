@@ -20,7 +20,7 @@ class MemberRole protected constructor(
         protected set
 
     companion object {
-        fun create(role: Role) = MemberRole(role = role)
+        fun create(role: Role) = MemberRole(role)
     }
 
     fun associateMember(member: Member) {
