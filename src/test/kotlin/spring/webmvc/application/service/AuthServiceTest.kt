@@ -23,10 +23,15 @@ class AuthServiceTest : DescribeSpec({
     val tokenRepository = mockk<TokenRepository>()
     val memberRepository = mockk<MemberRepository>()
     val passwordEncoder = mockk<PasswordEncoder>()
-    val authService = AuthService(jwtTokenProvider, tokenRepository, memberRepository, passwordEncoder)
+    val authService = AuthService(
+        jwtTokenProvider = jwtTokenProvider,
+        tokenRepository = tokenRepository,
+        memberRepository = memberRepository,
+        passwordEncoder = passwordEncoder
+    )
 
     describe("login 은") {
-        val request = MemberLoginRequest("account", "password")
+        val request = MemberLoginRequest(account = "account", password = "password")
 
         context("계정이 존재하지 않을 경우") {
             it("BadCredentialsException 던진다") {
@@ -56,13 +61,13 @@ class AuthServiceTest : DescribeSpec({
 
                 every { memberRepository.findByAccount(any()) } returns member
                 every { passwordEncoder.matches(any(), any()) } returns true
-                every { jwtTokenProvider.createAccessToken(any(), any()) } returns accessToken
+                every { jwtTokenProvider.createAccessToken(memberId = any(), permissions = any()) } returns accessToken
                 every { jwtTokenProvider.createRefreshToken() } returns refreshToken
-                every { tokenRepository.save(any(), any()) } returns refreshToken
+                every { tokenRepository.save(memberId = any(), token = any()) } returns refreshToken
 
                 val response = authService.login(request)
 
-                verify(exactly = 1) { tokenRepository.save(any(), any()) }
+                verify(exactly = 1) { tokenRepository.save(memberId = any(), token = any()) }
                 response.accessToken shouldBe accessToken
                 response.refreshToken shouldBe refreshToken
             }
@@ -122,7 +127,12 @@ class AuthServiceTest : DescribeSpec({
                 every { claims["memberId"] } returns memberId
                 every { tokenRepository.findByMemberIdOrNull(memberId) } returns token
                 every { memberRepository.findByIdOrNull(memberId) } returns member
-                every { jwtTokenProvider.createAccessToken(any(), any()) } returns "newAccessToken"
+                every {
+                    jwtTokenProvider.createAccessToken(
+                        memberId = any(),
+                        permissions = any()
+                    )
+                } returns "newAccessToken"
 
                 val response = authService.refreshToken(request)
 

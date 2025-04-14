@@ -19,7 +19,10 @@ class JwtExceptionHandlerTest : DescribeSpec({
     val filterChain = mockk<FilterChain>(relaxed = true)
     val problemDetailUtil = mockk<ProblemDetailUtil>()
     val responseWriter = mockk<ResponseWriter>(relaxed = true)
-    val jwtExceptionHandler = JwtExceptionHandler(problemDetailUtil, responseWriter)
+    val jwtExceptionHandler = JwtExceptionHandler(
+        problemDetailUtil = problemDetailUtil,
+        responseWriter = responseWriter
+    )
     lateinit var request: MockHttpServletRequest
     lateinit var response: MockHttpServletResponse
 

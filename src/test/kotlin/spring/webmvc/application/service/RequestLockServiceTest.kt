@@ -19,19 +19,43 @@ class RequestLockServiceTest : DescribeSpec({
 
         context("데이터가 없을 경우") {
             it("저장한다") {
-                every { requestLockRepository.setIfAbsent(memberId, method, uri) } returns true
+                every {
+                    requestLockRepository.setIfAbsent(
+                        memberId = memberId,
+                        method = method,
+                        uri = uri
+                    )
+                } returns true
 
-                requestLockService.validate(memberId, method, uri)
+                requestLockService.validate(memberId = memberId, method = method, uri = uri)
 
-                verify(exactly = 1) { requestLockRepository.setIfAbsent(memberId, method, uri) }
+                verify(exactly = 1) {
+                    requestLockRepository.setIfAbsent(
+                        memberId = memberId,
+                        method = method,
+                        uri = uri
+                    )
+                }
             }
         }
 
         context("데이터가 있을 경우") {
             it("DuplicateRequestException 던진다") {
-                every { requestLockRepository.setIfAbsent(memberId, method, uri) } returns false
+                every {
+                    requestLockRepository.setIfAbsent(
+                        memberId = memberId,
+                        method = method,
+                        uri = uri
+                    )
+                } returns false
 
-                shouldThrow<DuplicateRequestException> { requestLockService.validate(memberId, method, uri) }
+                shouldThrow<DuplicateRequestException> {
+                    requestLockService.validate(
+                        memberId = memberId,
+                        method = method,
+                        uri = uri
+                    )
+                }
             }
         }
     }

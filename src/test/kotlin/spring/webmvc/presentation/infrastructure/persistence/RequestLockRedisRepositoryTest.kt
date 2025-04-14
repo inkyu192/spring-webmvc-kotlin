@@ -19,9 +19,9 @@ class RequestLockRedisRepositoryTest(
 
         context("기존 데이터가 있을 경우") {
             it("저장하지 않는다") {
-                requestLockRedisRepository.setIfAbsent(memberId, method, uri)
+                requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri)
 
-                requestLockRedisRepository.setIfAbsent(memberId, method, uri).apply {
+                requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri).apply {
                     this shouldBe false
                 }
             }
@@ -29,11 +29,11 @@ class RequestLockRedisRepositoryTest(
 
         context("기존 데이터가 없을 경우") {
             it("저장한다") {
-                requestLockRedisRepository.setIfAbsent(memberId, method, uri)
+                requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri)
 
                 Thread.sleep(1000)
 
-                requestLockRedisRepository.setIfAbsent(memberId, method, uri).apply {
+                requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri).apply {
                     this shouldBe true
                 }
             }

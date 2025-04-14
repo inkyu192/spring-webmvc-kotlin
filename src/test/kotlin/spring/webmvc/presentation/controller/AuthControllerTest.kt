@@ -52,8 +52,8 @@ class AuthControllerTest(
 
     @Test
     fun login() {
-        val request = MemberLoginRequest("test@gmail.com", "password")
-        val response = TokenResponse("accessToken", "refreshToken")
+        val request = MemberLoginRequest(account = "test@gmail.com", password = "password")
+        val response = TokenResponse(accessToken = "accessToken", refreshToken = "refreshToken")
 
         Mockito.`when`(authService.login(request)).thenReturn(response)
 
@@ -80,8 +80,8 @@ class AuthControllerTest(
 
     @Test
     fun refreshToken() {
-        val request = TokenRequest("oldAccessToken", "refreshToken")
-        val response = TokenResponse("newAccessToken", "refreshToken")
+        val request = TokenRequest(accessToken = "oldAccessToken", refreshToken = "refreshToken")
+        val response = TokenResponse(accessToken = "newAccessToken", refreshToken = "refreshToken")
 
         Mockito.`when`(authService.refreshToken(request)).thenReturn(response)
 

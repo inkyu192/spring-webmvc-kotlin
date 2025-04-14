@@ -1,6 +1,5 @@
 package spring.webmvc.infrastructure.util.crypto
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -10,17 +9,14 @@ import javax.crypto.spec.SecretKeySpec
 
 @Component
 class Base64AESCryptoUtil(
-    @Value("\${crypto.secret-key}")
-    private val secretKey: String,
-    @Value("\${crypto.iv-parameter}")
-    private val ivParameter: String,
+    cryptoProperties: CryptoProperties,
 ) : CryptoUtil {
-    override fun encrypt(plainText: String): String = runCatching {
-        val secretKeySpec = SecretKeySpec(secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
-        val ivParameterSpec = IvParameterSpec(ivParameter.toByteArray(StandardCharsets.UTF_8))
+    private val secretKey = SecretKeySpec(cryptoProperties.secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
+    private val ivParameter = IvParameterSpec(cryptoProperties.ivParameter.toByteArray(StandardCharsets.UTF_8))
 
+    override fun encrypt(plainText: String): String = runCatching {
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-            .apply { init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec) }
+            .apply { init(Cipher.ENCRYPT_MODE, secretKey, ivParameter) }
 
         val encryptedBytes = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
 
@@ -28,11 +24,8 @@ class Base64AESCryptoUtil(
     }.getOrElse { throw RuntimeException(it) }
 
     override fun decrypt(encryptedText: String): String = runCatching {
-        val secretKeySpec = SecretKeySpec(secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
-        val ivParameterSpec = IvParameterSpec(ivParameter.toByteArray(StandardCharsets.UTF_8))
-
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-            .apply { init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec) }
+            .apply { init(Cipher.DECRYPT_MODE, secretKey, ivParameter) }
 
         val decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedText))
 

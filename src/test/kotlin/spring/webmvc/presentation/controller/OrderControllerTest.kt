@@ -63,19 +63,19 @@ class OrderControllerTest(
     @Throws(Exception::class)
     fun saveOrder() {
         val request = OrderSaveRequest(
-            1L,
-            "city",
-            "street",
-            "zipcode",
-            listOf(OrderItemSaveRequest(1L, 3))
+            memberId = 1L,
+            city = "city",
+            street = "street",
+            zipcode = "zipcode",
+            orderItems = listOf(OrderItemSaveRequest(1L, 3))
         )
 
         val response = OrderResponse(
-            1L,
-            "name",
-            Instant.now(),
-            OrderStatus.ORDER,
-            listOf(OrderItemResponse("name", 1000, 3))
+            id = 1L,
+            name = "name",
+            orderedAt = Instant.now(),
+            status = OrderStatus.ORDER,
+            orderItems = listOf(OrderItemResponse("name", 1000, 3))
         )
 
         Mockito.`when`(orderService.saveOrder(request)).thenReturn(response)
@@ -123,16 +123,17 @@ class OrderControllerTest(
 
         val response = listOf(
             OrderResponse(
-                1L,
-                "name",
-                Instant.now(),
-                OrderStatus.ORDER,
-                listOf(OrderItemResponse("name", 1000, 3))
+                id = 1L,
+                name = "name",
+                orderedAt = Instant.now(),
+                status = OrderStatus.ORDER,
+                orderItems = listOf(OrderItemResponse(itemName = "name", orderPrice = 1000, count = 3))
             )
         )
         val page: Page<OrderResponse> = PageImpl(response, pageable, response.size.toLong())
 
-        Mockito.`when`(orderService.findOrders(memberId, orderStatus, pageable)).thenReturn(page)
+        Mockito.`when`(orderService.findOrders(memberId = memberId, orderStatus = orderStatus, pageable = pageable))
+            .thenReturn(page)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders")
@@ -198,11 +199,11 @@ class OrderControllerTest(
         val requestId = 1L
 
         val response = OrderResponse(
-            1L,
-            "name",
-            Instant.now(),
-            OrderStatus.ORDER,
-            listOf(OrderItemResponse("name", 1000, 3))
+            id = 1L,
+            name = "name",
+            orderedAt = Instant.now(),
+            status = OrderStatus.ORDER,
+            orderItems = listOf(OrderItemResponse(itemName = "name", orderPrice = 1000, count = 3))
         )
 
         Mockito.`when`(orderService.findOrder(requestId)).thenReturn(response)
@@ -240,11 +241,11 @@ class OrderControllerTest(
         val requestId = 1L
 
         val response = OrderResponse(
-            1L,
-            "name",
-            Instant.now(),
-            OrderStatus.ORDER,
-            listOf(OrderItemResponse("name", 1000, 3))
+            id = 1L,
+            name = "name",
+            orderedAt = Instant.now(),
+            status = OrderStatus.ORDER,
+            orderItems = listOf(OrderItemResponse(itemName = "name", orderPrice = 1000, count = 3))
         )
 
         Mockito.`when`(orderService.cancelOrder(requestId)).thenReturn(response)

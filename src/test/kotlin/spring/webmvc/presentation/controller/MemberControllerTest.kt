@@ -57,21 +57,21 @@ class MemberControllerTest(
     @Test
     fun saveMember() {
         val request = MemberSaveRequest(
-            "test@gmail.com",
-            "password",
-            "name",
-            "010-1234-1234",
-            LocalDate.now(),
-            listOf(),
-            listOf(1L)
+            account = "test@gmail.com",
+            password = "password",
+            name = "name",
+            phone = "010-1234-1234",
+            birthDate = LocalDate.now(),
+            roleIds = listOf(),
+            permissionIds = listOf(1L)
         )
         val response = MemberResponse(
-            1L,
-            "test@gmail.com",
-            "name",
-            "010-1234-1234",
-            LocalDate.now(),
-            Instant.now()
+            id = 1L,
+            account = "test@gmail.com",
+            name = "name",
+            phone = "010-1234-1234",
+            birthDate = LocalDate.now(),
+            createdAt = Instant.now()
         )
 
         Mockito.`when`(memberService.saveMember(request)).thenReturn(response)
@@ -109,12 +109,12 @@ class MemberControllerTest(
     @Test
     fun findMember() {
         val response = MemberResponse(
-            1L,
-            "test@gmail.com",
-            "name",
-            "010-1234-1234",
-            LocalDate.now(),
-            Instant.now()
+            id = 1L,
+            account = "test@gmail.com",
+            name = "name",
+            phone = "010-1234-1234",
+            birthDate = LocalDate.now(),
+            createdAt = Instant.now()
         )
 
         Mockito.`when`(memberService.findMember()).thenReturn(response)
@@ -145,18 +145,18 @@ class MemberControllerTest(
     @Test
     fun updateMember() {
         val request = MemberUpdateRequest(
-            "password",
-            "name",
-            "010-1234-1234",
-            LocalDate.now()
+            password = "password",
+            name = "name",
+            phone = "010-1234-1234",
+            birthDate = LocalDate.now()
         )
         val response = MemberResponse(
-            1L,
-            "test@gmail.com",
-            "name",
-            "010-1234-1234",
-            LocalDate.now(),
-            Instant.now()
+            id = 1L,
+            account = "test@gmail.com",
+            name = "name",
+            phone = "010-1234-1234",
+            birthDate = LocalDate.now(),
+            createdAt = Instant.now()
         )
 
         Mockito.`when`(memberService.updateMember(request)).thenReturn(response)

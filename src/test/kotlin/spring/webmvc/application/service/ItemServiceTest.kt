@@ -86,9 +86,9 @@ class ItemServiceTest : DescribeSpec({
             )
             val page = PageImpl(items, pageable, items.size.toLong())
 
-            every { itemRepository.findAll(pageable, requestName) } returns page
+            every { itemRepository.findAll(pageable = pageable, name = requestName) } returns page
 
-            itemService.findItems(pageable, requestName).apply {
+            itemService.findItems(pageable = pageable, name = requestName).apply {
                 totalElements shouldBe items.size
                 map { it.id }.toList() shouldBe listOf(1L, 2L, 3L)
             }
@@ -154,7 +154,7 @@ class ItemServiceTest : DescribeSpec({
                 every { itemRepository.findByIdOrNull(itemId) } returns null
                 every { itemRepository.save(any()) } returns item
 
-                itemService.putItem(itemId, request).apply {
+                itemService.putItem(id = itemId, itemSaveRequest = request).apply {
                     first shouldBe true
                     second.name shouldBe request.name
                     second.description shouldBe request.description
@@ -178,7 +178,7 @@ class ItemServiceTest : DescribeSpec({
 
                 every { itemRepository.findByIdOrNull(itemId) } returns item
 
-                itemService.putItem(itemId, request).apply {
+                itemService.putItem(id = itemId, itemSaveRequest = request).apply {
                     first shouldBe false
                     second.name shouldBe request.name
                     second.description shouldBe request.description

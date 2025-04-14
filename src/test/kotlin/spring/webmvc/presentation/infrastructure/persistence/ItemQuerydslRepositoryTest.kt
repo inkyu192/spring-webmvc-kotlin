@@ -24,18 +24,48 @@ class ItemQuerydslRepositoryTest(
     describe("findAll 은") {
         it("name 을 필털링하고 페이징 되어서 조회한다") {
             val request = listOf(
-                Item.create("이름1", "설명1", 150, 1, Category.ROLE_BOOK),
-                Item.create("이름2", "설명2", 160, 2, Category.ROLE_BOOK),
-                Item.create("이름3", "설명3", 170, 3, Category.ROLE_BOOK),
-                Item.create("이름4", "설명4", 180, 4, Category.ROLE_TICKET),
-                Item.create("이5", "설명5", 190, 5, Category.ROLE_TICKET)
+                Item.create(
+                    name = "이름1",
+                    description = "설명1",
+                    price = 150,
+                    quantity = 1,
+                    category = Category.ROLE_BOOK
+                ),
+                Item.create(
+                    name = "이름2",
+                    description = "설명2",
+                    price = 160,
+                    quantity = 2,
+                    category = Category.ROLE_BOOK
+                ),
+                Item.create(
+                    name = "이름3",
+                    description = "설명3",
+                    price = 170,
+                    quantity = 3,
+                    category = Category.ROLE_BOOK
+                ),
+                Item.create(
+                    name = "이름4",
+                    description = "설명4",
+                    price = 180,
+                    quantity = 4,
+                    category = Category.ROLE_TICKET
+                ),
+                Item.create(
+                    name = "이5",
+                    description = "설명5",
+                    price = 190,
+                    quantity = 5,
+                    category = Category.ROLE_TICKET
+                )
             )
             itemJpaRepository.saveAll(request)
 
             val pageable: Pageable = PageRequest.of(0, 3)
             val name = "이름"
 
-            itemQuerydslRepository.findAll(pageable, name).apply {
+            itemQuerydslRepository.findAll(pageable = pageable, name = name).apply {
                 number shouldBe pageable.pageNumber
                 size shouldBe pageable.pageSize
                 totalElements shouldBe request.filter { it.name.contains(name) }.size.toLong()

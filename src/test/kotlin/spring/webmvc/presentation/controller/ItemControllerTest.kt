@@ -57,8 +57,21 @@ class ItemControllerTest(
 
     @Test
     fun saveItem() {
-        val request = ItemSaveRequest("상품명", "설명", 1000, 5, Category.ROLE_BOOK)
-        val response = ItemResponse(1L, "상품명", "설명", 1000, 10, Instant.now())
+        val request = ItemSaveRequest(
+            name = "상품명",
+            description = "설명",
+            price = 1000,
+            quantity = 5,
+            category = Category.ROLE_BOOK
+        )
+        val response = ItemResponse(
+            id = 1L,
+            name = "상품명",
+            description = "설명",
+            price = 1000,
+            quantity = 10,
+            createdAt = Instant.now()
+        )
 
         Mockito.`when`(itemService.saveItem(request)).thenReturn(response)
 
@@ -97,7 +110,14 @@ class ItemControllerTest(
     @Test
     fun findItem() {
         val requestId = 1L
-        val response = ItemResponse(1L, "item1", "description", 1000, 10, Instant.now())
+        val response = ItemResponse(
+            id = 1L,
+            name = "item1",
+            description = "description",
+            price = 1000,
+            quantity = 10,
+            createdAt = Instant.now()
+        )
 
         Mockito.`when`(itemService.findItem(requestId)).thenReturn(response)
 
@@ -133,13 +153,34 @@ class ItemControllerTest(
         val name = "item"
 
         val response = listOf(
-            ItemResponse(1L, "item1", "description", 1000, 10, Instant.now()),
-            ItemResponse(2L, "item2", "description", 2000, 20, Instant.now()),
-            ItemResponse(3L, "item3", "description", 3000, 30, Instant.now())
+            ItemResponse(
+                id = 1L,
+                name = "item1",
+                description = "description",
+                price = 1000,
+                quantity = 10,
+                createdAt = Instant.now()
+            ),
+            ItemResponse(
+                id = 2L,
+                name = "item2",
+                description = "description",
+                price = 2000,
+                quantity = 20,
+                createdAt = Instant.now()
+            ),
+            ItemResponse(
+                id = 3L,
+                name = "item3",
+                description = "description",
+                price = 3000,
+                quantity = 30,
+                createdAt = Instant.now()
+            )
         )
         val page = PageImpl(response, pageable, response.size.toLong())
 
-        Mockito.`when`(itemService.findItems(pageable, name)).thenReturn(page)
+        Mockito.`when`(itemService.findItems(pageable = pageable, name = name)).thenReturn(page)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/items")
@@ -199,11 +240,23 @@ class ItemControllerTest(
     @Test
     fun updateItem() {
         val requestId = 1L
+        val request = ItemSaveRequest(
+            name = "상품명",
+            description = "설명",
+            price = 1000,
+            quantity = 5,
+            category = Category.ROLE_BOOK
+        )
+        val response = ItemResponse(
+            id = 1L,
+            name = "상품명",
+            description = "설명",
+            price = 1000,
+            quantity = 10,
+            createdAt = Instant.now()
+        )
 
-        val request = ItemSaveRequest("상품명", "설명", 1000, 5, Category.ROLE_BOOK)
-        val response = ItemResponse(1L, "상품명", "설명", 1000, 10, Instant.now())
-
-        Mockito.`when`(itemService.putItem(requestId, request)).thenReturn(Pair(false, response))
+        Mockito.`when`(itemService.putItem(id = requestId, itemSaveRequest = request)).thenReturn(Pair(false, response))
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.put("/items/{id}", requestId)
