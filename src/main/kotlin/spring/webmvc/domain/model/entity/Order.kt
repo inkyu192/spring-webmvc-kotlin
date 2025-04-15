@@ -35,17 +35,15 @@ class Order protected constructor(
         get() = _orderItems.toList()
 
     companion object {
-        fun create(member: Member, orderItems: List<OrderItem>) =
-            Order(
-                orderedAt = Instant.now(),
-                status = OrderStatus.ORDER,
-                member = member,
-            ).apply { orderItems.forEach { associateItem(it) } }
+        fun create(member: Member) = Order(
+            orderedAt = Instant.now(),
+            status = OrderStatus.ORDER,
+            member = member,
+        )
     }
 
-    fun associateItem(orderItem: OrderItem) {
-        _orderItems.add(orderItem)
-        orderItem.associateOrder(this)
+    fun addItem(item: Item, count: Int) {
+        _orderItems.add(OrderItem.create(order = this, item = item, count = count))
     }
 
     fun cancel() {

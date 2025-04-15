@@ -1,6 +1,5 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Role
 import spring.webmvc.domain.repository.RoleRepository
@@ -12,5 +11,5 @@ class RoleRepositoryAdapter(
 ) : RoleRepository {
     override fun save(role: Role) = jpaRepository.save(role)
 
-    override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
+    override fun findAllById(ids: Iterable<Long>): List<Role> = jpaRepository.findAllById(ids)
 }

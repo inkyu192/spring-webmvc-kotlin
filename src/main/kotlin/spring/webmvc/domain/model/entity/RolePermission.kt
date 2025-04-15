@@ -6,7 +6,11 @@ import jakarta.persistence.*
 class RolePermission protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "permission_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var permission: Permission,
+    val permission: Permission,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    val role: Role,
 ) {
     @Id
     @GeneratedValue
@@ -14,16 +18,7 @@ class RolePermission protected constructor(
     var id: Long? = null
         protected set
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var role: Role? = null
-        protected set
-
     companion object {
-        fun create(permission: Permission) = RolePermission( permission)
-    }
-
-    fun associateRole(role: Role) {
-        this.role = role
+        fun create(role: Role, permission: Permission) = RolePermission(role = role, permission = permission)
     }
 }

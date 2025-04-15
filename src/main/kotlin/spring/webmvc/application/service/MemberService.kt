@@ -31,31 +31,27 @@ class MemberService(
             throw DuplicateEntityException(clazz = Member::class.java, name = memberSaveRequest.account)
         }
 
-        val memberRoles = memberSaveRequest.roleIds.map {
-            val role = roleRepository.findByIdOrNull(it)
-                ?: throw EntityNotFoundException(clazz = Role::class.java, id = it)
-
-            MemberRole.create(role)
-        }
-
-        val memberPermissions = memberSaveRequest.permissionIds.map {
-            val permission = permissionRepository.findByIdOrNull(it)
-                ?: throw EntityNotFoundException(clazz = Permission::class.java, id = it)
-
-            MemberPermission.create(permission)
-        }
-
-        val member = memberRepository.save(
-            Member.create(
-                account = memberSaveRequest.account,
-                password = passwordEncoder.encode(memberSaveRequest.password),
-                name = memberSaveRequest.name,
-                phone = memberSaveRequest.phone,
-                birthDate = memberSaveRequest.birthDate,
-                memberRoles = memberRoles,
-                memberPermissions = memberPermissions
-            )
+        val member = Member.create(
+            account = memberSaveRequest.account,
+            password = passwordEncoder.encode(memberSaveRequest.password),
+            name = memberSaveRequest.name,
+            phone = memberSaveRequest.phone,
+            birthDate = memberSaveRequest.birthDate,
         )
+
+        val roleMap = roleRepository.findAllById(memberSaveRequest.roleIds).associateBy { it.id }
+        memberSaveRequest.roleIds.forEach {
+            val role = roleMap[it] ?: throw EntityNotFoundException(clazz = Role::class.java, id = it)
+            member.addRole(role)
+        }
+
+        val permissionMap = permissionRepository.findAllById(memberSaveRequest.permissionIds).associateBy { it.id }
+        memberSaveRequest.permissionIds.forEach {
+            val permission = permissionMap[it] ?: throw EntityNotFoundException(clazz = Permission::class.java, id = it)
+            member.addPermission(permission)
+        }
+
+        memberRepository.save(member)
 
         eventPublisher.publishEvent(
             NotificationEvent(

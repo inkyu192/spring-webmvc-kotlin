@@ -6,7 +6,11 @@ import jakarta.persistence.*
 class MemberRole protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var role: Role,
+    val role: Role,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    var member: Member,
 ) {
     @Id
     @GeneratedValue
@@ -14,16 +18,7 @@ class MemberRole protected constructor(
     var id: Long? = null
         protected set
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var member: Member? = null
-        protected set
-
     companion object {
-        fun create(role: Role) = MemberRole(role)
-    }
-
-    fun associateMember(member: Member) {
-        this.member = member
+        fun create(member: Member, role: Role) = MemberRole(member = member, role = role)
     }
 }

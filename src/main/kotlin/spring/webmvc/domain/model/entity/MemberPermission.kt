@@ -7,6 +7,10 @@ class MemberPermission protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "permission_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     var permission: Permission,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    var member: Member,
 ) {
     @Id
     @GeneratedValue
@@ -14,16 +18,7 @@ class MemberPermission protected constructor(
     var id: Long? = null
         protected set
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var member: Member? = null
-        protected set
-
     companion object {
-        fun create(permission: Permission) = MemberPermission(permission)
-    }
-
-    fun associateMember(member: Member) {
-        this.member = member
+        fun create(member: Member, permission: Permission) = MemberPermission(member = member, permission = permission)
     }
 }

@@ -18,6 +18,8 @@ class ItemRepositoryAdapter(
 
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 
+    override fun findAllById(ids: Iterable<Long>): List<Item> = jpaRepository.findAllById(ids)
+
     override fun save(item: Item) = jpaRepository.save(item)
 
     override fun saveAll(items: Iterable<Item>): List<Item> = jpaRepository.saveAll(items)

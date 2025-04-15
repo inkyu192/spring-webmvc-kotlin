@@ -54,28 +54,21 @@ class Member protected constructor(
             name: String,
             phone: String,
             birthDate: LocalDate,
-            memberRoles: List<MemberRole>,
-            memberPermissions: List<MemberPermission>
         ) = Member(
             account = account,
             password = password,
             name = name,
             phone = phone,
             birthDate = birthDate,
-        ).apply {
-            memberRoles.forEach { this.associateRole(it) }
-            memberPermissions.forEach { this.associatePermission(it) }
-        }
+        )
     }
 
-    fun associateRole(memberRole: MemberRole) {
-        _memberRoles.add(memberRole)
-        memberRole.associateMember(this)
+    fun addRole(role: Role) {
+        _memberRoles.add(MemberRole.create(member = this, role = role))
     }
 
-    fun associatePermission(memberPermission: MemberPermission) {
-        _memberPermissions.add(memberPermission)
-        memberPermission.associateMember(this)
+    fun addPermission(permission: Permission) {
+        _memberPermissions.add(MemberPermission.create(member = this, permission = permission))
     }
 
     fun update(password: String?, name: String?, phone: String?, birthDate: LocalDate?) {

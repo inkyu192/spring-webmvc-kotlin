@@ -11,6 +11,10 @@ class OrderItem protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     var item: Item,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    var order: Order,
 ) {
     @Id
     @GeneratedValue
@@ -18,22 +22,16 @@ class OrderItem protected constructor(
     var id: Long? = null
         protected set
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var order: Order? = null
-        protected set
-
     companion object {
-        fun create(item: Item, count: Int) =
+        fun create(order: Order, item: Item, count: Int) =
             OrderItem(
                 orderPrice = item.price,
                 count = count,
-                item = item
-            ).apply { item.removeQuantity(count) }
-    }
-
-    fun associateOrder(order: Order) {
-        this.order = order
+                item = item,
+                order = order
+            ).also {
+                item.removeQuantity(count)
+            }
     }
 
     fun cancel() {

@@ -24,24 +24,22 @@ class OrderService(
 ) {
     @Transactional
     fun saveOrder(orderSaveRequest: OrderSaveRequest): OrderResponse {
-        val (memberId, city, street, zipcode, requestOrderItems) = orderSaveRequest
+        val (memberId, city, street, zipcode, orderItems) = orderSaveRequest
 
         val member = memberRepository.findByIdOrNull(memberId)
             ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
-        val orderItems = requestOrderItems.map { orderItem ->
-            val item = itemRepository.findByIdOrNull(orderItem.itemId)
-                ?: throw EntityNotFoundException(clazz = OrderItem::class.java, id = orderItem.itemId)
+        val order = Order.create(member)
 
-            OrderItem.create(item = item, count = orderItem.count)
+        val itemMap = itemRepository.findAllById(orderItems.map { it.itemId }).associateBy { it.id }
+        orderItems.forEach {
+            val item = itemMap[it.itemId]
+                ?: throw EntityNotFoundException(clazz = OrderItem::class.java, id = it.itemId)
+
+            order.addItem(item = item, count = it.count)
         }
 
-        val order = orderRepository.save(
-            Order.create(
-                member = member,
-                orderItems = orderItems,
-            )
-        )
+        orderRepository.save(order)
 
         return OrderResponse(order)
     }

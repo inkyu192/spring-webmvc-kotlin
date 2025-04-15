@@ -23,12 +23,10 @@ class Role protected constructor(
         get() = _rolePermissions.toList()
 
     companion object {
-        fun create(name: String, rolePermission: List<RolePermission>) =
-            Role(name).apply { rolePermission.forEach { associatePermission(it) } }
+        fun create(name: String) = Role(name)
     }
 
-    fun associatePermission(rolePermission: RolePermission) {
-        _rolePermissions.add(rolePermission)
-        rolePermission.associateRole(this)
+    fun addPermission(permission: Permission) {
+        _rolePermissions.add(RolePermission.create(role = this, permission = permission))
     }
 }
