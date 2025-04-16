@@ -36,5 +36,5 @@ class ItemQuerydslRepository(
         return PageImpl(content, pageable, count)
     }
 
-    private fun likeName(name: String?) = name.takeIf { it.isNullOrBlank().not() }?.let { item.name.like("%$it%") }
+    private fun likeName(name: String?) = name.takeIf { !it.isNullOrBlank() }?.let { item.name.like("%$it%") }
 }

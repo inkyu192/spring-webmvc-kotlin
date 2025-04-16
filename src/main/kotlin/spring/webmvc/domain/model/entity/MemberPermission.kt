@@ -6,11 +6,11 @@ import jakarta.persistence.*
 class MemberPermission protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "permission_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var permission: Permission,
+    val permission: Permission,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var member: Member,
+    val member: Member,
 ) {
     @Id
     @GeneratedValue

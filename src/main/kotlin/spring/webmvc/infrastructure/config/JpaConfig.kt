@@ -12,7 +12,5 @@ import java.util.*
 class JpaConfig {
 
     @Bean
-    fun auditorProvider() = AuditorAware {
-        runCatching { Optional.of(SecurityContextUtil.getMemberId()) }.getOrDefault(Optional.empty())
-    }
+    fun auditorProvider() = AuditorAware { Optional.ofNullable(SecurityContextUtil.getMemberIdOrNull()) }
 }

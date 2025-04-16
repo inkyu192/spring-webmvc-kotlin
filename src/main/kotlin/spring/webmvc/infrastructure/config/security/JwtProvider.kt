@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class JwtTokenProvider(
+class JwtProvider(
     jwtProperties: JwtProperties,
 ) {
     private val accessTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.accessToken.key))

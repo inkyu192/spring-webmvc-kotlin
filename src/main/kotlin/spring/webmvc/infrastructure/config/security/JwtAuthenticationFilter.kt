@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthenticationFilter(
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtProvider: JwtProvider
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -34,7 +34,7 @@ class JwtAuthenticationFilter(
             ?.trim()
 
     private fun createAuthentication(token: String): Authentication {
-        val claims = jwtTokenProvider.parseAccessToken(token)
+        val claims = jwtProvider.parseAccessToken(token)
 
         val memberId = claims["memberId"].toString().toLong()
         val permissions = claims["permissions", List::class.java]

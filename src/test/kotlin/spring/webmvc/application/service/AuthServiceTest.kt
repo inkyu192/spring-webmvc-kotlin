@@ -14,17 +14,17 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.TokenRepository
-import spring.webmvc.infrastructure.config.security.JwtTokenProvider
+import spring.webmvc.infrastructure.config.security.JwtProvider
 import spring.webmvc.presentation.dto.request.MemberLoginRequest
 import spring.webmvc.presentation.dto.request.TokenRequest
 
 class AuthServiceTest : DescribeSpec({
-    val jwtTokenProvider = mockk<JwtTokenProvider>()
+    val jwtProvider = mockk<JwtProvider>()
     val tokenRepository = mockk<TokenRepository>()
     val memberRepository = mockk<MemberRepository>()
     val passwordEncoder = mockk<PasswordEncoder>()
     val authService = AuthService(
-        jwtTokenProvider = jwtTokenProvider,
+        jwtProvider = jwtProvider,
         tokenRepository = tokenRepository,
         memberRepository = memberRepository,
         passwordEncoder = passwordEncoder
@@ -61,8 +61,8 @@ class AuthServiceTest : DescribeSpec({
 
                 every { memberRepository.findByAccount(any()) } returns member
                 every { passwordEncoder.matches(any(), any()) } returns true
-                every { jwtTokenProvider.createAccessToken(memberId = any(), permissions = any()) } returns accessToken
-                every { jwtTokenProvider.createRefreshToken() } returns refreshToken
+                every { jwtProvider.createAccessToken(memberId = any(), permissions = any()) } returns accessToken
+                every { jwtProvider.createRefreshToken() } returns refreshToken
                 every { tokenRepository.save(memberId = any(), token = any()) } returns refreshToken
 
                 val response = authService.login(request)
@@ -79,7 +79,7 @@ class AuthServiceTest : DescribeSpec({
 
         context("Access 토큰이 유효하지 않을 경우") {
             it("JwtException 던진다") {
-                every { jwtTokenProvider.parseAccessToken(request.accessToken) } throws JwtException("invalid access token")
+                every { jwtProvider.parseAccessToken(request.accessToken) } throws JwtException("invalid access token")
 
                 shouldThrow<JwtException> { authService.refreshToken(request) }
             }
@@ -90,8 +90,8 @@ class AuthServiceTest : DescribeSpec({
                 val memberId = 1L
                 val claims = mockk<Claims>()
 
-                every { jwtTokenProvider.parseAccessToken(request.accessToken) } returns claims
-                every { jwtTokenProvider.parseRefreshToken(request.refreshToken) } throws JwtException("invalid refresh token")
+                every { jwtProvider.parseAccessToken(request.accessToken) } returns claims
+                every { jwtProvider.parseRefreshToken(request.refreshToken) } throws JwtException("invalid refresh token")
                 every { claims["memberId"] } returns memberId
 
                 shouldThrow<JwtException> { authService.refreshToken(request) }
@@ -105,8 +105,8 @@ class AuthServiceTest : DescribeSpec({
                 val token = "realRefreshToken"
                 val member = mockk<Member>()
 
-                every { jwtTokenProvider.parseAccessToken(request.accessToken) } returns claims
-                every { jwtTokenProvider.parseRefreshToken(request.refreshToken) } returns mockk()
+                every { jwtProvider.parseAccessToken(request.accessToken) } returns claims
+                every { jwtProvider.parseRefreshToken(request.refreshToken) } returns mockk()
                 every { claims["memberId"] } returns memberId
                 every { tokenRepository.findByMemberIdOrNull(memberId) } returns token
                 every { memberRepository.findByIdOrNull(memberId) } returns member
@@ -122,13 +122,13 @@ class AuthServiceTest : DescribeSpec({
                 val token = "refreshToken"
                 val member = mockk<Member>(relaxed = true)
 
-                every { jwtTokenProvider.parseAccessToken(request.accessToken) } returns claims
-                every { jwtTokenProvider.parseRefreshToken(request.refreshToken) } returns mockk()
+                every { jwtProvider.parseAccessToken(request.accessToken) } returns claims
+                every { jwtProvider.parseRefreshToken(request.refreshToken) } returns mockk()
                 every { claims["memberId"] } returns memberId
                 every { tokenRepository.findByMemberIdOrNull(memberId) } returns token
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every {
-                    jwtTokenProvider.createAccessToken(
+                    jwtProvider.createAccessToken(
                         memberId = any(),
                         permissions = any()
                     )

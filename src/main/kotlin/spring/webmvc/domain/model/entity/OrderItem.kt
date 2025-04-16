@@ -10,11 +10,11 @@ class OrderItem protected constructor(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var item: Item,
+    val item: Item,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var order: Order,
+    val order: Order,
 ) {
     @Id
     @GeneratedValue

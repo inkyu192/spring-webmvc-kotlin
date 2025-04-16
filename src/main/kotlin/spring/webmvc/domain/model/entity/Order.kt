@@ -10,7 +10,10 @@ import java.time.Instant
 class Order protected constructor(
     val orderedAt: Instant,
     status: OrderStatus,
-    member: Member
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    val member: Member,
 ) : BaseTime() {
     @Id
     @GeneratedValue
@@ -20,11 +23,6 @@ class Order protected constructor(
 
     @Enumerated(EnumType.STRING)
     var status: OrderStatus = status
-        protected set
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    var member: Member = member
         protected set
 
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])

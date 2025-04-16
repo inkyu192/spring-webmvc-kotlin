@@ -13,12 +13,12 @@ import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.security.core.context.SecurityContextHolder
 import spring.webmvc.infrastructure.config.security.JwtAuthenticationFilter
-import spring.webmvc.infrastructure.config.security.JwtTokenProvider
+import spring.webmvc.infrastructure.config.security.JwtProvider
 
 class JwtAuthenticationFilterTest : DescribeSpec({
     val filterChain = mockk<FilterChain>(relaxed = true)
-    val jwtTokenProvider = mockk<JwtTokenProvider>()
-    val jwtAuthenticationFilter = JwtAuthenticationFilter(jwtTokenProvider)
+    val jwtProvider = mockk<JwtProvider>()
+    val jwtAuthenticationFilter = JwtAuthenticationFilter(jwtProvider)
     lateinit var request: MockHttpServletRequest
     lateinit var response: MockHttpServletResponse
 
@@ -49,7 +49,7 @@ class JwtAuthenticationFilterTest : DescribeSpec({
 
         context("잘못된 토큰일 경우") {
             it("JwtException 발생한다") {
-                every { jwtTokenProvider.parseAccessToken(any()) } throws JwtException("invalidToken")
+                every { jwtProvider.parseAccessToken(any()) } throws JwtException("invalidToken")
 
                 request.addHeader("Authorization", "Bearer invalid.jwt.token")
 
@@ -64,7 +64,7 @@ class JwtAuthenticationFilterTest : DescribeSpec({
                 val memberId = 1L
                 val permissions = listOf("ITEM_READ")
 
-                every { jwtTokenProvider.parseAccessToken(any()) } returns claims
+                every { jwtProvider.parseAccessToken(any()) } returns claims
                 every { claims["memberId"] } returns memberId
                 every { claims["permissions", List::class.java] } returns permissions
 

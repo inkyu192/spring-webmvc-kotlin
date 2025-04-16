@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.TokenRepository
-import spring.webmvc.infrastructure.config.security.JwtTokenProvider
+import spring.webmvc.infrastructure.config.security.JwtProvider
 import spring.webmvc.presentation.dto.request.MemberLoginRequest
 import spring.webmvc.presentation.dto.request.TokenRequest
 import spring.webmvc.presentation.dto.response.TokenResponse
@@ -17,7 +17,7 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 @Service
 @Transactional(readOnly = true)
 class AuthService(
-    private val jwtTokenProvider: JwtTokenProvider,
+    private val jwtProvider: JwtProvider,
     private val tokenRepository: TokenRepository,
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder
@@ -30,11 +30,11 @@ class AuthService(
 
         val memberId = checkNotNull(member.id)
 
-        val accessToken = jwtTokenProvider.createAccessToken(
+        val accessToken = jwtProvider.createAccessToken(
             memberId = memberId,
             permissions = getPermissions(member)
         )
-        val refreshToken = jwtTokenProvider.createRefreshToken()
+        val refreshToken = jwtProvider.createRefreshToken()
 
         tokenRepository.save(
             memberId = memberId,
@@ -49,7 +49,7 @@ class AuthService(
 
     fun refreshToken(tokenRequest: TokenRequest): TokenResponse {
         val requestMemberId = extractMemberId(tokenRequest.accessToken)
-        jwtTokenProvider.parseRefreshToken(tokenRequest.refreshToken)
+        jwtProvider.parseRefreshToken(tokenRequest.refreshToken)
 
         val member = memberRepository.findByIdOrNull(requestMemberId)
             ?: throw EntityNotFoundException(clazz = Member::class.java, id = requestMemberId)
@@ -59,7 +59,7 @@ class AuthService(
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
 
         return TokenResponse(
-            accessToken = jwtTokenProvider.createAccessToken(
+            accessToken = jwtProvider.createAccessToken(
                 memberId = checkNotNull(member.id),
                 permissions = getPermissions(member),
             ),
@@ -68,7 +68,7 @@ class AuthService(
     }
 
     private fun extractMemberId(accessToken: String): Long {
-        val claims = runCatching { jwtTokenProvider.parseAccessToken(accessToken) }
+        val claims = runCatching { jwtProvider.parseAccessToken(accessToken) }
             .getOrElse { throwable ->
                 when (throwable) {
                     is ExpiredJwtException -> throwable.claims
