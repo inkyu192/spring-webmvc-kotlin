@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.infrastructure.persistence
+package spring.webmvc.infrastructure.persistence
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import io.kotest.core.spec.style.DescribeSpec
@@ -9,9 +9,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import spring.webmvc.domain.model.entity.Item
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.infrastructure.persistence.ItemJpaRepository
-import spring.webmvc.infrastructure.persistence.ItemQuerydslRepository
-import spring.webmvc.presentation.infrastructure.config.DataJpaTestConfig
+import spring.webmvc.infrastructure.config.DataJpaTestConfig
 
 @DataJpaTest
 @Import(DataJpaTestConfig::class)

@@ -26,7 +26,7 @@ import spring.webmvc.application.service.MemberService
 import spring.webmvc.presentation.dto.request.MemberSaveRequest
 import spring.webmvc.presentation.dto.request.MemberUpdateRequest
 import spring.webmvc.presentation.dto.response.MemberResponse
-import spring.webmvc.presentation.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import java.time.Instant
 import java.time.LocalDate
 

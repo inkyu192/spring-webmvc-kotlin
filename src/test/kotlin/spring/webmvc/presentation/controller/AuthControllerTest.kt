@@ -25,7 +25,7 @@ import spring.webmvc.application.service.AuthService
 import spring.webmvc.presentation.dto.request.MemberLoginRequest
 import spring.webmvc.presentation.dto.request.TokenRequest
 import spring.webmvc.presentation.dto.response.TokenResponse
-import spring.webmvc.presentation.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.infrastructure.config.WebMvcTestConfig
 
 @WebMvcTest(AuthController::class)
 @Import(WebMvcTestConfig::class)

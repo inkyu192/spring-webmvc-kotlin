@@ -1,12 +1,15 @@
-package spring.webmvc.presentation.infrastructure.persistence
+package spring.webmvc.infrastructure.persistence
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest
+import org.springframework.context.annotation.Import
 import org.springframework.data.redis.core.RedisTemplate
+import spring.webmvc.infrastructure.config.RedisTestContainerConfig
 import spring.webmvc.infrastructure.persistence.RequestLockRedisRepository
 
 @DataRedisTest
+@Import(RedisTestContainerConfig::class)
 class RequestLockRedisRepositoryTest(
     private val redisTemplate: RedisTemplate<String, String>
 ) : DescribeSpec({

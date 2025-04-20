@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.infrastructure.config.security
+package spring.webmvc.infrastructure.config.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
@@ -12,8 +12,6 @@ import jakarta.servlet.FilterChain
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.security.core.context.SecurityContextHolder
-import spring.webmvc.infrastructure.config.security.JwtAuthenticationFilter
-import spring.webmvc.infrastructure.config.security.JwtProvider
 
 class JwtAuthenticationFilterTest : DescribeSpec({
     val filterChain = mockk<FilterChain>(relaxed = true)

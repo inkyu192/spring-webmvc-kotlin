@@ -1,4 +1,4 @@
-package spring.webmvc.exception
+package spring.webmvc.presentation.exception
 
 import io.jsonwebtoken.JwtException
 import io.kotest.core.spec.style.DescribeSpec

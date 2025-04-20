@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.infrastructure.config
+package spring.webmvc.infrastructure.config
 
 import io.mockk.mockk
 import org.springframework.boot.test.context.TestConfiguration

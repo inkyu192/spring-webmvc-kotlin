@@ -33,7 +33,7 @@ import spring.webmvc.presentation.dto.request.OrderItemSaveRequest
 import spring.webmvc.presentation.dto.request.OrderSaveRequest
 import spring.webmvc.presentation.dto.response.OrderItemResponse
 import spring.webmvc.presentation.dto.response.OrderResponse
-import spring.webmvc.presentation.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import java.time.Instant
 
 @WebMvcTest(OrderController::class)

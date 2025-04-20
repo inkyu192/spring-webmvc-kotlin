@@ -29,7 +29,7 @@ import spring.webmvc.application.service.ItemService
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.presentation.dto.request.ItemSaveRequest
 import spring.webmvc.presentation.dto.response.ItemResponse
-import spring.webmvc.presentation.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import java.time.Instant
 
 @WebMvcTest(ItemController::class)

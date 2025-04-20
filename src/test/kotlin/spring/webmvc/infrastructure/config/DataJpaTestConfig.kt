@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.infrastructure.config
+package spring.webmvc.infrastructure.config
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import io.mockk.mockk

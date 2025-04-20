@@ -20,18 +20,15 @@ class ItemQuerydslRepository(
             .where(likeName(name))
             .fetchOne() ?: 0
 
-        val tuples = jpaQueryFactory
-            .select(item, orderItem.count)
+        val content = jpaQueryFactory
+            .select(item)
             .from(item)
             .leftJoin(orderItem).on(item.id.eq(orderItem.item.id))
             .where(likeName(name))
             .groupBy(item.id)
-            .orderBy(orderItem.count.desc())
             .limit(pageable.pageSize.toLong())
             .offset(pageable.offset)
             .fetch()
-
-        val content = tuples.map { it.get(0, Item::class.java) }
 
         return PageImpl(content, pageable, count)
     }
