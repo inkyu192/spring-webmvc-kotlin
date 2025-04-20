@@ -8,7 +8,7 @@ plugins {
 	id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
 
-group = "spring"
+group = "spring.webmvc"
 version = "0.0.1-SNAPSHOT"
 
 java {
@@ -37,7 +37,9 @@ dependencies {
 	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
-	testImplementation("com.h2database:h2")
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:postgresql")
+	testImplementation("org.testcontainers:testcontainers")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
