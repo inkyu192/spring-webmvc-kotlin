@@ -10,17 +10,17 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
-import spring.webmvc.infrastructure.util.ProblemDetailUtil
-import spring.webmvc.infrastructure.util.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.common.ResponseWriter
 import spring.webmvc.presentation.exception.handler.JwtExceptionHandler
 import java.net.URI
 
 class JwtExceptionHandlerTest : DescribeSpec({
     val filterChain = mockk<FilterChain>(relaxed = true)
-    val problemDetailUtil = mockk<ProblemDetailUtil>()
+    val uriFactory = mockk<UriFactory>()
     val responseWriter = mockk<ResponseWriter>(relaxed = true)
     val jwtExceptionHandler = JwtExceptionHandler(
-        problemDetailUtil = problemDetailUtil,
+        uriFactory = uriFactory,
         responseWriter = responseWriter
     )
     lateinit var request: MockHttpServletRequest
@@ -39,7 +39,7 @@ class JwtExceptionHandlerTest : DescribeSpec({
                 val uri = URI.create("uri")
 
                 every { filterChain.doFilter(request, response) } throws JwtException(message)
-                every { problemDetailUtil.createType(status) } returns uri
+                every { uriFactory.createApiDocUri(status) } returns uri
 
                 val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
                 problemDetail.type = uri
@@ -57,7 +57,7 @@ class JwtExceptionHandlerTest : DescribeSpec({
                 val uri = URI.create("uri")
 
                 every { filterChain.doFilter(request, response) } throws RuntimeException(message)
-                every { problemDetailUtil.createType(status) } returns uri
+                every { uriFactory.createApiDocUri(status) } returns uri
 
                 val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
                 problemDetail.type = uri

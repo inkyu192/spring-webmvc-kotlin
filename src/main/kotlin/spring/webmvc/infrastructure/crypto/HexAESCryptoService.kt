@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.util.crypto
+package spring.webmvc.infrastructure.crypto
 
 import org.springframework.stereotype.Component
 import spring.webmvc.infrastructure.util.hexToBytes
@@ -9,9 +9,9 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 @Component
-class HexAESCryptoUtil(
+class HexAESCryptoService(
     cryptoProperties: CryptoProperties,
-) : CryptoUtil {
+) : CryptoService {
     private val secretKey = SecretKeySpec(cryptoProperties.secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
     private val ivParameter = IvParameterSpec(cryptoProperties.ivParameter.toByteArray(StandardCharsets.UTF_8))
 

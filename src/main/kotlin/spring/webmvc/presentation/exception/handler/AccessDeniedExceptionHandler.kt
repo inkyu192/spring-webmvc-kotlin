@@ -7,12 +7,12 @@ import org.springframework.http.ProblemDetail
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
-import spring.webmvc.infrastructure.util.ProblemDetailUtil
-import spring.webmvc.infrastructure.util.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.common.ResponseWriter
 
 @Component
 class AccessDeniedExceptionHandler(
-    private val problemDetailUtil: ProblemDetailUtil,
+    private val uriFactory: UriFactory,
     private val responseWriter: ResponseWriter,
 ) : AccessDeniedHandler {
     override fun handle(
@@ -21,7 +21,7 @@ class AccessDeniedExceptionHandler(
         exception: AccessDeniedException?
     ) {
         val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception?.message).apply {
-            type = problemDetailUtil.createType(HttpStatus.FORBIDDEN)
+            type = uriFactory.createApiDocUri(HttpStatus.FORBIDDEN)
         }
 
         responseWriter.writeResponse(problemDetail)

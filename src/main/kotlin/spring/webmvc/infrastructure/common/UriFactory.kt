@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.util
+package spring.webmvc.infrastructure.common
 
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
@@ -6,15 +6,15 @@ import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class ProblemDetailUtil(
-    private val request: HttpServletRequest
+class UriFactory(
+    private val request: HttpServletRequest,
 ) {
-    fun createType(statusCode: Int): URI? {
-        val status = HttpStatus.resolve(statusCode) ?: return null
-        return createType(status)
+    fun createApiDocUri(statusCode: Int): URI {
+        val status = HttpStatus.resolve(statusCode) ?: return URI.create("about:blank")
+        return createApiDocUri(status)
     }
 
-    fun createType(status: HttpStatus): URI {
+    fun createApiDocUri(status: HttpStatus): URI {
         val baseUrl = getBaseUrl()
         val typeUri = "$baseUrl/docs/index.html#${status.name}"
         return URI.create(typeUri)

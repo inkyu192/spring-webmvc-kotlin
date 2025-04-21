@@ -1,6 +1,6 @@
-package spring.webmvc.infrastructure.util.crypto
+package spring.webmvc.infrastructure.crypto
 
-interface CryptoUtil {
+interface CryptoService {
     fun encrypt(plainText: String): String
     fun decrypt(encryptedText: String): String
 }

@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.util
+package spring.webmvc.infrastructure.common
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletResponse

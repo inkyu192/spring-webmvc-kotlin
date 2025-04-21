@@ -4,8 +4,8 @@ import io.mockk.mockk
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import spring.webmvc.infrastructure.config.security.JwtProvider
-import spring.webmvc.infrastructure.util.ProblemDetailUtil
-import spring.webmvc.infrastructure.util.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.common.ResponseWriter
 
 @TestConfiguration
 class WebMvcTestConfig {
@@ -17,5 +17,5 @@ class WebMvcTestConfig {
     fun responseWriter() = mockk<ResponseWriter>()
 
     @Bean
-    fun problemDetailUtil() = mockk<ProblemDetailUtil>()
+    fun problemDetailUtil() = mockk<UriFactory>()
 }

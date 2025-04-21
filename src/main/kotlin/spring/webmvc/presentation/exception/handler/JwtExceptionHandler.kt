@@ -8,12 +8,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import spring.webmvc.infrastructure.util.ProblemDetailUtil
-import spring.webmvc.infrastructure.util.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.common.ResponseWriter
 
 @Component
 class JwtExceptionHandler(
-    private val problemDetailUtil: ProblemDetailUtil,
+    private val uriFactory: UriFactory,
     private val responseWriter: ResponseWriter,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
@@ -39,7 +39,7 @@ class JwtExceptionHandler(
 
     private fun handleException(status: HttpStatus, message: String?) {
         val problemDetail = ProblemDetail.forStatusAndDetail(status, message).apply {
-            type = problemDetailUtil.createType(status)
+            type = uriFactory.createApiDocUri(status)
         }
 
         responseWriter.writeResponse(problemDetail)
