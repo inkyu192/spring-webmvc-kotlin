@@ -40,6 +40,7 @@ dependencies {
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:postgresql")
 	testImplementation("org.testcontainers:testcontainers")
+	testImplementation("org.testcontainers:localstack")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
@@ -51,6 +52,8 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")
 	implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
+	implementation("software.amazon.awssdk:s3:2.31.25")
 
 	testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
 	testImplementation("io.kotest:kotest-assertions-core:5.9.1")
