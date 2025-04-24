@@ -13,19 +13,18 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException
 import spring.webmvc.infrastructure.common.UriFactory
 import spring.webmvc.presentation.exception.AbstractHttpException
-import spring.webmvc.presentation.exception.AtLeastOneRequiredException
+import spring.webmvc.presentation.exception.AbstractValidationException
 
 @RestControllerAdvice
 class ApplicationExceptionHandler(
     private val uriFactory: UriFactory,
 ) {
-
     @ExceptionHandler(AbstractHttpException::class)
     fun handleBusinessException(e: AbstractHttpException) =
         ProblemDetail.forStatusAndDetail(e.httpStatus, e.message).apply {
             type = uriFactory.createApiDocUri(status)
 
-            if (e is AtLeastOneRequiredException) {
+            if (e is AbstractValidationException) {
                 setProperty("fields", e.fields)
             }
         }
