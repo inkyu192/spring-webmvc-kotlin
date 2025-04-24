@@ -14,7 +14,6 @@ class MemberRole protected constructor(
 ) {
     @Id
     @GeneratedValue
-    @Column(name = "member_role_id")
     var id: Long? = null
         protected set
 

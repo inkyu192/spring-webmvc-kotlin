@@ -17,7 +17,6 @@ class Order protected constructor(
 ) : BaseTime() {
     @Id
     @GeneratedValue
-    @Column(name = "order_id")
     var id: Long? = null
         protected set
 

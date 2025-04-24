@@ -15,7 +15,6 @@ class Notification protected constructor(
 ) : BaseTime() {
     @Id
     @GeneratedValue
-    @Column(name = "notification_id")
     var id: Long? = null
         protected set
 

@@ -14,7 +14,6 @@ class Item protected constructor(
 ) : BaseCreator() {
     @Id
     @GeneratedValue
-    @Column(name = "item_id")
     var id: Long? = null
         protected set
 

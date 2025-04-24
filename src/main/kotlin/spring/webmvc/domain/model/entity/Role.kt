@@ -8,7 +8,6 @@ class Role protected constructor(
 ) : BaseTime() {
     @Id
     @GeneratedValue
-    @Column(name = "role_id")
     var id: Long? = null
         protected set
 

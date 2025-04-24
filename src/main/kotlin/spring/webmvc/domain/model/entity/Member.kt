@@ -15,7 +15,6 @@ class Member protected constructor(
 ) : BaseTime() {
     @Id
     @GeneratedValue
-    @Column(name = "member_id")
     var id: Long? = null
         protected set
 

@@ -18,7 +18,6 @@ class OrderItem protected constructor(
 ) {
     @Id
     @GeneratedValue
-    @Column(name = "order_item_id")
     var id: Long? = null
         protected set
 

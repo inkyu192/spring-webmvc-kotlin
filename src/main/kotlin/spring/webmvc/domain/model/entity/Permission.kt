@@ -1,6 +1,5 @@
 package spring.webmvc.domain.model.entity
 
-import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
@@ -11,7 +10,6 @@ class Permission protected constructor(
 ) : BaseTime() {
     @Id
     @GeneratedValue
-    @Column(name = "permission_id")
     var id: Long? = null
         protected set
 }
