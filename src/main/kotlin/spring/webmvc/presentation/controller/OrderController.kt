@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.infrastructure.aspect.RequestLock
-import spring.webmvc.presentation.dto.request.OrderSaveRequest
+import spring.webmvc.presentation.dto.request.OrderCreateRequest
 
 @RestController
 @RequestMapping("/orders")
@@ -20,7 +20,7 @@ class OrderController(
     @PreAuthorize("isAuthenticated()")
     @RequestLock
     @ResponseStatus(HttpStatus.CREATED)
-    fun saveOrder(@RequestBody @Validated orderSaveRequest: OrderSaveRequest) = orderService.saveOrder(orderSaveRequest)
+    fun saveOrder(@RequestBody @Validated orderCreateRequest: OrderCreateRequest) = orderService.saveOrder(orderCreateRequest)
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")

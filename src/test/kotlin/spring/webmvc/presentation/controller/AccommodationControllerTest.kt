@@ -1,0 +1,254 @@
+package spring.webmvc.presentation.controller
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
+import org.springframework.http.MediaType
+import org.springframework.restdocs.RestDocumentationContextProvider
+import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.headers.HeaderDocumentation
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
+import org.springframework.restdocs.operation.preprocess.Preprocessors
+import org.springframework.restdocs.payload.PayloadDocumentation
+import org.springframework.restdocs.request.RequestDocumentation
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.application.service.AccommodationService
+import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.presentation.dto.request.AccommodationCreateRequest
+import spring.webmvc.presentation.dto.request.AccommodationUpdateRequest
+import spring.webmvc.presentation.dto.response.AccommodationResponse
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
+@WebMvcTest(AccommodationController::class)
+@Import(WebMvcTestConfig::class)
+@ExtendWith(RestDocumentationExtension::class)
+class AccommodationControllerTest(
+    @Autowired private val objectMapper: ObjectMapper,
+) {
+    @MockitoBean
+    private lateinit var accommodationService: AccommodationService
+
+    private lateinit var mockMvc: MockMvc
+
+    @BeforeEach
+    fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+            .apply<DefaultMockMvcBuilder>(
+                MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
+                    .operationPreprocessors()
+                    .withRequestDefaults(Preprocessors.prettyPrint())
+                    .withResponseDefaults(Preprocessors.prettyPrint())
+            )
+            .build()
+    }
+
+    @Test
+    fun createAccommodation() {
+        val request = AccommodationCreateRequest(
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            place = "place",
+            checkInTime = Instant.now(),
+            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+        )
+        val response = AccommodationResponse(
+            id = 1L,
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            createdAt = Instant.now(),
+            place = "place",
+            checkInTime = Instant.now(),
+            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+        )
+
+        Mockito.`when`(accommodationService.createAccommodation(request)).thenReturn(response)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/products/accommodations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "accommodation-create",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun findAccommodation() {
+        val requestId = 1L
+        val response = AccommodationResponse(
+            id = 1L,
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            createdAt = Instant.now(),
+            place = "place",
+            checkInTime = Instant.now(),
+            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+        )
+
+        Mockito.`when`(accommodationService.findAccommodation(requestId)).thenReturn(response)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/products/accommodations/{id}", requestId)
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "accommodation-get",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    RequestDocumentation.pathParameters(
+                        RequestDocumentation.parameterWithName("id").description("아이디")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun updateAccommodation() {
+        val requestId = 1L
+        val request = AccommodationUpdateRequest(
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            place = "place",
+            checkInTime = Instant.now(), checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+        )
+        val response = AccommodationResponse(
+            id = 1L,
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            createdAt = Instant.now(),
+            place = "place",
+            checkInTime = Instant.now(),
+            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+        )
+
+        Mockito.`when`(accommodationService.updateAccommodation(id = requestId, accommodationUpdateRequest = request))
+            .thenReturn(response)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.patch("/products/accommodations/{id}", requestId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer access-token")
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "accommodation-update",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    RequestDocumentation.pathParameters(
+                        RequestDocumentation.parameterWithName("id").description("아이디")
+                    ),
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun deleteAccommodation() {
+        val requestId = 1L
+
+        Mockito.doNothing().`when`(accommodationService).deleteAccommodation(requestId)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.delete("/products/accommodations/{id}", requestId)
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "accommodation-delete",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    RequestDocumentation.pathParameters(
+                        RequestDocumentation.parameterWithName("id").description("아이디")
+                    )
+                )
+            )
+    }
+}

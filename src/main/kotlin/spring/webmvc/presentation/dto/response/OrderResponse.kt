@@ -9,13 +9,13 @@ data class OrderResponse(
     val name: String,
     val orderedAt: Instant,
     val status: OrderStatus,
-    val orderItems: List<OrderItemResponse>
+    val orderProducts: List<OrderProductResponse>
 ) {
     constructor(order: Order) : this(
         id = checkNotNull(order.id),
         name = order.member.name,
         orderedAt = order.orderedAt,
         status = order.status,
-        orderItems = order.orderItems.map { OrderItemResponse(it) }
+        orderProducts = order.orderProducts.map { OrderProductResponse(it) }
     )
 }

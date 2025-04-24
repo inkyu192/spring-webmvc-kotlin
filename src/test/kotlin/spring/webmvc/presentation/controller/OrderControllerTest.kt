@@ -29,9 +29,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.presentation.dto.request.OrderItemSaveRequest
-import spring.webmvc.presentation.dto.request.OrderSaveRequest
-import spring.webmvc.presentation.dto.response.OrderItemResponse
+import spring.webmvc.presentation.dto.request.OrderProductCreateRequest
+import spring.webmvc.presentation.dto.request.OrderCreateRequest
+import spring.webmvc.presentation.dto.response.OrderProductResponse
 import spring.webmvc.presentation.dto.response.OrderResponse
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import java.time.Instant
@@ -62,12 +62,12 @@ class OrderControllerTest(
     @Test
     @Throws(Exception::class)
     fun saveOrder() {
-        val request = OrderSaveRequest(
+        val request = OrderCreateRequest(
             memberId = 1L,
             city = "city",
             street = "street",
             zipcode = "zipcode",
-            orderItems = listOf(OrderItemSaveRequest(1L, 3))
+            orderProducts = listOf(OrderProductCreateRequest(1L, 3))
         )
 
         val response = OrderResponse(
@@ -75,7 +75,7 @@ class OrderControllerTest(
             name = "name",
             orderedAt = Instant.now(),
             status = OrderStatus.ORDER,
-            orderItems = listOf(OrderItemResponse("name", 1000, 3))
+            orderProducts = listOf(OrderProductResponse("name", 1000, 3))
         )
 
         Mockito.`when`(orderService.saveOrder(request)).thenReturn(response)
@@ -98,17 +98,17 @@ class OrderControllerTest(
                         PayloadDocumentation.fieldWithPath("city").description("city"),
                         PayloadDocumentation.fieldWithPath("street").description("street"),
                         PayloadDocumentation.fieldWithPath("zipcode").description("우편번호"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].itemId").description("상품아이디"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("orderProducts[].productId").description("상품아이디"),
+                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("주문아이디"),
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].itemName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("orderProducts[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("orderProducts[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
                     )
                 )
             )
@@ -127,7 +127,7 @@ class OrderControllerTest(
                 name = "name",
                 orderedAt = Instant.now(),
                 status = OrderStatus.ORDER,
-                orderItems = listOf(OrderItemResponse(itemName = "name", orderPrice = 1000, count = 3))
+                orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, count = 3))
             )
         )
         val page: Page<OrderResponse> = PageImpl(response, pageable, response.size.toLong())
@@ -161,9 +161,9 @@ class OrderControllerTest(
                         PayloadDocumentation.fieldWithPath("content[].name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("content[].orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("content[].status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("content[].orderItems[].itemName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("content[].orderItems[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("content[].orderItems[].count").description("주문수량"),
+                        PayloadDocumentation.fieldWithPath("content[].orderProducts[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("content[].orderProducts[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("content[].orderProducts[].count").description("주문수량"),
 
                         PayloadDocumentation.fieldWithPath("pageable.pageNumber").description("현재 페이지 번호"),
                         PayloadDocumentation.fieldWithPath("pageable.pageSize").description("페이지 크기"),
@@ -203,7 +203,7 @@ class OrderControllerTest(
             name = "name",
             orderedAt = Instant.now(),
             status = OrderStatus.ORDER,
-            orderItems = listOf(OrderItemResponse(itemName = "name", orderPrice = 1000, count = 3))
+            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, count = 3))
         )
 
         Mockito.`when`(orderService.findOrder(requestId)).thenReturn(response)
@@ -227,9 +227,9 @@ class OrderControllerTest(
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].itemName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("orderProducts[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("orderProducts[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
                     )
                 )
             )
@@ -245,7 +245,7 @@ class OrderControllerTest(
             name = "name",
             orderedAt = Instant.now(),
             status = OrderStatus.ORDER,
-            orderItems = listOf(OrderItemResponse(itemName = "name", orderPrice = 1000, count = 3))
+            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, count = 3))
         )
 
         Mockito.`when`(orderService.cancelOrder(requestId)).thenReturn(response)
@@ -269,9 +269,9 @@ class OrderControllerTest(
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].itemName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("orderItems[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("orderProducts[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("orderProducts[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
                     )
                 )
             )

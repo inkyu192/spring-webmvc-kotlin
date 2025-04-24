@@ -1,6 +1,7 @@
 package spring.webmvc.infrastructure.persistence
 
 import org.springframework.data.jpa.repository.JpaRepository
-import spring.webmvc.domain.model.entity.Item
+import spring.webmvc.domain.model.entity.Flight
 
-interface ItemJpaRepository : JpaRepository<Item, Long>
+interface FlightJpaRepository : JpaRepository<Flight, Long> {
+}

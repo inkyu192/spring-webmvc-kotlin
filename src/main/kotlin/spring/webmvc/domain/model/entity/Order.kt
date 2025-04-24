@@ -25,11 +25,11 @@ class Order protected constructor(
         protected set
 
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
-    private val _orderItems: MutableList<OrderItem> = mutableListOf()
+    private val _orderProducts: MutableList<OrderProduct> = mutableListOf()
 
     @get:Transient
-    val orderItems: List<OrderItem>
-        get() = _orderItems.toList()
+    val orderProducts: List<OrderProduct>
+        get() = _orderProducts.toList()
 
     companion object {
         fun create(member: Member) = Order(
@@ -39,18 +39,18 @@ class Order protected constructor(
         )
     }
 
-    fun addItem(item: Item, count: Int) {
-        _orderItems.add(OrderItem.create(order = this, item = item, count = count))
+    fun addProduct(product: Product, count: Int) {
+        _orderProducts.add(OrderProduct.create(order = this, product = product, count = count))
     }
 
     fun cancel() {
         val id = checkNotNull(this.id)
 
         if (status == OrderStatus.CONFIRM) {
-            throw OrderCancelNotAllowedException(id)
+            throw OrderCancelNotAllowedException(orderId = id)
         }
 
         status = OrderStatus.CANCEL
-        orderItems.forEach { it.cancel() }
+        _orderProducts.forEach { it.cancel() }
     }
 }

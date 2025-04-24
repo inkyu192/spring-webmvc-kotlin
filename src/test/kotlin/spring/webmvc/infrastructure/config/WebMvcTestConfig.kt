@@ -3,9 +3,9 @@ package spring.webmvc.infrastructure.config
 import io.mockk.mockk
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import spring.webmvc.infrastructure.config.security.JwtProvider
-import spring.webmvc.infrastructure.common.UriFactory
 import spring.webmvc.infrastructure.common.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.config.security.JwtProvider
 
 @TestConfiguration
 class WebMvcTestConfig {
