@@ -19,13 +19,18 @@ class OrderQuerydslRepository(
             .select(order.count())
             .from(order)
             .join(order.member, member)
-            .where(eqMemberId(memberId), eqOrderStatus(orderStatus))
+            .where(
+                eqMemberId(memberId = memberId),
+                eqOrderStatus(orderStatus = orderStatus)
+            )
             .fetchOne() ?: 0L
 
         val content = jpaQueryFactory
             .selectFrom(order)
             .join(order.member, member).fetchJoin()
-            .where(eqMemberId(memberId), eqOrderStatus(orderStatus))
+            .where(
+                eqMemberId(memberId = memberId),
+                eqOrderStatus(orderStatus = orderStatus))
             .limit(pageable.pageSize.toLong())
             .offset(pageable.offset)
             .fetch()

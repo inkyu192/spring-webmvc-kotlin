@@ -23,25 +23,24 @@ class OrderController(
     @ResponseStatus(HttpStatus.CREATED)
     fun createOrder(@RequestBody @Validated orderCreateRequest: OrderCreateRequest): OrderResponse {
         val productQuantities = orderCreateRequest.products
-            .map { Pair(it.productId, it.quantity) }
+            .map { Pair(first = it.productId, second = it.quantity) }
 
-        return orderService.createOrder(productQuantities = productQuantities)
+        return OrderResponse(order = orderService.createOrder(productQuantities = productQuantities))
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     fun findOrders(
         @PageableDefault pageable: Pageable,
-        @RequestParam(required = false) memberId: Long?,
         @RequestParam(required = false) orderStatus: OrderStatus?,
-    ) = orderService.findOrders(pageable = pageable, memberId = memberId, orderStatus = orderStatus)
+    ) = orderService.findOrders(pageable = pageable, orderStatus = orderStatus).map { OrderResponse(order = it) }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    fun findOrder(@PathVariable id: Long) = orderService.findOrder(id)
+    fun findOrder(@PathVariable id: Long) = OrderResponse(order = orderService.findOrder(id = id))
 
     @PatchMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @RequestLock
-    fun cancelOrder(@PathVariable id: Long) = orderService.cancelOrder(id)
+    fun cancelOrder(@PathVariable id: Long) = OrderResponse(order = orderService.cancelOrder(id = id))
 }

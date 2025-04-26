@@ -14,6 +14,6 @@ data class OrderResponse(
         id = checkNotNull(order.id),
         orderedAt = order.orderedAt,
         status = order.status,
-        products = order.orderProducts.map { OrderProductResponse(it) }
+        products = order.orderProducts.map { OrderProductResponse(orderProduct = it) }
     )
 }
