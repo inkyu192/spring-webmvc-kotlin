@@ -10,6 +10,7 @@ import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.infrastructure.aspect.RequestLock
 import spring.webmvc.presentation.dto.request.OrderCreateRequest
+import spring.webmvc.presentation.dto.response.OrderResponse
 
 @RestController
 @RequestMapping("/orders")
@@ -20,7 +21,12 @@ class OrderController(
     @PreAuthorize("isAuthenticated()")
     @RequestLock
     @ResponseStatus(HttpStatus.CREATED)
-    fun saveOrder(@RequestBody @Validated orderCreateRequest: OrderCreateRequest) = orderService.saveOrder(orderCreateRequest)
+    fun createOrder(@RequestBody @Validated orderCreateRequest: OrderCreateRequest): OrderResponse {
+        val productQuantities = orderCreateRequest.products
+            .map { Pair(it.productId, it.quantity) }
+
+        return orderService.createOrder(productQuantities = productQuantities)
+    }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")

@@ -39,8 +39,8 @@ class Order protected constructor(
         )
     }
 
-    fun addProduct(product: Product, count: Int) {
-        _orderProducts.add(OrderProduct.create(order = this, product = product, count = count))
+    fun addProduct(product: Product, quantity: Int) {
+        _orderProducts.add(OrderProduct.create(order = this, product = product, quantity = quantity))
     }
 
     fun cancel() {

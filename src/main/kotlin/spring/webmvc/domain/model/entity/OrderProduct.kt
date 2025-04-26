@@ -5,7 +5,7 @@ import jakarta.persistence.*
 @Entity
 class OrderProduct protected constructor(
     val orderPrice: Int,
-    val count: Int,
+    val quantity: Int,
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -21,14 +21,14 @@ class OrderProduct protected constructor(
         protected set
 
     companion object {
-        fun create(order: Order, product: Product, count: Int) =
+        fun create(order: Order, product: Product, quantity: Int) =
             OrderProduct(
                 orderPrice = product.price,
-                count = count,
+                quantity = quantity,
                 product = product,
                 order = order
-            ).also { product.removeQuantity(quantity = count) }
+            ).also { product.removeQuantity(quantity = quantity) }
     }
 
-    fun cancel() { product.addQuantity(quantity = count) }
+    fun cancel() { product.addQuantity(quantity = quantity) }
 }

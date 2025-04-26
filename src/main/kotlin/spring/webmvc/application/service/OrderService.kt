@@ -10,7 +10,7 @@ import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.OrderRepository
 import spring.webmvc.domain.repository.ProductRepository
-import spring.webmvc.presentation.dto.request.OrderCreateRequest
+import spring.webmvc.infrastructure.util.SecurityContextUtil
 import spring.webmvc.presentation.dto.response.OrderResponse
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
@@ -22,20 +22,20 @@ class OrderService(
     private val orderRepository: OrderRepository
 ) {
     @Transactional
-    fun saveOrder(orderCreateRequest: OrderCreateRequest): OrderResponse {
-        val (memberId, city, street, zipcode, orderProducts) = orderCreateRequest
+    fun createOrder(productQuantities: List<Pair<Long, Int>>): OrderResponse {
+        val memberId = SecurityContextUtil.getMemberId()
 
         val member = memberRepository.findByIdOrNull(memberId)
             ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
         val order = Order.create(member)
 
-        val productMap = productRepository.findAllById(orderProducts.map { it.productId }).associateBy { it.id }
-        orderProducts.forEach {
-            val product = productMap[it.productId]
-                ?: throw EntityNotFoundException(clazz = OrderItem::class.java, id = it.productId)
+        val productMap = productRepository.findAllById(productQuantities.map { it.first }).associateBy { it.id }
+        productQuantities.forEach {
+            val product = productMap[it.first]
+                ?: throw EntityNotFoundException(clazz = OrderItem::class.java, id = it.first)
 
-            order.addProduct(product = product, count = it.count)
+            order.addProduct(product = product, quantity = it.second)
         }
 
         orderRepository.save(order)

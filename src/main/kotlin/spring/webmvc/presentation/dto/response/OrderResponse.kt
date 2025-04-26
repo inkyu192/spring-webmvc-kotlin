@@ -6,16 +6,14 @@ import java.time.Instant
 
 data class OrderResponse(
     val id: Long,
-    val name: String,
     val orderedAt: Instant,
     val status: OrderStatus,
-    val orderProducts: List<OrderProductResponse>
+    val products: List<OrderProductResponse>
 ) {
     constructor(order: Order) : this(
         id = checkNotNull(order.id),
-        name = order.member.name,
         orderedAt = order.orderedAt,
         status = order.status,
-        orderProducts = order.orderProducts.map { OrderProductResponse(it) }
+        products = order.orderProducts.map { OrderProductResponse(it) }
     )
 }

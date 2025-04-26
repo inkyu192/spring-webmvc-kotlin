@@ -5,12 +5,12 @@ import spring.webmvc.domain.model.entity.OrderProduct
 data class OrderProductResponse(
     val productName: String,
     val orderPrice: Int,
-    val count: Int,
+    val quantity: Int,
 ) {
     constructor(orderProduct: OrderProduct) : this(
         productName = orderProduct.product.name,
         orderPrice = orderProduct.orderPrice,
-        count = orderProduct.count
+        quantity = orderProduct.quantity
     )
 }
 

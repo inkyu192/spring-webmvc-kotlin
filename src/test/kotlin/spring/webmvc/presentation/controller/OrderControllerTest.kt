@@ -67,7 +67,7 @@ class OrderControllerTest(
             city = "city",
             street = "street",
             zipcode = "zipcode",
-            orderProducts = listOf(OrderProductCreateRequest(1L, 3))
+            products = listOf(OrderProductCreateRequest(1L, 3))
         )
 
         val response = OrderResponse(
@@ -78,7 +78,7 @@ class OrderControllerTest(
             orderProducts = listOf(OrderProductResponse("name", 1000, 3))
         )
 
-        Mockito.`when`(orderService.saveOrder(request)).thenReturn(response)
+        Mockito.`when`(orderService.createOrder(request)).thenReturn(response)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/orders")
@@ -127,7 +127,7 @@ class OrderControllerTest(
                 name = "name",
                 orderedAt = Instant.now(),
                 status = OrderStatus.ORDER,
-                orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, count = 3))
+                orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, quantity = 3))
             )
         )
         val page: Page<OrderResponse> = PageImpl(response, pageable, response.size.toLong())
@@ -203,7 +203,7 @@ class OrderControllerTest(
             name = "name",
             orderedAt = Instant.now(),
             status = OrderStatus.ORDER,
-            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, count = 3))
+            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, quantity = 3))
         )
 
         Mockito.`when`(orderService.findOrder(requestId)).thenReturn(response)
@@ -245,7 +245,7 @@ class OrderControllerTest(
             name = "name",
             orderedAt = Instant.now(),
             status = OrderStatus.ORDER,
-            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, count = 3))
+            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, quantity = 3))
         )
 
         Mockito.`when`(orderService.cancelOrder(requestId)).thenReturn(response)
