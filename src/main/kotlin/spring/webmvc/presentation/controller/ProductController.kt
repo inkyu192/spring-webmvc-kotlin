@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import spring.webmvc.application.service.ProductService
+import spring.webmvc.presentation.dto.response.ProductResponse
 
 @RestController
 @RequestMapping("/products")
@@ -19,5 +20,5 @@ class ProductController(
     fun findProducts(
         @PageableDefault pageable: Pageable,
         @RequestParam(required = false) name: String?,
-    ) = productService.findProducts(pageable = pageable, name = name)
+    ) = productService.findProducts(pageable = pageable, name = name).map { ProductResponse(product = it) }
 }

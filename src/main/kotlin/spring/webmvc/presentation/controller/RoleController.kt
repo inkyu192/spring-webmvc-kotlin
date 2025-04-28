@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.RoleService
-import spring.webmvc.presentation.dto.request.RoleSaveRequest
+import spring.webmvc.presentation.dto.request.RoleCreateRequest
+import spring.webmvc.presentation.dto.response.RoleResponse
 
 @RestController
 @RequestMapping("/roles")
@@ -13,5 +14,11 @@ class RoleController(
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun saveRole(@RequestBody @Validated roleSaveRequest: RoleSaveRequest) = roleService.saveRole(roleSaveRequest)
+    fun createRole(@RequestBody @Validated roleCreateRequest: RoleCreateRequest) =
+        RoleResponse(
+            role = roleService.createRole(
+                name = roleCreateRequest.name,
+                permissionIds = roleCreateRequest.permissionIds
+            )
+        )
 }

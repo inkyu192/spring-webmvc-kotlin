@@ -10,11 +10,9 @@ import spring.webmvc.domain.model.entity.Role
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.RoleRepository
 import spring.webmvc.infrastructure.util.SecurityContextUtil
-import spring.webmvc.presentation.dto.request.MemberSaveRequest
-import spring.webmvc.presentation.dto.request.MemberUpdateRequest
-import spring.webmvc.presentation.dto.response.MemberResponse
 import spring.webmvc.presentation.exception.DuplicateEntityException
 import spring.webmvc.presentation.exception.EntityNotFoundException
+import java.time.LocalDate
 
 @Service
 @Transactional(readOnly = true)
@@ -26,27 +24,35 @@ class MemberService(
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
-    fun saveMember(memberSaveRequest: MemberSaveRequest): MemberResponse {
-        if (memberRepository.existsByAccount(memberSaveRequest.account)) {
-            throw DuplicateEntityException(clazz = Member::class.java, name = memberSaveRequest.account)
+    fun createMember(
+        account: String,
+        password: String,
+        name: String,
+        phone: String,
+        birthDate: LocalDate,
+        roleIds: List<Long>,
+        permissionIds: List<Long>,
+    ): Member {
+        if (memberRepository.existsByAccount(account)) {
+            throw DuplicateEntityException(clazz = Member::class.java, name = account)
         }
 
         val member = Member.create(
-            account = memberSaveRequest.account,
-            password = passwordEncoder.encode(memberSaveRequest.password),
-            name = memberSaveRequest.name,
-            phone = memberSaveRequest.phone,
-            birthDate = memberSaveRequest.birthDate,
+            account = account,
+            password = passwordEncoder.encode(password),
+            name = name,
+            phone = phone,
+            birthDate = birthDate,
         )
 
-        val roleMap = roleRepository.findAllById(memberSaveRequest.roleIds).associateBy { it.id }
-        memberSaveRequest.roleIds.forEach {
+        val roleMap = roleRepository.findAllById(roleIds).associateBy { it.id }
+        roleIds.forEach {
             val role = roleMap[it] ?: throw EntityNotFoundException(clazz = Role::class.java, id = it)
             member.addRole(role)
         }
 
         permissionService.addPermission(
-            permissionIds = memberSaveRequest.permissionIds,
+            permissionIds = permissionIds,
             consumer = member::addPermission
         )
 
@@ -61,31 +67,35 @@ class MemberService(
             )
         )
 
-        return MemberResponse(member)
+        return member
     }
 
-    fun findMember(): MemberResponse {
+    fun findMember(): Member {
         val memberId = SecurityContextUtil.getMemberId()
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
-        return MemberResponse(member)
+        return memberRepository.findByIdOrNull(memberId)
+            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
     }
 
     @Transactional
-    fun updateMember(memberUpdateRequest: MemberUpdateRequest): MemberResponse {
+    fun updateMember(
+        password: String?,
+        name: String?,
+        phone: String?,
+        birthDate: LocalDate?,
+    ): Member {
         val memberId = SecurityContextUtil.getMemberId()
         val member = memberRepository.findByIdOrNull(memberId)
             ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
 
         member.update(
-            password = passwordEncoder.encode(memberUpdateRequest.password),
-            name = memberUpdateRequest.name,
-            phone = memberUpdateRequest.phone,
-            birthDate = memberUpdateRequest.birthDate,
+            password = passwordEncoder.encode(password),
+            name = name,
+            phone = phone,
+            birthDate = birthDate,
         )
 
-        return MemberResponse(member)
+        return member
     }
 
     @Transactional

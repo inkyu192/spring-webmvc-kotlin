@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Pattern
 import java.time.LocalDate
 
 
-data class MemberSaveRequest(
+data class MemberCreateRequest(
     @field:Email
     val account: String,
     val password: String,

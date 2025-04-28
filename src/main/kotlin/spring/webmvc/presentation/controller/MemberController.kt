@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import spring.webmvc.presentation.dto.request.MemberSaveRequest
-import spring.webmvc.presentation.dto.request.MemberUpdateRequest
 import spring.webmvc.application.service.MemberService
+import spring.webmvc.presentation.dto.request.MemberCreateRequest
+import spring.webmvc.presentation.dto.request.MemberUpdateRequest
 import spring.webmvc.presentation.dto.response.MemberResponse
 import spring.webmvc.presentation.exception.AtLeastOneRequiredException
 
@@ -17,22 +17,39 @@ class MemberController(
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun saveMember(@RequestBody @Validated memberSaveRequest: MemberSaveRequest): MemberResponse {
-        if (memberSaveRequest.roleIds.isEmpty() && memberSaveRequest.permissionIds.isEmpty()) {
+    fun createMember(@RequestBody @Validated memberCreateRequest: MemberCreateRequest): MemberResponse {
+        if (memberCreateRequest.roleIds.isEmpty() && memberCreateRequest.permissionIds.isEmpty()) {
             throw AtLeastOneRequiredException("roleIds", "permissionIds")
         }
 
-        return memberService.saveMember(memberSaveRequest)
+        return MemberResponse(
+            member = memberService.createMember(
+                account = memberCreateRequest.account,
+                password = memberCreateRequest.password,
+                name = memberCreateRequest.name,
+                phone = memberCreateRequest.phone,
+                birthDate = memberCreateRequest.birthDate,
+                roleIds = memberCreateRequest.roleIds,
+                permissionIds = memberCreateRequest.permissionIds,
+            )
+        )
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    fun findMember() = memberService.findMember()
+    fun findMember() = MemberResponse(member = memberService.findMember())
 
     @PatchMapping
     @PreAuthorize("isAuthenticated()")
     fun updateMember(@RequestBody @Validated memberUpdateRequest: MemberUpdateRequest) =
-        memberService.updateMember(memberUpdateRequest)
+        MemberResponse(
+            member = memberService.updateMember(
+                password = memberUpdateRequest.password,
+                name = memberUpdateRequest.name,
+                phone = memberUpdateRequest.phone,
+                birthDate = memberUpdateRequest.birthDate,
+            )
+        )
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")

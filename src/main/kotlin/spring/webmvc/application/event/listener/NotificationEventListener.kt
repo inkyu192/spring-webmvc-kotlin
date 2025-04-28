@@ -13,6 +13,6 @@ class NotificationEventListener(
     @Async
     @TransactionalEventListener
     fun handleNotificationEvent(notificationEvent: NotificationEvent) {
-        notificationService.saveNotification(notificationEvent)
+        notificationService.createNotification(notificationEvent)
     }
 }

@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.MemberService
-import spring.webmvc.presentation.dto.request.MemberSaveRequest
+import spring.webmvc.presentation.dto.request.MemberCreateRequest
 import spring.webmvc.presentation.dto.request.MemberUpdateRequest
 import spring.webmvc.presentation.dto.response.MemberResponse
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -56,7 +56,7 @@ class MemberControllerTest(
 
     @Test
     fun saveMember() {
-        val request = MemberSaveRequest(
+        val request = MemberCreateRequest(
             account = "test@gmail.com",
             password = "password",
             name = "name",
@@ -74,7 +74,7 @@ class MemberControllerTest(
             createdAt = Instant.now()
         )
 
-        Mockito.`when`(memberService.saveMember(request)).thenReturn(response)
+        Mockito.`when`(memberService.createMember(request)).thenReturn(response)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/members")

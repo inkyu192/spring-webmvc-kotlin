@@ -9,8 +9,6 @@ import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.TokenRepository
 import spring.webmvc.infrastructure.config.security.JwtProvider
-import spring.webmvc.presentation.dto.request.MemberLoginRequest
-import spring.webmvc.presentation.dto.request.TokenRequest
 import spring.webmvc.presentation.dto.response.TokenResponse
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
@@ -23,9 +21,9 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder
 ) {
     @Transactional
-    fun login(memberLoginRequest: MemberLoginRequest): TokenResponse {
-        val member = memberRepository.findByAccount(memberLoginRequest.account)
-            ?.takeIf { passwordEncoder.matches(memberLoginRequest.password, it.password) }
+    fun login(account: String, password: String): Pair<String, String> {
+        val member = memberRepository.findByAccount(account)
+            ?.takeIf { passwordEncoder.matches(password, it.password) }
             ?: throw BadCredentialsException("잘못된 아이디 또는 비밀번호입니다.")
 
         val memberId = checkNotNull(member.id)
@@ -41,30 +39,24 @@ class AuthService(
             token = refreshToken,
         )
 
-        return TokenResponse(
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-        )
+        return accessToken to refreshToken
     }
 
-    fun refreshToken(tokenRequest: TokenRequest): TokenResponse {
-        val requestMemberId = extractMemberId(tokenRequest.accessToken)
-        jwtProvider.parseRefreshToken(tokenRequest.refreshToken)
+    fun refreshToken(accessToken: String, refreshToken: String): Pair<String, String> {
+        val requestMemberId = extractMemberId(accessToken)
+        jwtProvider.parseRefreshToken(refreshToken)
 
         val member = memberRepository.findByIdOrNull(requestMemberId)
             ?: throw EntityNotFoundException(clazz = Member::class.java, id = requestMemberId)
 
-        val token = tokenRepository.findByMemberIdOrNull(requestMemberId)
-            ?.takeIf { tokenRequest.refreshToken == it }
+        tokenRepository.findByMemberIdOrNull(requestMemberId)
+            ?.takeIf { refreshToken == it }
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
 
-        return TokenResponse(
-            accessToken = jwtProvider.createAccessToken(
-                memberId = checkNotNull(member.id),
-                permissions = getPermissions(member),
-            ),
-            refreshToken = token,
-        )
+        return jwtProvider.createAccessToken(
+            memberId = checkNotNull(member.id),
+            permissions = getPermissions(member),
+        ) to refreshToken
     }
 
     private fun extractMemberId(accessToken: String): Long {

@@ -4,62 +4,75 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.repository.FlightRepository
-import spring.webmvc.presentation.dto.request.FlightCreateRequest
-import spring.webmvc.presentation.dto.request.FlightUpdateRequest
-import spring.webmvc.presentation.dto.response.FlightResponse
 import spring.webmvc.presentation.exception.EntityNotFoundException
+import java.time.Instant
 
 @Service
 @Transactional(readOnly = true)
 class FlightService(
     private val flightRepository: FlightRepository,
 ) {
-    fun findFlight(id: Long): FlightResponse {
-        val flight = flightRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(clazz = FlightRepository::class.java, id = id)
-
-        return FlightResponse(flight = flight)
-    }
+    fun findFlight(id: Long) = flightRepository.findByIdOrNull(id)
+        ?: throw EntityNotFoundException(clazz = FlightRepository::class.java, id = id)
 
     @Transactional
-    fun createFlight(flightCreateRequest: FlightCreateRequest): FlightResponse {
-        val flight = flightRepository.save(
-            Flight.create(
-                name = flightCreateRequest.name,
-                description = flightCreateRequest.description,
-                price = flightCreateRequest.price,
-                quantity = flightCreateRequest.quantity,
-                flightNumber = flightCreateRequest.flightNumber,
-                airline = flightCreateRequest.airline,
-                departureAirport = flightCreateRequest.departureAirport,
-                arrivalAirport = flightCreateRequest.arrivalAirport,
-                departureTime = flightCreateRequest.departureTime,
-                arrivalTime = flightCreateRequest.arrivalTime,
-            )
+    fun createFlight(
+        name: String,
+        description: String,
+        price: Int,
+        quantity: Int,
+        airline: String,
+        flightNumber: String,
+        departureAirport: String,
+        arrivalAirport: String,
+        departureTime: Instant,
+        arrivalTime: Instant,
+    ) = flightRepository.save(
+        Flight.create(
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            flightNumber = flightNumber,
+            airline = airline,
+            departureAirport = departureAirport,
+            arrivalAirport = arrivalAirport,
+            departureTime = departureTime,
+            arrivalTime = arrivalTime,
         )
-
-        return FlightResponse(flight = flight)
-    }
+    )
 
     @Transactional
-    fun updateFlight(id: Long, flightUpdateRequest: FlightUpdateRequest): FlightResponse {
+    fun updateFlight(
+        id: Long,
+        name: String,
+        description: String,
+        price: Int,
+        quantity: Int,
+        airline: String,
+        flightNumber: String,
+        departureAirport: String,
+        arrivalAirport: String,
+        departureTime: Instant,
+        arrivalTime: Instant,
+    ): Flight {
         val flight = flightRepository.findByIdOrNull(id)
             ?: throw EntityNotFoundException(clazz = FlightRepository::class.java, id = id)
 
         flight.update(
-            name = flightUpdateRequest.name,
-            description = flightUpdateRequest.description,
-            price = flightUpdateRequest.price,
-            quantity = flightUpdateRequest.quantity,
-            airline = flightUpdateRequest.airline,
-            flightNumber = flightUpdateRequest.flightNumber,
-            departureAirport = flightUpdateRequest.departureAirport,
-            arrivalAirport = flightUpdateRequest.arrivalAirport,
-            departureTime = flightUpdateRequest.departureTime,
-            arrivalTime = flightUpdateRequest.arrivalTime,
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            airline = airline,
+            flightNumber = flightNumber,
+            departureAirport = departureAirport,
+            arrivalAirport = arrivalAirport,
+            departureTime = departureTime,
+            arrivalTime = arrivalTime,
         )
 
-        return FlightResponse(flight = flight)
+        return flight
     }
 
     @Transactional
