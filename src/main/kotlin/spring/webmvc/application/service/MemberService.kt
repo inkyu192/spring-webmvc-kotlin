@@ -5,9 +5,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.event.NotificationEvent
-import spring.webmvc.domain.model.entity.*
+import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.domain.model.entity.Role
 import spring.webmvc.domain.repository.MemberRepository
-import spring.webmvc.domain.repository.PermissionRepository
 import spring.webmvc.domain.repository.RoleRepository
 import spring.webmvc.infrastructure.util.SecurityContextUtil
 import spring.webmvc.presentation.dto.request.MemberSaveRequest
@@ -21,7 +21,7 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 class MemberService(
     private val memberRepository: MemberRepository,
     private val roleRepository: RoleRepository,
-    private val permissionRepository: PermissionRepository,
+    private val permissionService: PermissionService,
     private val passwordEncoder: PasswordEncoder,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
@@ -45,11 +45,10 @@ class MemberService(
             member.addRole(role)
         }
 
-        val permissionMap = permissionRepository.findAllById(memberSaveRequest.permissionIds).associateBy { it.id }
-        memberSaveRequest.permissionIds.forEach {
-            val permission = permissionMap[it] ?: throw EntityNotFoundException(clazz = Permission::class.java, id = it)
-            member.addPermission(permission)
-        }
+        permissionService.addPermission(
+            permissionIds = memberSaveRequest.permissionIds,
+            consumer = member::addPermission
+        )
 
         memberRepository.save(member)
 
