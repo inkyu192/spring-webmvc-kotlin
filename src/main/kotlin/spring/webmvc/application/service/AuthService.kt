@@ -9,7 +9,6 @@ import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.TokenRepository
 import spring.webmvc.infrastructure.config.security.JwtProvider
-import spring.webmvc.presentation.dto.response.TokenResponse
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Service
