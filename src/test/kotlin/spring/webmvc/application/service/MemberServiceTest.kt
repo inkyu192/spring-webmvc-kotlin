@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
-import spring.webmvc.domain.repository.PermissionRepository
 import spring.webmvc.domain.repository.RoleRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import java.time.Instant
@@ -21,13 +20,13 @@ import java.time.LocalDate
 class MemberServiceTest : DescribeSpec({
     val memberRepository = mockk<MemberRepository>()
     val roleRepository = mockk<RoleRepository>()
-    val permissionRepository = mockk<PermissionRepository>()
+    val permissionService = mockk<PermissionService>()
     val passwordEncoder = mockk<PasswordEncoder>()
     val eventPublisher = mockk<ApplicationEventPublisher>()
     val memberService = MemberService(
         memberRepository = memberRepository,
         roleRepository = roleRepository,
-        permissionRepository = permissionRepository,
+        permissionService = permissionService,
         passwordEncoder = passwordEncoder,
         eventPublisher = eventPublisher
     )
@@ -36,7 +35,7 @@ class MemberServiceTest : DescribeSpec({
         val authentication = UsernamePasswordAuthenticationToken(
             1L,
             null,
-            listOf(SimpleGrantedAuthority("ROLE_USER"))
+            listOf(SimpleGrantedAuthority("TEST"))
         )
 
         SecurityContextHolder.getContext().authentication = authentication
@@ -46,17 +45,19 @@ class MemberServiceTest : DescribeSpec({
         SecurityContextHolder.clearContext()
     }
 
-    describe("findMember 는") {
-        context("엔티티가 존재하지 않을 경우") {
-            it("EntityNotFoundException 던진다") {
-                every { memberRepository.findByIdOrNull(any()) } returns null
+    describe("findMember") {
+        context("Member 없을 경우") {
+            it("EntityNotFoundException 발생한다") {
+                val memberId = 1L
+
+                every { memberRepository.findByIdOrNull(memberId) } returns null
 
                 shouldThrow<EntityNotFoundException> { memberService.findMember() }
             }
         }
 
-        context("엔티티가 존재할 경우") {
-            it("MemberResponse 반환한다") {
+        context("Member 있을 경우") {
+            it("조회 후 반환한다") {
                 val memberId = 1L
                 val member = mockk<Member> {
                     every { id } returns memberId
@@ -69,9 +70,14 @@ class MemberServiceTest : DescribeSpec({
 
                 every { memberRepository.findByIdOrNull(any()) } returns member
 
-                memberService.findMember().apply {
-                    this.id shouldBe memberId
-                }
+                val result = memberService.findMember()
+
+                result.id shouldBe memberId
+                result.account shouldBe member.account
+                result.name shouldBe member.name
+                result.phone shouldBe member.phone
+                result.birthDate shouldBe member.birthDate
+                result.createdAt shouldBe member.createdAt
             }
         }
     }

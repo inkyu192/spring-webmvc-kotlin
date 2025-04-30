@@ -31,9 +31,9 @@ class JwtExceptionHandlerTest : DescribeSpec({
         response = MockHttpServletResponse()
     }
 
-    describe("ExceptionHandlerFilter 는") {
+    describe("doFilter") {
         context("JwtException 발생할 경우") {
-            it("UNAUTHORIZED 반환한다") {
+            it("ProblemDetail 반환한다") {
                 val status = HttpStatus.UNAUTHORIZED
                 val message = "JwtException"
                 val uri = URI.create("uri")
@@ -50,8 +50,8 @@ class JwtExceptionHandlerTest : DescribeSpec({
             }
         }
 
-        context("RuntimeException 발생할 경우") {
-            it("INTERNAL_SERVER_ERROR 반환한다") {
+        context("ServletException 발생할 경우") {
+            it("ProblemDetail 반환한다") {
                 val status = HttpStatus.INTERNAL_SERVER_ERROR
                 val message = "RuntimeException"
                 val uri = URI.create("uri")

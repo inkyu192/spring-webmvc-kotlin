@@ -12,13 +12,13 @@ class RequestLockServiceTest : DescribeSpec({
     val requestLockRepository = mockk<RequestLockRepository>()
     val requestLockService = RequestLockService(requestLockRepository)
 
-    describe("validate 는") {
-        val memberId = 1L
-        val method = "GET"
-        val uri = "/members"
-
-        context("데이터가 없을 경우") {
+    describe("validate") {
+        context("RequestLock 없을 경우") {
             it("저장한다") {
+                val memberId = 1L
+                val method = "GET"
+                val uri = "/members"
+
                 every {
                     requestLockRepository.setIfAbsent(
                         memberId = memberId,
@@ -39,8 +39,12 @@ class RequestLockServiceTest : DescribeSpec({
             }
         }
 
-        context("데이터가 있을 경우") {
-            it("DuplicateRequestException 던진다") {
+        context("RequestLock 있을 경우") {
+            it("DuplicateRequestException 발생한다") {
+                val memberId = 1L
+                val method = "GET"
+                val uri = "/members"
+
                 every {
                     requestLockRepository.setIfAbsent(
                         memberId = memberId,

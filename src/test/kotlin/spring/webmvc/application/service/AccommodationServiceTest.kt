@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.springframework.http.HttpStatus
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.repository.AccommodationRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
@@ -66,11 +65,7 @@ class AccommodationServiceTest : DescribeSpec({
 
                 every { accommodationRepository.findByIdOrNull(accommodationId) } returns null
 
-                val result = shouldThrow<EntityNotFoundException> {
-                    accommodationService.findAccommodation(accommodationId)
-                }
-
-                result.httpStatus shouldBe HttpStatus.NOT_FOUND
+                shouldThrow<EntityNotFoundException> { accommodationService.findAccommodation(accommodationId) }
             }
         }
 
@@ -117,7 +112,7 @@ class AccommodationServiceTest : DescribeSpec({
 
                 every { accommodationRepository.findByIdOrNull(accommodationId) } returns null
 
-                val result = shouldThrow<EntityNotFoundException> {
+                shouldThrow<EntityNotFoundException> {
                     accommodationService.updateAccommodation(
                         id = accommodationId,
                         name = name,
@@ -129,8 +124,6 @@ class AccommodationServiceTest : DescribeSpec({
                         checkOutTime = checkOutTime,
                     )
                 }
-
-                result.httpStatus shouldBe HttpStatus.NOT_FOUND
             }
         }
 
@@ -187,11 +180,7 @@ class AccommodationServiceTest : DescribeSpec({
 
                 every { accommodationRepository.findByIdOrNull(accommodationId) } returns null
 
-                val result = shouldThrow<EntityNotFoundException> {
-                    accommodationService.deleteAccommodation(accommodationId)
-                }
-
-                result.httpStatus shouldBe HttpStatus.NOT_FOUND
+                shouldThrow<EntityNotFoundException> { accommodationService.deleteAccommodation(accommodationId) }
             }
         }
 

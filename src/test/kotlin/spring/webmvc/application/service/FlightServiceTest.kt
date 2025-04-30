@@ -5,13 +5,9 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
-import org.springframework.http.HttpStatus
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.repository.FlightRepository
-import spring.webmvc.presentation.dto.request.FlightCreateRequest
-import spring.webmvc.presentation.dto.request.FlightUpdateRequest
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -22,48 +18,55 @@ class FlightServiceTest : DescribeSpec({
 
     describe("createFlight") {
         it("Flight 저장 후 반환한다") {
+            val name = "name"
+            val description = "description"
+            val price = 1000
+            val quantity = 5
+            val airline = "airline"
+            val flightNumber = "flightNumber"
+            val departureAirport = "departureAirport"
+            val arrivalAirport = "arrivalAirport"
             val departureTime = Instant.now()
-            val arrivalTime = departureTime.plus(1, ChronoUnit.DAYS)
-            val request = FlightCreateRequest(
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 5,
-                airline = "airline",
-                flightNumber = "flightNumber",
-                departureAirport = "departureAirport",
-                arrivalAirport = "arrivalAirport",
+            val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
+
+            val flight = Flight.create(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                airline = airline,
+                flightNumber = flightNumber,
+                departureAirport = departureAirport,
+                arrivalAirport = arrivalAirport,
                 departureTime = departureTime,
                 arrivalTime = arrivalTime,
             )
-            val flight = spyk(
-                Flight.create(
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 5,
-                    airline = "airline",
-                    flightNumber = "flightNumber",
-                    departureAirport = "departureAirport",
-                    arrivalAirport = "arrivalAirport",
-                    departureTime = departureTime,
-                    arrivalTime = arrivalTime,
-                )
-            ).apply { every { id } returns 1L }
 
-            every { flightRepository.save(any<Flight>()) } returns flight
+            every { flightRepository.save(flight = any<Flight>()) } returns flight
 
-            flightService.createFlight(request).apply {
-                name shouldBe request.name
-                description shouldBe request.description
-                price shouldBe request.price
-                quantity shouldBe request.quantity
-                departureAirport shouldBe request.departureAirport
-                arrivalAirport shouldBe request.arrivalAirport
-                departureTime shouldBe request.departureTime
-                arrivalTime shouldBe request.arrivalTime
-                airline shouldBe request.airline
-            }
+            // When
+            val result = flightService.createFlight(
+                name,
+                description,
+                price,
+                quantity,
+                airline,
+                flightNumber,
+                departureAirport,
+                arrivalAirport,
+                departureTime,
+                arrivalTime
+            )
+
+            result.product.name shouldBe name
+            result.product.description shouldBe description
+            result.product.price shouldBe price
+            result.product.quantity shouldBe quantity
+            result.departureAirport shouldBe departureAirport
+            result.arrivalAirport shouldBe arrivalAirport
+            result.departureTime shouldBe departureTime
+            result.arrivalTime shouldBe arrivalTime
+            result.airline shouldBe airline
         }
     }
 
@@ -74,37 +77,39 @@ class FlightServiceTest : DescribeSpec({
 
                 every { flightRepository.findByIdOrNull(flightId) } returns null
 
-                shouldThrow<EntityNotFoundException> { flightService.findFlight(flightId) }.apply {
-                    httpStatus shouldBe HttpStatus.NOT_FOUND
-                }
+                shouldThrow<EntityNotFoundException> { flightService.findFlight(flightId) }
             }
         }
 
         context("Flight 있을 경우") {
             it("조회 후 반환한다") {
                 val flightId = 1L
-                val departureTime = Instant.now()
-                val arrivalTime = departureTime.plus(1, ChronoUnit.DAYS)
-                val flight = spyk(
-                    Flight.create(
-                        name = "name",
-                        description = "description",
-                        price = 1000,
-                        quantity = 5,
-                        airline = "airline",
-                        flightNumber = "flightNumber",
-                        departureAirport = "departureAirport",
-                        arrivalAirport = "arrivalAirport",
-                        departureTime = departureTime,
-                        arrivalTime = arrivalTime,
-                    )
-                ).apply { every { id } returns flightId }
+                val flight = Flight.create(
+                    name = "name",
+                    description = "description",
+                    price = 1000,
+                    quantity = 5,
+                    airline = "airline",
+                    flightNumber = "flightNumber",
+                    departureAirport = "departureAirport",
+                    arrivalAirport = "arrivalAirport",
+                    departureTime = Instant.now(),
+                    arrivalTime = Instant.now().plus(1, ChronoUnit.DAYS),
+                )
 
                 every { flightRepository.findByIdOrNull(flightId) } returns flight
 
-                flightService.findFlight(flightId).apply {
-                    id shouldBe flightId
-                }
+                val result = flightService.findFlight(flightId)
+
+                result.product.name shouldBe flight.product.name
+                result.product.description shouldBe flight.product.description
+                result.product.price shouldBe flight.product.price
+                result.product.quantity shouldBe flight.product.quantity
+                result.departureAirport shouldBe flight.departureAirport
+                result.arrivalAirport shouldBe flight.arrivalAirport
+                result.departureTime shouldBe flight.departureTime
+                result.arrivalTime shouldBe flight.arrivalTime
+                result.airline shouldBe flight.airline
             }
         }
     }
@@ -113,30 +118,33 @@ class FlightServiceTest : DescribeSpec({
         context("Flight 없을 경우") {
             it("EntityNotFoundException 발생한다") {
                 val flightId = 1L
+                val name = "name"
+                val description = "description"
+                val price = 1000
+                val quantity = 5
+                val airline = "airline"
+                val flightNumber = "flightNumber"
+                val departureAirport = "departureAirport"
+                val arrivalAirport = "arrivalAirport"
                 val departureTime = Instant.now()
-                val arrivalTime = departureTime.plus(1, ChronoUnit.DAYS)
-                val request = FlightUpdateRequest(
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 5,
-                    airline = "airline",
-                    flightNumber = "flightNumber",
-                    departureAirport = "departureAirport",
-                    arrivalAirport = "arrivalAirport",
-                    departureTime = departureTime,
-                    arrivalTime = arrivalTime,
-                )
+                val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
 
                 every { flightRepository.findByIdOrNull(flightId) } returns null
 
                 shouldThrow<EntityNotFoundException> {
                     flightService.updateFlight(
                         id = flightId,
-                        flightUpdateRequest = request
+                        name = name,
+                        description = description,
+                        price = price,
+                        quantity = quantity,
+                        airline = airline,
+                        flightNumber = flightNumber,
+                        departureAirport = departureAirport,
+                        arrivalAirport = arrivalAirport,
+                        departureTime = departureTime,
+                        arrivalTime = arrivalTime,
                     )
-                }.apply {
-                    httpStatus shouldBe HttpStatus.NOT_FOUND
                 }
             }
         }
@@ -144,49 +152,55 @@ class FlightServiceTest : DescribeSpec({
         context("Flight 있을 경우") {
             it("수정 후 반환한다") {
                 val flightId = 1L
+                val name = "name"
+                val description = "description"
+                val price = 1000
+                val quantity = 5
+                val airline = "airline"
+                val flightNumber = "flightNumber"
+                val departureAirport = "departureAirport"
+                val arrivalAirport = "arrivalAirport"
                 val departureTime = Instant.now()
-                val arrivalTime = departureTime.plus(1, ChronoUnit.DAYS)
-                val request = FlightUpdateRequest(
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 5,
-                    airline = "airline",
-                    flightNumber = "flightNumber",
-                    departureAirport = "departureAirport",
-                    arrivalAirport = "arrivalAirport",
+                val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
+
+                val flight = Flight.create(
+                    name = name,
+                    description = description,
+                    price = price,
+                    quantity = quantity,
+                    airline = airline,
+                    flightNumber = flightNumber,
+                    departureAirport = departureAirport,
+                    arrivalAirport = arrivalAirport,
                     departureTime = departureTime,
                     arrivalTime = arrivalTime,
                 )
-                val flight = spyk(
-                    Flight.create(
-                        name = "name",
-                        description = "description",
-                        price = 1000,
-                        quantity = 5,
-                        airline = "airline",
-                        flightNumber = "flightNumber",
-                        departureAirport = "departureAirport",
-                        arrivalAirport = "arrivalAirport",
-                        departureTime = departureTime,
-                        arrivalTime = arrivalTime,
-                    )
-                ).apply { every { id } returns flightId }
 
                 every { flightRepository.findByIdOrNull(flightId) } returns flight
 
-                flightService.updateFlight(id = flightId, flightUpdateRequest = request).apply {
-                    name shouldBe request.name
-                    description shouldBe request.description
-                    price shouldBe request.price
-                    quantity shouldBe request.quantity
-                    departureAirport shouldBe request.departureAirport
-                    arrivalAirport shouldBe request.arrivalAirport
-                    departureTime shouldBe request.departureTime
-                    arrivalTime shouldBe request.arrivalTime
-                    airline shouldBe request.airline
-                    id shouldBe flightId
-                }
+                val result = flightService.updateFlight(
+                    id = flightId,
+                    name = name,
+                    description = description,
+                    price = price,
+                    quantity = quantity,
+                    airline = airline,
+                    flightNumber = flightNumber,
+                    departureAirport = departureAirport,
+                    arrivalAirport = arrivalAirport,
+                    departureTime = departureTime,
+                    arrivalTime = arrivalTime,
+                )
+
+                result.product.name shouldBe flight.product.name
+                result.product.description shouldBe flight.product.description
+                result.product.price shouldBe flight.product.price
+                result.product.quantity shouldBe flight.product.quantity
+                result.departureAirport shouldBe flight.departureAirport
+                result.arrivalAirport shouldBe flight.arrivalAirport
+                result.departureTime shouldBe flight.departureTime
+                result.arrivalTime shouldBe flight.arrivalTime
+                result.airline shouldBe flight.airline
             }
         }
     }
@@ -198,34 +212,27 @@ class FlightServiceTest : DescribeSpec({
 
                 every { flightRepository.findByIdOrNull(flightId) } returns null
 
-                shouldThrow<EntityNotFoundException> { flightService.deleteFlight(flightId) }.apply {
-                    httpStatus shouldBe HttpStatus.NOT_FOUND
-                }
+                shouldThrow<EntityNotFoundException> { flightService.deleteFlight(flightId) }
             }
         }
 
         context("Flight 있을 경우") {
             it("삭제한다") {
                 val flightId = 1L
-                val departureTime = Instant.now()
-                val arrivalTime = departureTime.plus(1, ChronoUnit.DAYS)
-                val flight = spyk(
-                    Flight.create(
-                        name = "name",
-                        description = "description",
-                        price = 1000,
-                        quantity = 5,
-                        airline = "airline",
-                        flightNumber = "flightNumber",
-                        departureAirport = "departureAirport",
-                        arrivalAirport = "arrivalAirport",
-                        departureTime = departureTime,
-                        arrivalTime = arrivalTime,
-                    )
-                ).apply { every { id } returns flightId }
+                val flight = Flight.create(
+                    name = "name",
+                    description = "description",
+                    price = 1000,
+                    quantity = 5,
+                    airline = "airline",
+                    flightNumber = "flightNumber",
+                    departureAirport = "departureAirport",
+                    arrivalAirport = "arrivalAirport",
+                    departureTime = Instant.now(),
+                    arrivalTime = Instant.now().plus(1, ChronoUnit.DAYS),
+                )
 
                 every { flightRepository.findByIdOrNull(flightId) } returns flight
-                every { flightRepository.delete(flight) } returns Unit
 
                 flightService.deleteFlight(flightId)
 
