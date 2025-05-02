@@ -2,7 +2,7 @@
 - **Language:** Kotlin
 - **Library / Framework:** Spring Web MVC, Spring Data JPA, Querydsl, Spring REST Docs
 - **Database:** PostgreSQL, Redis
-- **Testing:** Kotest, MockK, Testcontainers
+- **Test:** JUnit 5, Mockito, Kotest, MockK, Testcontainers
 - **Infrastructure**: Docker, Docker Compose, LocalStack
 
 ---
