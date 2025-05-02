@@ -13,7 +13,7 @@ class FlightService(
     private val flightRepository: FlightRepository,
 ) {
     fun findFlight(id: Long) = flightRepository.findByIdOrNull(id)
-        ?: throw EntityNotFoundException(clazz = FlightRepository::class.java, id = id)
+        ?: throw EntityNotFoundException(kClass = FlightRepository::class, id = id)
 
     @Transactional
     fun createFlight(
@@ -57,7 +57,7 @@ class FlightService(
         arrivalTime: Instant,
     ): Flight {
         val flight = flightRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(clazz = FlightRepository::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = FlightRepository::class, id = id)
 
         flight.update(
             name = name,
@@ -78,7 +78,7 @@ class FlightService(
     @Transactional
     fun deleteFlight(id: Long) {
         val flight = flightRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(clazz = FlightRepository::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = FlightRepository::class, id = id)
 
         flightRepository.delete(flight)
     }

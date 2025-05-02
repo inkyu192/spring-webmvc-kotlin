@@ -13,7 +13,7 @@ class AccommodationService(
     private val accommodationRepository: AccommodationRepository,
 ) {
     fun findAccommodation(id: Long) = accommodationRepository.findByIdOrNull(id)
-        ?: throw EntityNotFoundException(clazz = AccommodationRepository::class.java, id = id)
+        ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = id)
 
     @Transactional
     fun createAccommodation(
@@ -48,7 +48,7 @@ class AccommodationService(
         checkOutTime: Instant,
     ): Accommodation {
         val accommodation = accommodationRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(clazz = AccommodationRepository::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = id)
 
         accommodation.update(
             name = name,
@@ -66,7 +66,7 @@ class AccommodationService(
     @Transactional
     fun deleteAccommodation(id: Long) {
         val accommodation = accommodationRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(clazz = AccommodationRepository::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = id)
 
         accommodationRepository.delete(accommodation)
     }

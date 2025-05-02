@@ -26,14 +26,14 @@ class OrderService(
         val memberId = SecurityContextUtil.getMemberId()
 
         val member = memberRepository.findByIdOrNull(id = memberId)
-            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
+            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
         val order = Order.create(member = member)
 
         val productMap = productRepository.findAllById(ids = productQuantities.map { it.first }).associateBy { it.id }
         productQuantities.forEach {
             val product = productMap[it.first]
-                ?: throw EntityNotFoundException(clazz = OrderItem::class.java, id = it.first)
+                ?: throw EntityNotFoundException(kClass = OrderItem::class, id = it.first)
 
             order.addProduct(product = product, quantity = it.second)
         }
@@ -55,7 +55,7 @@ class OrderService(
         val memberId = SecurityContextUtil.getMemberId()
 
         val order = orderRepository.findByIdAndMemberId(id = id, memberId = memberId)
-            ?: throw EntityNotFoundException(clazz = Order::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = Order::class, id = id)
 
         return order
     }
@@ -65,7 +65,7 @@ class OrderService(
         val memberId = SecurityContextUtil.getMemberId()
 
         val order = orderRepository.findByIdAndMemberId(id = id, memberId = memberId)
-            ?: throw EntityNotFoundException(clazz = Order::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = Order::class, id = id)
 
         order.cancel()
 

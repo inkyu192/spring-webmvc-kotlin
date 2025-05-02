@@ -18,7 +18,7 @@ class NotificationService(
     @Transactional
     fun createNotification(notificationEvent: NotificationEvent) {
         val member = memberRepository.findByIdOrNull(notificationEvent.memberId)
-            ?: throw EntityNotFoundException(clazz = Member::class.java, id = notificationEvent.memberId)
+            ?: throw EntityNotFoundException(kClass = Member::class, id = notificationEvent.memberId)
 
         notificationRepository.save(
             Notification.of(

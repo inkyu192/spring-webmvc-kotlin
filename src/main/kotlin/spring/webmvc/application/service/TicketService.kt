@@ -13,7 +13,7 @@ class TicketService(
     private val ticketRepository: TicketRepository,
 ) {
     fun findTicket(id: Long) = ticketRepository.findByIdOrNull(id)
-        ?: throw EntityNotFoundException(clazz = TicketRepository::class.java, id = id)
+        ?: throw EntityNotFoundException(kClass = TicketRepository::class, id = id)
 
     @Transactional
     fun createTicket(
@@ -51,7 +51,7 @@ class TicketService(
         ageLimit: String,
     ): Ticket {
         val ticket = ticketRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(clazz = TicketRepository::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = TicketRepository::class, id = id)
 
         ticket.update(
             name = name,
@@ -70,7 +70,7 @@ class TicketService(
     @Transactional
     fun deleteTicket(id: Long) {
         val ticket = ticketRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(clazz = TicketRepository::class.java, id = id)
+            ?: throw EntityNotFoundException(kClass = TicketRepository::class, id = id)
 
         ticketRepository.delete(ticket)
     }

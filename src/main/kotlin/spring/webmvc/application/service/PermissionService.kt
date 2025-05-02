@@ -14,7 +14,7 @@ class PermissionService(
     fun addPermission(permissionIds: List<Long>, consumer: (Permission) -> Unit) {
         val permissionMap = permissionRepository.findAllById(permissionIds).associateBy { it.id }
         permissionIds.forEach {
-            val permission = permissionMap[it] ?: throw EntityNotFoundException(clazz = Permission::class.java, id = it)
+            val permission = permissionMap[it] ?: throw EntityNotFoundException(kClass = Permission::class, id = it)
             consumer(permission)
         }
     }

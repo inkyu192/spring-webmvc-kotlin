@@ -34,7 +34,7 @@ class MemberService(
         permissionIds: List<Long>,
     ): Member {
         if (memberRepository.existsByAccount(account)) {
-            throw DuplicateEntityException(clazz = Member::class.java, name = account)
+            throw DuplicateEntityException(kClass = Member::class, name = account)
         }
 
         val member = Member.create(
@@ -47,7 +47,7 @@ class MemberService(
 
         val roleMap = roleRepository.findAllById(roleIds).associateBy { it.id }
         roleIds.forEach {
-            val role = roleMap[it] ?: throw EntityNotFoundException(clazz = Role::class.java, id = it)
+            val role = roleMap[it] ?: throw EntityNotFoundException(kClass = Role::class, id = it)
             member.addRole(role)
         }
 
@@ -74,7 +74,7 @@ class MemberService(
         val memberId = SecurityContextUtil.getMemberId()
 
         return memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
+            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
     }
 
     @Transactional
@@ -86,7 +86,7 @@ class MemberService(
     ): Member {
         val memberId = SecurityContextUtil.getMemberId()
         val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
+            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
         member.update(
             password = passwordEncoder.encode(password),
@@ -102,7 +102,7 @@ class MemberService(
     fun deleteMember() {
         val memberId = SecurityContextUtil.getMemberId()
         val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(clazz = Member::class.java, id = memberId)
+            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
         memberRepository.delete(member)
     }
