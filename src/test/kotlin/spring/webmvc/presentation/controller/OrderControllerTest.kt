@@ -8,7 +8,6 @@ import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -28,12 +27,13 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.OrderService
+import spring.webmvc.domain.model.entity.Order
+import spring.webmvc.domain.model.entity.OrderProduct
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.presentation.dto.request.OrderProductCreateRequest
-import spring.webmvc.presentation.dto.request.OrderCreateRequest
-import spring.webmvc.presentation.dto.response.OrderProductResponse
-import spring.webmvc.presentation.dto.response.OrderResponse
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.presentation.dto.request.OrderCreateRequest
+import spring.webmvc.presentation.dto.request.OrderProductCreateRequest
 import java.time.Instant
 
 @WebMvcTest(OrderController::class)
@@ -60,25 +60,24 @@ class OrderControllerTest(
     }
 
     @Test
-    @Throws(Exception::class)
-    fun saveOrder() {
+    fun createOrder() {
         val request = OrderCreateRequest(
-            memberId = 1L,
-            city = "city",
-            street = "street",
-            zipcode = "zipcode",
-            products = listOf(OrderProductCreateRequest(1L, 3))
+            products = listOf(OrderProductCreateRequest(productId = 1L, quantity = 3)),
         )
+        val productQuantities = listOf(1L to 3)
 
-        val response = OrderResponse(
-            id = 1L,
-            name = "name",
-            orderedAt = Instant.now(),
-            status = OrderStatus.ORDER,
-            orderProducts = listOf(OrderProductResponse("name", 1000, 3))
-        )
+        val order = Mockito.mock<Order>()
+        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
+        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
 
-        Mockito.`when`(orderService.createOrder(request)).thenReturn(response)
+        val product = Mockito.mock<Product>()
+        Mockito.`when`(product.name).thenReturn("name")
+
+        val orderProduct = Mockito.mock<OrderProduct>()
+
+        Mockito.`when`(orderProduct.product).thenReturn(product)
+        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
+        Mockito.`when`(orderService.createOrder(productQuantities)).thenReturn(order)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/orders")
@@ -94,46 +93,43 @@ class OrderControllerTest(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("memberId").description("회원아이디"),
-                        PayloadDocumentation.fieldWithPath("city").description("city"),
-                        PayloadDocumentation.fieldWithPath("street").description("street"),
-                        PayloadDocumentation.fieldWithPath("zipcode").description("우편번호"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].productId").description("상품아이디"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("products[].productId").description("상품아이디"),
+                        PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("주문아이디"),
-                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].productName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("products[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("products[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")
                     )
                 )
             )
     }
 
     @Test
-    @Throws(Exception::class)
     fun findOrders() {
         val pageable: Pageable = PageRequest.of(0, 10)
         val memberId = 1L
         val orderStatus = OrderStatus.ORDER
 
-        val response = listOf(
-            OrderResponse(
-                id = 1L,
-                name = "name",
-                orderedAt = Instant.now(),
-                status = OrderStatus.ORDER,
-                orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, quantity = 3))
-            )
-        )
-        val page: Page<OrderResponse> = PageImpl(response, pageable, response.size.toLong())
+        val order = Mockito.mock<Order>()
+        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
+        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
 
-        Mockito.`when`(orderService.findOrders(memberId = memberId, orderStatus = orderStatus, pageable = pageable))
-            .thenReturn(page)
+        val product = Mockito.mock<Product>()
+        Mockito.`when`(product.name).thenReturn("name")
+
+        val orderProduct = Mockito.mock<OrderProduct>()
+
+        Mockito.`when`(orderProduct.product).thenReturn(product)
+        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
+
+        val response = listOf(order)
+        val page = PageImpl(response, pageable, response.size.toLong())
+
+        Mockito.`when`(orderService.findOrders(pageable = pageable, orderStatus = orderStatus)).thenReturn(page)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders")
@@ -158,12 +154,11 @@ class OrderControllerTest(
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("content[].id").description("주문아이디"),
-                        PayloadDocumentation.fieldWithPath("content[].name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("content[].orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("content[].status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("content[].orderProducts[].productName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("content[].orderProducts[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("content[].orderProducts[].count").description("주문수량"),
+                        PayloadDocumentation.fieldWithPath("content[].products[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("content[].products[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("content[].products[].quantity").description("주문수량"),
 
                         PayloadDocumentation.fieldWithPath("pageable.pageNumber").description("현재 페이지 번호"),
                         PayloadDocumentation.fieldWithPath("pageable.pageSize").description("페이지 크기"),
@@ -194,19 +189,22 @@ class OrderControllerTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun findOrder() {
         val requestId = 1L
 
-        val response = OrderResponse(
-            id = 1L,
-            name = "name",
-            orderedAt = Instant.now(),
-            status = OrderStatus.ORDER,
-            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, quantity = 3))
-        )
+        val order = Mockito.mock<Order>()
+        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
+        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
 
-        Mockito.`when`(orderService.findOrder(requestId)).thenReturn(response)
+        val product = Mockito.mock<Product>()
+        Mockito.`when`(product.name).thenReturn("name")
+
+        val orderProduct = Mockito.mock<OrderProduct>()
+
+        Mockito.`when`(orderProduct.product).thenReturn(product)
+        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
+
+        Mockito.`when`(orderService.findOrder(id = requestId)).thenReturn(order)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders/{id}", requestId)
@@ -224,31 +222,33 @@ class OrderControllerTest(
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("주문아이디"),
-                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].productName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("products[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("products[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")
                     )
                 )
             )
     }
 
     @Test
-    @Throws(Exception::class)
     fun cancelOder() {
         val requestId = 1L
 
-        val response = OrderResponse(
-            id = 1L,
-            name = "name",
-            orderedAt = Instant.now(),
-            status = OrderStatus.ORDER,
-            orderProducts = listOf(OrderProductResponse(productName = "name", orderPrice = 1000, quantity = 3))
-        )
+        val order = Mockito.mock<Order>()
+        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
+        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
 
-        Mockito.`when`(orderService.cancelOrder(requestId)).thenReturn(response)
+        val product = Mockito.mock<Product>()
+        Mockito.`when`(product.name).thenReturn("name")
+
+        val orderProduct = Mockito.mock<OrderProduct>()
+
+        Mockito.`when`(orderProduct.product).thenReturn(product)
+        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
+
+        Mockito.`when`(orderService.cancelOrder(id = requestId)).thenReturn(order)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/orders/{id}", requestId)
@@ -266,12 +266,11 @@ class OrderControllerTest(
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("주문아이디"),
-                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].productName").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].orderPrice").description("주문가격"),
-                        PayloadDocumentation.fieldWithPath("orderProducts[].count").description("주문수량")
+                        PayloadDocumentation.fieldWithPath("products[].productName").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("products[].orderPrice").description("주문가격"),
+                        PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")
                     )
                 )
             )

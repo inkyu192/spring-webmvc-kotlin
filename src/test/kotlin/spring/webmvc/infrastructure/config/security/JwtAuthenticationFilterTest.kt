@@ -26,17 +26,17 @@ class JwtAuthenticationFilterTest : DescribeSpec({
         response = MockHttpServletResponse()
     }
 
-    describe("JwtAuthenticationFilter 는") {
-        context("토큰이 null 일 경우") {
-            it("authentication 을 생성하지 않는다") {
+    describe("doFilter") {
+        context("Authorization 없을 경우") {
+            it("Authentication 을 생성하지 않는다") {
                 jwtAuthenticationFilter.doFilter(request, response, filterChain)
 
                 SecurityContextHolder.getContext().authentication shouldBe null
             }
         }
 
-        context("토큰이 비어있을 경우") {
-            it("authentication 을 생성하지 않는다") {
+        context("Authorization 비어있을 경우") {
+            it("Authentication 을 생성하지 않는다") {
                 request.addHeader("Authorization", "")
 
                 jwtAuthenticationFilter.doFilter(request, response, filterChain)
@@ -45,7 +45,7 @@ class JwtAuthenticationFilterTest : DescribeSpec({
             }
         }
 
-        context("잘못된 토큰일 경우") {
+        context("Authorization 있고 유효성 검사 실패할 경우") {
             it("JwtException 발생한다") {
                 every { jwtProvider.parseAccessToken(any()) } throws JwtException("invalidToken")
 
@@ -55,8 +55,8 @@ class JwtAuthenticationFilterTest : DescribeSpec({
             }
         }
 
-        context("유효한 토큰일 경우") {
-            it("authentication 을 생성 한다") {
+        context("Authorization 있고 유효성 검사 성공할 경우") {
+            it("Authentication 생성한다") {
                 val token = "valid.jwt.token"
                 val claims = mockk<Claims>(relaxed = true)
                 val memberId = 1L

@@ -36,14 +36,17 @@ class S3ServiceTest : DescribeSpec({
         s3Service = S3Service(s3Client)
     }
 
-    describe("S3Service") {
+    describe("putObject") {
         it("MultipartFile S3 업로드 후 key 반환한다") {
             val directory = "directory"
             val filename = "file.txt"
             val content = "content"
 
             val multipartFile = MockMultipartFile(
-                filename, filename, MediaType.TEXT_PLAIN_VALUE, content.toByteArray(Charsets.UTF_8)
+                filename,
+                filename,
+                MediaType.TEXT_PLAIN_VALUE,
+                content.toByteArray(Charsets.UTF_8)
             )
 
             val key = s3Service.putObject(bucket = bucket, directory = directory, file = multipartFile)
@@ -55,8 +58,9 @@ class S3ServiceTest : DescribeSpec({
                     .build()
             )
 
-            val downloaded = response.readAllBytes().toString(Charsets.UTF_8)
-            downloaded shouldBe content
+            val result = response.readAllBytes().toString(Charsets.UTF_8)
+
+            result shouldBe content
         }
     }
 })

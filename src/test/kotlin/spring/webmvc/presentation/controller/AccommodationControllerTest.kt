@@ -24,10 +24,10 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.AccommodationService
+import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.presentation.dto.request.AccommodationCreateRequest
 import spring.webmvc.presentation.dto.request.AccommodationUpdateRequest
-import spring.webmvc.presentation.dto.response.AccommodationResponse
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -56,28 +56,46 @@ class AccommodationControllerTest(
 
     @Test
     fun createAccommodation() {
-        val request = AccommodationCreateRequest(
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            place = "place",
-            checkInTime = Instant.now(),
-            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-        )
-        val response = AccommodationResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            place = "place",
-            checkInTime = Instant.now(),
-            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-        )
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val place = "place"
+        val checkInTime = Instant.now()
+        val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
 
-        Mockito.`when`(accommodationService.createAccommodation(request)).thenReturn(response)
+        val request = AccommodationCreateRequest(
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            place = place,
+            checkInTime = checkInTime,
+            checkOutTime = checkOutTime,
+        )
+        val accommodation = Mockito.spy(
+            Accommodation.create(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                checkInTime = checkInTime,
+                checkOutTime = checkOutTime,
+            ),
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(
+            accommodationService.createAccommodation(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                checkInTime = checkInTime,
+                checkOutTime = checkOutTime,
+            )
+        ).thenReturn(accommodation)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/products/accommodations")
@@ -119,19 +137,19 @@ class AccommodationControllerTest(
     @Test
     fun findAccommodation() {
         val requestId = 1L
-        val response = AccommodationResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            place = "place",
-            checkInTime = Instant.now(),
-            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-        )
+        val accommodation = Mockito.spy(
+            Accommodation.create(
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 5,
+                place = "place",
+                checkInTime = Instant.now(),
+                checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
 
-        Mockito.`when`(accommodationService.findAccommodation(requestId)).thenReturn(response)
+        Mockito.`when`(accommodationService.findAccommodation(requestId)).thenReturn(accommodation)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/accommodations/{id}", requestId)
@@ -165,28 +183,47 @@ class AccommodationControllerTest(
     @Test
     fun updateAccommodation() {
         val requestId = 1L
-        val request = AccommodationUpdateRequest(
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            place = "place",
-            checkInTime = Instant.now(), checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-        )
-        val response = AccommodationResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            place = "place",
-            checkInTime = Instant.now(),
-            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-        )
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val place = "place"
+        val checkInTime = Instant.now()
+        val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
 
-        Mockito.`when`(accommodationService.updateAccommodation(id = requestId, accommodationUpdateRequest = request))
-            .thenReturn(response)
+        val request = AccommodationUpdateRequest(
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            place = place,
+            checkInTime = checkInTime,
+            checkOutTime = checkOutTime,
+        )
+        val accommodation = Mockito.spy(
+            Accommodation.create(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                checkInTime = checkInTime,
+                checkOutTime = checkOutTime,
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(
+            accommodationService.updateAccommodation(
+                id = requestId,
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                checkInTime = checkInTime,
+                checkOutTime = checkOutTime,
+            )
+        ).thenReturn(accommodation)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/products/accommodations/{id}", requestId)

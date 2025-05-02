@@ -24,10 +24,10 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.FlightService
+import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.presentation.dto.request.FlightCreateRequest
 import spring.webmvc.presentation.dto.request.FlightUpdateRequest
-import spring.webmvc.presentation.dto.response.FlightResponse
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -56,34 +56,58 @@ class FlightControllerTest(
 
     @Test
     fun createFlight() {
-        val request = FlightCreateRequest(
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            airline = "airline",
-            flightNumber = "flightNumber",
-            departureAirport = "departureAirport",
-            arrivalAirport = "arrivalAirport",
-            departureTime = Instant.now(),
-            arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
-        )
-        val response = FlightResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            airline = "airline",
-            flightNumber = "flightNumber",
-            departureAirport = "departureAirport",
-            arrivalAirport = "arrivalAirport",
-            departureTime = Instant.now(),
-            arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
-        )
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val airline = "airline"
+        val flightNumber = "flightNumber"
+        val departureAirport = "departureAirport"
+        val arrivalAirport = "arrivalAirport"
+        val departureTime = Instant.now()
+        val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
 
-        Mockito.`when`(flightService.createFlight(request)).thenReturn(response)
+        val request = FlightCreateRequest(
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            airline = airline,
+            flightNumber = flightNumber,
+            departureAirport = departureAirport,
+            arrivalAirport = arrivalAirport,
+            departureTime = departureTime,
+            arrivalTime = arrivalTime,
+        )
+        val flight = Mockito.spy(
+            Flight.create(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                airline = airline,
+                flightNumber = flightNumber,
+                departureAirport = departureAirport,
+                arrivalAirport = arrivalAirport,
+                departureTime = departureTime,
+                arrivalTime = arrivalTime,
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(
+            flightService.createFlight(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                airline = airline,
+                flightNumber = flightNumber,
+                departureAirport = departureAirport,
+                arrivalAirport = arrivalAirport,
+                departureTime = departureTime,
+                arrivalTime = arrivalTime,
+            )
+        ).thenReturn(flight)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/products/flights")
@@ -131,22 +155,22 @@ class FlightControllerTest(
     @Test
     fun findFlight() {
         val requestId = 1L
-        val response = FlightResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            airline = "airline",
-            flightNumber = "flightNumber",
-            departureAirport = "departureAirport",
-            arrivalAirport = "arrivalAirport",
-            departureTime = Instant.now(),
-            arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
-        )
+        val flight = Mockito.spy(
+            Flight.create(
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 5,
+                airline = "airline",
+                flightNumber = "flightNumber",
+                departureAirport = "departureAirport",
+                arrivalAirport = "arrivalAirport",
+                departureTime = Instant.now(),
+                arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS),
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
 
-        Mockito.`when`(flightService.findFlight(requestId)).thenReturn(response)
+        Mockito.`when`(flightService.findFlight(requestId)).thenReturn(flight)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/flights/{id}", requestId)
@@ -183,34 +207,59 @@ class FlightControllerTest(
     @Test
     fun updateFlight() {
         val requestId = 1L
-        val request = FlightUpdateRequest(
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            airline = "airline",
-            flightNumber = "flightNumber",
-            departureAirport = "departureAirport",
-            arrivalAirport = "arrivalAirport",
-            departureTime = Instant.now(),
-            arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
-        )
-        val response = FlightResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            airline = "airline",
-            flightNumber = "flightNumber",
-            departureAirport = "departureAirport",
-            arrivalAirport = "arrivalAirport",
-            departureTime = Instant.now(),
-            arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
-        )
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val airline = "airline"
+        val flightNumber = "flightNumber"
+        val departureAirport = "departureAirport"
+        val arrivalAirport = "arrivalAirport"
+        val departureTime = Instant.now()
+        val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
 
-        Mockito.`when`(flightService.updateFlight(id = requestId, flightUpdateRequest = request)).thenReturn(response)
+        val request = FlightUpdateRequest(
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            airline = airline,
+            flightNumber = flightNumber,
+            departureAirport = departureAirport,
+            arrivalAirport = arrivalAirport,
+            departureTime = departureTime,
+            arrivalTime = arrivalTime,
+        )
+        val flight = Mockito.spy(
+            Flight.create(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                airline = airline,
+                flightNumber = flightNumber,
+                departureAirport = departureAirport,
+                arrivalAirport = arrivalAirport,
+                departureTime = departureTime,
+                arrivalTime = arrivalTime,
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(
+            flightService.updateFlight(
+                id = requestId,
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                airline = airline,
+                flightNumber = flightNumber,
+                departureAirport = departureAirport,
+                arrivalAirport = arrivalAirport,
+                departureTime = departureTime,
+                arrivalTime = arrivalTime,
+            )
+        ).thenReturn(flight)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/products/flights/{id}", requestId)

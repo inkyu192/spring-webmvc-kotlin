@@ -121,6 +121,7 @@ class AuthServiceTest : DescribeSpec({
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every { claims["memberId"] } returns memberId
                 every { tokenRepository.findByMemberIdOrNull(memberId) } returns refreshToken
+                every { jwtProvider.parseRefreshToken(fakeRefreshToken) } returns claims
 
                 shouldThrow<BadCredentialsException> {
                     authService.refreshToken(accessToken = accessToken, refreshToken = fakeRefreshToken)
@@ -142,6 +143,7 @@ class AuthServiceTest : DescribeSpec({
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every { claims["memberId"] } returns memberId
                 every { tokenRepository.findByMemberIdOrNull(memberId) } returns refreshToken
+                every { jwtProvider.parseRefreshToken(refreshToken) } returns claims
                 every {
                     jwtProvider.createAccessToken(
                         memberId = any(),

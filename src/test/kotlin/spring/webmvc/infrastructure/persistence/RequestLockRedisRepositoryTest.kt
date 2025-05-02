@@ -15,30 +15,30 @@ class RequestLockRedisRepositoryTest(
 ) : DescribeSpec({
     val requestLockRedisRepository = RequestLockRedisRepository(redisTemplate)
 
-    describe("setIfAbsent 는") {
+    describe("setIfAbsent") {
         val memberId = 1L
         val method = "GET"
         val uri = "/members"
 
-        context("기존 데이터가 있을 경우") {
-            it("저장하지 않는다") {
+        context("RequestLock 있을 경우") {
+            it("false 반환한다") {
                 requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri)
 
-                requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri).apply {
-                    this shouldBe false
-                }
+                val result = requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri)
+
+                result shouldBe false
             }
         }
 
-        context("기존 데이터가 없을 경우") {
-            it("저장한다") {
+        context("RequestLock 없을 경우") {
+            it("저장 후 true 반환한다") {
                 requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri)
 
                 Thread.sleep(1000)
 
-                requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri).apply {
-                    this shouldBe true
-                }
+                val result = requestLockRedisRepository.setIfAbsent(memberId = memberId, method = method, uri = uri)
+
+                result shouldBe true
             }
         }
     }

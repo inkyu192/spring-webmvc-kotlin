@@ -25,10 +25,10 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.TicketService
+import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.presentation.dto.request.TicketCreateRequest
 import spring.webmvc.presentation.dto.request.TicketUpdateRequest
-import spring.webmvc.presentation.dto.response.TicketResponse
 import java.time.Instant
 
 @WebMvcTest(TicketController::class)
@@ -56,30 +56,50 @@ class TicketControllerTest(
 
     @Test
     fun createTicket() {
-        val request = TicketCreateRequest(
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            place = "place",
-            performanceTime = Instant.now(),
-            duration = "duration",
-            ageLimit = "ageLimit",
-        )
-        val response = TicketResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            place = "place",
-            performanceTime = Instant.now(),
-            duration = "duration",
-            ageLimit = "ageLimit",
-            createdAt = Instant.now()
-        )
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val place = "place"
+        val performanceTime = Instant.now()
+        val duration = "duration"
+        val ageLimit = "ageLimit"
 
-        Mockito.`when`(ticketService.createTicket(request)).thenReturn(response)
+        val request = TicketCreateRequest(
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            place = place,
+            performanceTime = performanceTime,
+            duration = duration,
+            ageLimit = ageLimit,
+        )
+        val ticket = Mockito.spy(
+            Ticket.create(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                performanceTime = performanceTime,
+                duration = duration,
+                ageLimit = ageLimit,
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(
+            ticketService.createTicket(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                performanceTime = performanceTime,
+                duration = duration,
+                ageLimit = ageLimit,
+            )
+        ).thenReturn(ticket)
 
         mockMvc.perform(
             MockMvcRequestBuilders.post("/products/tickets")
@@ -123,20 +143,21 @@ class TicketControllerTest(
     @Test
     fun findTicket() {
         val requestId = 1L
-        val response = TicketResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            place = "place",
-            performanceTime = Instant.now(),
-            duration = "duration",
-            ageLimit = "ageLimit"
-        )
 
-        Mockito.`when`(ticketService.findTicket(requestId)).thenReturn(response)
+        val ticket = Mockito.spy(
+            Ticket.create(
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 5,
+                place = "place",
+                performanceTime = Instant.now(),
+                duration = "duration",
+                ageLimit = "ageLimit"
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(ticketService.findTicket(requestId)).thenReturn(ticket)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/tickets/{id}", requestId)
@@ -171,30 +192,51 @@ class TicketControllerTest(
     @Test
     fun updateTicket() {
         val requestId = 1L
-        val request = TicketUpdateRequest(
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            place = "place",
-            performanceTime = Instant.now(),
-            duration = "duration",
-            ageLimit = "ageLimit"
-        )
-        val response = TicketResponse(
-            id = 1L,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            place = "place",
-            performanceTime = Instant.now(),
-            duration = "duration",
-            ageLimit = "ageLimit"
-        )
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val place = "place"
+        val performanceTime = Instant.now()
+        val duration = "duration"
+        val ageLimit = "ageLimit"
 
-        Mockito.`when`(ticketService.updateTicket(id = requestId, ticketUpdateRequest = request)).thenReturn(response)
+        val request = TicketUpdateRequest(
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            place = place,
+            performanceTime = performanceTime,
+            duration = duration,
+            ageLimit = ageLimit,
+        )
+        val ticket = Mockito.spy(
+            Ticket.create(
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                performanceTime = performanceTime,
+                duration = duration,
+                ageLimit = ageLimit,
+            )
+        ).apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(
+            ticketService.updateTicket(
+                id = requestId,
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                performanceTime = performanceTime,
+                duration = duration,
+                ageLimit = ageLimit,
+            )
+        ).thenReturn(ticket)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/products/tickets/{id}", requestId)

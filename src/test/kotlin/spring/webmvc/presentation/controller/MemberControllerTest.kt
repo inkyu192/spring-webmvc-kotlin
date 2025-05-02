@@ -23,10 +23,10 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.MemberService
+import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.presentation.dto.request.MemberCreateRequest
 import spring.webmvc.presentation.dto.request.MemberUpdateRequest
-import spring.webmvc.presentation.dto.response.MemberResponse
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import java.time.Instant
 import java.time.LocalDate
 
@@ -43,8 +43,8 @@ class MemberControllerTest(
     private lateinit var mockMvc: MockMvc
 
     @BeforeEach
-    fun setUp(restDocumentation: RestDocumentationContextProvider?, webApplicationContext: WebApplicationContext?) {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext!!)
+    fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply<DefaultMockMvcBuilder>(
                 MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
                     .operationPreprocessors()
@@ -55,26 +55,44 @@ class MemberControllerTest(
     }
 
     @Test
-    fun saveMember() {
+    fun createMember() {
+        val account = "test@gmail.com"
+        val password = "password"
+        val name = "name"
+        val phone = "010-1234-1234"
+        val birthDate = LocalDate.now()
+        val roleIds = mutableListOf(1L)
+        val permissionIds = mutableListOf<Long>()
+
         val request = MemberCreateRequest(
-            account = "test@gmail.com",
-            password = "password",
-            name = "name",
-            phone = "010-1234-1234",
-            birthDate = LocalDate.now(),
-            roleIds = listOf(),
-            permissionIds = listOf(1L)
-        )
-        val response = MemberResponse(
-            id = 1L,
-            account = "test@gmail.com",
-            name = "name",
-            phone = "010-1234-1234",
-            birthDate = LocalDate.now(),
-            createdAt = Instant.now()
+            account = account,
+            password = password,
+            name = name,
+            phone = phone,
+            birthDate = birthDate,
+            roleIds = roleIds,
+            permissionIds = permissionIds,
         )
 
-        Mockito.`when`(memberService.createMember(request)).thenReturn(response)
+        val member = Mockito.mock<Member>()
+        Mockito.`when`(member.id).thenReturn(1L)
+        Mockito.`when`(member.account).thenReturn(account)
+        Mockito.`when`(member.name).thenReturn(name)
+        Mockito.`when`(member.phone).thenReturn(phone)
+        Mockito.`when`(member.birthDate).thenReturn(birthDate)
+        Mockito.`when`(member.createdAt).thenReturn(Instant.now())
+
+        Mockito.`when`(
+            memberService.createMember(
+                account = account,
+                password = password,
+                name = name,
+                phone = phone,
+                birthDate = birthDate,
+                roleIds = roleIds,
+                permissionIds = permissionIds,
+            )
+        ).thenReturn(member)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/members")
@@ -108,16 +126,15 @@ class MemberControllerTest(
 
     @Test
     fun findMember() {
-        val response = MemberResponse(
-            id = 1L,
-            account = "test@gmail.com",
-            name = "name",
-            phone = "010-1234-1234",
-            birthDate = LocalDate.now(),
-            createdAt = Instant.now()
-        )
+        val member = Mockito.mock<Member>()
+        Mockito.`when`(member.id).thenReturn(1L)
+        Mockito.`when`(member.account).thenReturn("account")
+        Mockito.`when`(member.name).thenReturn("name")
+        Mockito.`when`(member.phone).thenReturn("phone")
+        Mockito.`when`(member.birthDate).thenReturn(LocalDate.now())
+        Mockito.`when`(member.createdAt).thenReturn(Instant.now())
 
-        Mockito.`when`(memberService.findMember()).thenReturn(response)
+        Mockito.`when`(memberService.findMember()).thenReturn(member)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/members")
@@ -144,22 +161,33 @@ class MemberControllerTest(
 
     @Test
     fun updateMember() {
-        val request = MemberUpdateRequest(
-            password = "password",
-            name = "name",
-            phone = "010-1234-1234",
-            birthDate = LocalDate.now()
-        )
-        val response = MemberResponse(
-            id = 1L,
-            account = "test@gmail.com",
-            name = "name",
-            phone = "010-1234-1234",
-            birthDate = LocalDate.now(),
-            createdAt = Instant.now()
-        )
+        val password = "password"
+        val name = "name"
+        val phone = "010-1234-1234"
+        val birthDate = LocalDate.now()
 
-        Mockito.`when`(memberService.updateMember(request)).thenReturn(response)
+        val request = MemberUpdateRequest(
+            password = password,
+            name = name,
+            phone = phone,
+            birthDate = birthDate,
+        )
+        val member = Mockito.mock<Member>()
+        Mockito.`when`(member.id).thenReturn(1L)
+        Mockito.`when`(member.account).thenReturn("account")
+        Mockito.`when`(member.name).thenReturn(name)
+        Mockito.`when`(member.phone).thenReturn(phone)
+        Mockito.`when`(member.birthDate).thenReturn(birthDate)
+        Mockito.`when`(member.createdAt).thenReturn(Instant.now())
+
+        Mockito.`when`(
+            memberService.updateMember(
+                password = password,
+                name = name,
+                phone = phone,
+                birthDate = birthDate,
+            )
+        ).thenReturn(member)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/members")

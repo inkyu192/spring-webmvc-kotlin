@@ -62,13 +62,13 @@ class ProductQuerydslRepositoryTest(
             productJpaRepository.saveAll(request)
 
             val pageable: Pageable = PageRequest.of(0, 3)
-            val name = "이름"
+            val name = "product"
 
-            productQuerydslRepository.findAll(pageable = pageable, name = name).apply {
-                number shouldBe pageable.pageNumber
-                size shouldBe pageable.pageSize
-                totalElements shouldBe request.filter { it.name.contains(name) }.size.toLong()
-            }
+            val result = productQuerydslRepository.findAll(pageable = pageable, name = name)
+
+            result.number shouldBe pageable.pageNumber
+            result.size shouldBe pageable.pageSize
+            result.totalElements shouldBe request.filter { it.name.contains(name) }.size.toLong()
         }
     }
 })

@@ -233,6 +233,7 @@ class FlightServiceTest : DescribeSpec({
                 )
 
                 every { flightRepository.findByIdOrNull(flightId) } returns flight
+                every { flightRepository.delete(flight) } returns Unit
 
                 flightService.deleteFlight(flightId)
 

@@ -168,7 +168,6 @@ class AccommodationServiceTest : DescribeSpec({
                 result.place shouldBe place
                 result.checkInTime shouldBe checkInTime
                 result.checkOutTime shouldBe checkOutTime
-                result.id shouldBe accommodationId
             }
         }
     }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -25,9 +24,9 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.ProductService
+import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.dto.response.ProductResponse
-import java.time.Instant
 
 @WebMvcTest(ProductController::class)
 @Import(WebMvcTestConfig::class)
@@ -55,32 +54,35 @@ class ProductControllerTest() {
         val pageable: Pageable = PageRequest.of(0, 10)
         val name = "product"
         val response = listOf(
-            ProductResponse(
-                id = 1L,
-                name = "product1",
-                description = "description",
-                price = 1000,
-                quantity = 10,
-                createdAt = Instant.now()
-            ),
-            ProductResponse(
-                id = 2L,
-                name = "product2",
-                description = "description",
-                price = 2000,
-                quantity = 20,
-                createdAt = Instant.now()
-            ),
-            ProductResponse(
-                id = 3L,
-                name = "product3",
-                description = "description",
-                price = 3000,
-                quantity = 30,
-                createdAt = Instant.now()
-            )
+            Mockito.spy(
+                Product.create(
+                    name = "name1",
+                    description = "description",
+                    price = 1000,
+                    quantity = 10,
+                    category = Category.ACCOMMODATION
+                )
+            ).apply { Mockito.`when`(id).thenReturn(1L) },
+            Mockito.spy(
+                Product.create(
+                    name = "name2",
+                    description = "description",
+                    price = 2000,
+                    quantity = 20,
+                    category = Category.FLIGHT
+                )
+            ).apply { Mockito.`when`(id).thenReturn(2L) },
+            Mockito.spy(
+                Product.create(
+                    name = "name3",
+                    description = "description",
+                    price = 3000,
+                    quantity = 30,
+                    category = Category.TICKET
+                )
+            ).apply { Mockito.`when`(id).thenReturn(3L) },
         )
-        val page: Page<ProductResponse> = PageImpl(response, pageable, response.size.toLong())
+        val page = PageImpl(response, pageable, response.size.toLong())
 
         Mockito.`when`(productService.findProducts(pageable = pageable, name = name)).thenReturn(page)
 

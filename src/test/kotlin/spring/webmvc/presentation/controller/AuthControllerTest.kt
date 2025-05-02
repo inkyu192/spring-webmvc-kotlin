@@ -22,10 +22,9 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.AuthService
+import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.presentation.dto.request.MemberLoginRequest
 import spring.webmvc.presentation.dto.request.TokenRequest
-import spring.webmvc.presentation.dto.response.TokenResponse
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
 
 @WebMvcTest(AuthController::class)
 @Import(WebMvcTestConfig::class)
@@ -52,10 +51,15 @@ class AuthControllerTest(
 
     @Test
     fun login() {
-        val request = MemberLoginRequest(account = "test@gmail.com", password = "password")
-        val response = TokenResponse(accessToken = "accessToken", refreshToken = "refreshToken")
+        val accessToken = "accessToken"
+        val refreshToken = "refreshToken"
+        val account = "test@gmail.com"
+        val password = "password"
 
-        Mockito.`when`(authService.login(request)).thenReturn(response)
+        val request = MemberLoginRequest(account = "test@gmail.com", password = "password")
+        val pair = Pair(accessToken, refreshToken)
+
+        Mockito.`when`(authService.login(account = account, password = password)).thenReturn(pair)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/login")
@@ -80,10 +84,14 @@ class AuthControllerTest(
 
     @Test
     fun refreshToken() {
-        val request = TokenRequest(accessToken = "oldAccessToken", refreshToken = "refreshToken")
-        val response = TokenResponse(accessToken = "newAccessToken", refreshToken = "refreshToken")
+        val accessToken = "accessToken"
+        val refreshToken = "refreshToken"
 
-        Mockito.`when`(authService.refreshToken(request)).thenReturn(response)
+        val request = TokenRequest(accessToken = accessToken, refreshToken = refreshToken)
+        val pair = Pair(accessToken, refreshToken)
+
+        Mockito.`when`(authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken))
+            .thenReturn(pair)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/token/refresh")

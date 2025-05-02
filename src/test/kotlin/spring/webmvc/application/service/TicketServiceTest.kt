@@ -151,7 +151,7 @@ class TicketServiceTest : DescribeSpec({
                     price = 1000,
                     quantity = 5,
                     place = "place",
-                    performanceTime = Instant.now(),
+                    performanceTime = performanceTime,
                     duration = "duration",
                     ageLimit = "ageLimit"
                 )
@@ -208,6 +208,7 @@ class TicketServiceTest : DescribeSpec({
                 )
 
                 every { tickerRepository.findByIdOrNull(ticketId) } returns ticket
+                every { tickerRepository.delete(ticket) } returns Unit
 
                 ticketService.deleteTicket(ticketId)
 
