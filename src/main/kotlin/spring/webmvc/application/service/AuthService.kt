@@ -5,9 +5,9 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import spring.webmvc.domain.cache.TokenCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
-import spring.webmvc.domain.repository.TokenRepository
 import spring.webmvc.infrastructure.config.security.JwtProvider
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
@@ -15,7 +15,7 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 @Transactional(readOnly = true)
 class AuthService(
     private val jwtProvider: JwtProvider,
-    private val tokenRepository: TokenRepository,
+    private val tokenCache: TokenCache,
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
@@ -33,10 +33,7 @@ class AuthService(
         )
         val refreshToken = jwtProvider.createRefreshToken()
 
-        tokenRepository.save(
-            memberId = memberId,
-            token = refreshToken,
-        )
+        tokenCache.set(memberId = memberId, value = refreshToken)
 
         return accessToken to refreshToken
     }
@@ -48,7 +45,7 @@ class AuthService(
         val member = memberRepository.findByIdOrNull(requestMemberId)
             ?: throw EntityNotFoundException(kClass = Member::class, id = requestMemberId)
 
-        tokenRepository.findByMemberIdOrNull(requestMemberId)
+        tokenCache.get(requestMemberId)
             ?.takeIf { refreshToken == it }
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
 
