@@ -5,12 +5,12 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import spring.webmvc.domain.repository.RequestLockRepository
+import spring.webmvc.domain.cache.RequestLockCache
 import spring.webmvc.presentation.exception.DuplicateRequestException
 
 class RequestLockServiceTest : DescribeSpec({
-    val requestLockRepository = mockk<RequestLockRepository>()
-    val requestLockService = RequestLockService(requestLockRepository)
+    val requestLockCache = mockk<RequestLockCache>()
+    val requestLockService = RequestLockService(requestLockCache)
 
     describe("validate") {
         context("RequestLock 없을 경우") {
@@ -20,7 +20,7 @@ class RequestLockServiceTest : DescribeSpec({
                 val uri = "/members"
 
                 every {
-                    requestLockRepository.setIfAbsent(
+                    requestLockCache.setIfAbsent(
                         memberId = memberId,
                         method = method,
                         uri = uri
@@ -30,7 +30,7 @@ class RequestLockServiceTest : DescribeSpec({
                 requestLockService.validate(memberId = memberId, method = method, uri = uri)
 
                 verify(exactly = 1) {
-                    requestLockRepository.setIfAbsent(
+                    requestLockCache.setIfAbsent(
                         memberId = memberId,
                         method = method,
                         uri = uri
@@ -46,7 +46,7 @@ class RequestLockServiceTest : DescribeSpec({
                 val uri = "/members"
 
                 every {
-                    requestLockRepository.setIfAbsent(
+                    requestLockCache.setIfAbsent(
                         memberId = memberId,
                         method = method,
                         uri = uri

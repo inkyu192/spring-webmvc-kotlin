@@ -1,5 +1,5 @@
-package spring.webmvc.domain.repository
+package spring.webmvc.domain.cache
 
-interface RequestLockRepository {
+interface RequestLockCache {
     fun setIfAbsent(memberId: Long, method: String, uri: String): Boolean
 }
