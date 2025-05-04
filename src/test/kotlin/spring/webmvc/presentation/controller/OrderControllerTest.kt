@@ -190,7 +190,7 @@ class OrderControllerTest(
 
     @Test
     fun findOrder() {
-        val requestId = 1L
+        val orderId = 1L
 
         val order = Mockito.mock<Order>()
         Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
@@ -204,10 +204,10 @@ class OrderControllerTest(
         Mockito.`when`(orderProduct.product).thenReturn(product)
         Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
 
-        Mockito.`when`(orderService.findOrder(id = requestId)).thenReturn(order)
+        Mockito.`when`(orderService.findOrder(id = orderId)).thenReturn(order)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/orders/{id}", requestId)
+            RestDocumentationRequestBuilders.get("/orders/{id}", orderId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -234,7 +234,7 @@ class OrderControllerTest(
 
     @Test
     fun cancelOder() {
-        val requestId = 1L
+        val orderId = 1L
 
         val order = Mockito.mock<Order>()
         Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
@@ -248,10 +248,10 @@ class OrderControllerTest(
         Mockito.`when`(orderProduct.product).thenReturn(product)
         Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
 
-        Mockito.`when`(orderService.cancelOrder(id = requestId)).thenReturn(order)
+        Mockito.`when`(orderService.cancelOrder(id = orderId)).thenReturn(order)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/orders/{id}", requestId)
+            RestDocumentationRequestBuilders.patch("/orders/{id}", orderId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())

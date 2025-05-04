@@ -1,10 +1,9 @@
-package spring.webmvc.presentation.dto.response
+package spring.webmvc.application.dto
 
-import spring.webmvc.application.dto.TicketDto
 import spring.webmvc.domain.model.entity.Ticket
 import java.time.Instant
 
-data class TicketResponse(
+data class TicketDto(
     val id: Long,
     val name: String,
     val description: String,
@@ -27,18 +26,5 @@ data class TicketResponse(
         performanceTime = ticket.performanceTime,
         duration = ticket.duration,
         ageLimit = ticket.ageLimit,
-    )
-
-    constructor(ticketDto: TicketDto) : this(
-        id = ticketDto.id,
-        name = ticketDto.name,
-        description = ticketDto.description,
-        price = ticketDto.price,
-        quantity = ticketDto.quantity,
-        createdAt = ticketDto.createdAt,
-        place = ticketDto.place,
-        performanceTime = ticketDto.performanceTime,
-        duration = ticketDto.duration,
-        ageLimit = ticketDto.ageLimit,
     )
 }

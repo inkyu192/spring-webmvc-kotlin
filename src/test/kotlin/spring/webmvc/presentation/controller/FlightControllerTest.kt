@@ -154,7 +154,7 @@ class FlightControllerTest(
 
     @Test
     fun findFlight() {
-        val requestId = 1L
+        val flightId = 1L
         val flight = Mockito.spy(
             Flight.create(
                 name = "name",
@@ -170,10 +170,10 @@ class FlightControllerTest(
             )
         ).apply { Mockito.`when`(id).thenReturn(1L) }
 
-        Mockito.`when`(flightService.findFlight(requestId)).thenReturn(flight)
+        Mockito.`when`(flightService.findFlight(flightId)).thenReturn(flight)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/products/flights/{id}", requestId)
+            RestDocumentationRequestBuilders.get("/products/flights/{id}", flightId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -206,7 +206,7 @@ class FlightControllerTest(
 
     @Test
     fun updateFlight() {
-        val requestId = 1L
+        val flightId = 1L
         val name = "name"
         val description = "description"
         val price = 1000
@@ -247,7 +247,7 @@ class FlightControllerTest(
 
         Mockito.`when`(
             flightService.updateFlight(
-                id = requestId,
+                id = flightId,
                 name = name,
                 description = description,
                 price = price,
@@ -262,7 +262,7 @@ class FlightControllerTest(
         ).thenReturn(flight)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/products/flights/{id}", requestId)
+            RestDocumentationRequestBuilders.patch("/products/flights/{id}", flightId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
                 .content(objectMapper.writeValueAsString(request))
@@ -309,12 +309,12 @@ class FlightControllerTest(
 
     @Test
     fun deleteFlight() {
-        val requestId = 1L
+        val flightId = 1L
 
-        Mockito.doNothing().`when`(flightService).deleteFlight(requestId)
+        Mockito.doNothing().`when`(flightService).deleteFlight(flightId)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.delete("/products/flights/{id}", requestId)
+            RestDocumentationRequestBuilders.delete("/products/flights/{id}", flightId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())

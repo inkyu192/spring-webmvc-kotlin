@@ -136,7 +136,7 @@ class AccommodationControllerTest(
 
     @Test
     fun findAccommodation() {
-        val requestId = 1L
+        val accommodationId = 1L
         val accommodation = Mockito.spy(
             Accommodation.create(
                 name = "name",
@@ -149,10 +149,10 @@ class AccommodationControllerTest(
             )
         ).apply { Mockito.`when`(id).thenReturn(1L) }
 
-        Mockito.`when`(accommodationService.findAccommodation(requestId)).thenReturn(accommodation)
+        Mockito.`when`(accommodationService.findAccommodation(accommodationId)).thenReturn(accommodation)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/products/accommodations/{id}", requestId)
+            RestDocumentationRequestBuilders.get("/products/accommodations/{id}", accommodationId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -182,7 +182,7 @@ class AccommodationControllerTest(
 
     @Test
     fun updateAccommodation() {
-        val requestId = 1L
+        val accommodationId = 1L
         val name = "name"
         val description = "description"
         val price = 1000
@@ -214,7 +214,7 @@ class AccommodationControllerTest(
 
         Mockito.`when`(
             accommodationService.updateAccommodation(
-                id = requestId,
+                id = accommodationId,
                 name = name,
                 description = description,
                 price = price,
@@ -226,7 +226,7 @@ class AccommodationControllerTest(
         ).thenReturn(accommodation)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/products/accommodations/{id}", requestId)
+            RestDocumentationRequestBuilders.patch("/products/accommodations/{id}", accommodationId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
                 .content(objectMapper.writeValueAsString(request))
@@ -267,12 +267,12 @@ class AccommodationControllerTest(
 
     @Test
     fun deleteAccommodation() {
-        val requestId = 1L
+        val accommodationId = 1L
 
-        Mockito.doNothing().`when`(accommodationService).deleteAccommodation(requestId)
+        Mockito.doNothing().`when`(accommodationService).deleteAccommodation(accommodationId)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.delete("/products/accommodations/{id}", requestId)
+            RestDocumentationRequestBuilders.delete("/products/accommodations/{id}", accommodationId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())

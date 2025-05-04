@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.application.dto.TicketDto
 import spring.webmvc.application.service.TicketService
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -142,25 +143,24 @@ class TicketControllerTest(
 
     @Test
     fun findTicket() {
-        val requestId = 1L
+        val ticketId = 1L
+        val ticketDto = TicketDto(
+            id = 1L,
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            createdAt = Instant.now(),
+            place = "place",
+            performanceTime = Instant.now(),
+            duration = "duration",
+            ageLimit = "ageLimit"
+        )
 
-        val ticket = Mockito.spy(
-            Ticket.create(
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 5,
-                place = "place",
-                performanceTime = Instant.now(),
-                duration = "duration",
-                ageLimit = "ageLimit"
-            )
-        ).apply { Mockito.`when`(id).thenReturn(1L) }
-
-        Mockito.`when`(ticketService.findTicket(requestId)).thenReturn(ticket)
+        Mockito.`when`(ticketService.findTicket(ticketId)).thenReturn(ticketDto)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/products/tickets/{id}", requestId)
+            RestDocumentationRequestBuilders.get("/products/tickets/{id}", ticketId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -191,7 +191,7 @@ class TicketControllerTest(
 
     @Test
     fun updateTicket() {
-        val requestId = 1L
+        val ticketId = 1L
         val name = "name"
         val description = "description"
         val price = 1000
@@ -226,7 +226,7 @@ class TicketControllerTest(
 
         Mockito.`when`(
             ticketService.updateTicket(
-                id = requestId,
+                id = ticketId,
                 name = name,
                 description = description,
                 price = price,
@@ -239,7 +239,7 @@ class TicketControllerTest(
         ).thenReturn(ticket)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/products/tickets/{id}", requestId)
+            RestDocumentationRequestBuilders.patch("/products/tickets/{id}", ticketId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
                 .content(objectMapper.writeValueAsString(request))
@@ -282,12 +282,12 @@ class TicketControllerTest(
 
     @Test
     fun deleteTicket() {
-        val requestId = 1L
+        val ticketId = 1L
 
-        Mockito.doNothing().`when`(ticketService).deleteTicket(requestId)
+        Mockito.doNothing().`when`(ticketService).deleteTicket(ticketId)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.delete("/products/tickets/{id}", requestId)
+            RestDocumentationRequestBuilders.delete("/products/tickets/{id}", ticketId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())

@@ -16,7 +16,7 @@ class TicketController(
 ) {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_READER')")
-    fun findTicket(@PathVariable id: Long) = TicketResponse(ticket = ticketService.findTicket(id))
+    fun findTicket(@PathVariable id: Long) = TicketResponse(ticketDto = ticketService.findTicket(id))
 
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
