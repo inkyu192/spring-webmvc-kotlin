@@ -17,7 +17,7 @@ class AccommodationController(
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_READER')")
     fun findAccommodation(@PathVariable id: Long) =
-        AccommodationResponse(accommodation = accommodationService.findAccommodation(id))
+        AccommodationResponse(accommodationDto = accommodationService.findAccommodation(id))
 
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")

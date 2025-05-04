@@ -1,10 +1,9 @@
-package spring.webmvc.presentation.dto.response
+package spring.webmvc.application.dto
 
-import spring.webmvc.application.dto.FlightDto
 import spring.webmvc.domain.model.entity.Flight
 import java.time.Instant
 
-data class FlightResponse(
+data class FlightDto(
     val id: Long,
     val name: String,
     val description: String,
@@ -31,20 +30,5 @@ data class FlightResponse(
         arrivalAirport = flight.arrivalAirport,
         departureTime = flight.departureTime,
         arrivalTime = flight.arrivalTime,
-    )
-
-    constructor(flightDto: FlightDto) : this(
-        id = flightDto.id,
-        name = flightDto.name,
-        description = flightDto.description,
-        price = flightDto.price,
-        quantity = flightDto.quantity,
-        createdAt = flightDto.createdAt,
-        airline = flightDto.airline,
-        flightNumber = flightDto.flightNumber,
-        departureAirport = flightDto.departureAirport,
-        arrivalAirport = flightDto.arrivalAirport,
-        departureTime = flightDto.departureTime,
-        arrivalTime = flightDto.arrivalTime,
     )
 }

@@ -1,10 +1,9 @@
-package spring.webmvc.presentation.dto.response
+package spring.webmvc.application.dto
 
-import spring.webmvc.application.dto.AccommodationDto
 import spring.webmvc.domain.model.entity.Accommodation
 import java.time.Instant
 
-data class AccommodationResponse(
+data class AccommodationDto(
     val id: Long,
     val name: String,
     val description: String,
@@ -25,17 +24,5 @@ data class AccommodationResponse(
         place = accommodation.place,
         checkInTime = accommodation.checkInTime,
         checkOutTime = accommodation.checkOutTime,
-    )
-
-    constructor(accommodationDto: AccommodationDto) : this(
-        id = accommodationDto.id,
-        name = accommodationDto.name,
-        description = accommodationDto.description,
-        price = accommodationDto.price,
-        quantity = accommodationDto.quantity,
-        createdAt = accommodationDto.createdAt,
-        place = accommodationDto.place,
-        checkInTime = accommodationDto.checkInTime,
-        checkOutTime = accommodationDto.checkOutTime,
     )
 }

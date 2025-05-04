@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.application.dto.FlightDto
 import spring.webmvc.application.service.FlightService
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -155,22 +156,22 @@ class FlightControllerTest(
     @Test
     fun findFlight() {
         val flightId = 1L
-        val flight = Mockito.spy(
-            Flight.create(
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 5,
-                airline = "airline",
-                flightNumber = "flightNumber",
-                departureAirport = "departureAirport",
-                arrivalAirport = "arrivalAirport",
-                departureTime = Instant.now(),
-                arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS),
-            )
-        ).apply { Mockito.`when`(id).thenReturn(1L) }
+        val flightDto = FlightDto(
+            id = flightId,
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            createdAt = Instant.now(),
+            airline = "airline",
+            flightNumber = "flightNumber",
+            departureAirport = "departureAirport",
+            arrivalAirport = "arrivalAirport",
+            departureTime = Instant.now(),
+            arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS),
+        )
 
-        Mockito.`when`(flightService.findFlight(flightId)).thenReturn(flight)
+        Mockito.`when`(flightService.findFlight(flightId)).thenReturn(flightDto)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/flights/{id}", flightId)

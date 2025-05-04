@@ -145,7 +145,7 @@ class TicketControllerTest(
     fun findTicket() {
         val ticketId = 1L
         val ticketDto = TicketDto(
-            id = 1L,
+            id = ticketId,
             name = "name",
             description = "description",
             price = 1000,

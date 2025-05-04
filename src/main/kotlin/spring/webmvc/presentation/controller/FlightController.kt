@@ -16,7 +16,7 @@ class FlightController(
 ) {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_READER')")
-    fun findFlight(@PathVariable id: Long) = FlightResponse(flight = flightService.findFlight(id))
+    fun findFlight(@PathVariable id: Long) = FlightResponse(flightDto = flightService.findFlight(id))
 
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")

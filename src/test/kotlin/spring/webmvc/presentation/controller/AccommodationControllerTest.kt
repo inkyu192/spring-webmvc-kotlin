@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.application.dto.AccommodationDto
 import spring.webmvc.application.service.AccommodationService
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -137,19 +138,19 @@ class AccommodationControllerTest(
     @Test
     fun findAccommodation() {
         val accommodationId = 1L
-        val accommodation = Mockito.spy(
-            Accommodation.create(
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 5,
-                place = "place",
-                checkInTime = Instant.now(),
-                checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-            )
-        ).apply { Mockito.`when`(id).thenReturn(1L) }
+        val accommodationDto = AccommodationDto(
+            id = accommodationId,
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 5,
+            createdAt = Instant.now(),
+            place = "place",
+            checkInTime = Instant.now(),
+            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS),
+        )
 
-        Mockito.`when`(accommodationService.findAccommodation(accommodationId)).thenReturn(accommodation)
+        Mockito.`when`(accommodationService.findAccommodation(accommodationId)).thenReturn(accommodationDto)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/accommodations/{id}", accommodationId)
