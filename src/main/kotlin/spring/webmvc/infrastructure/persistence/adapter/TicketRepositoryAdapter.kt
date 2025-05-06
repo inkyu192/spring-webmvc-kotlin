@@ -9,8 +9,10 @@ import spring.webmvc.infrastructure.persistence.TicketJpaRepository
 @Component
 class TicketRepositoryAdapter(
     private val jpaRepository: TicketJpaRepository,
-): TicketRepository {
+) : TicketRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
+
+    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
 
     override fun save(ticket: Ticket) = jpaRepository.save(ticket)
 

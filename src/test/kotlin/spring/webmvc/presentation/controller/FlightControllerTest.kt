@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
-import spring.webmvc.application.dto.FlightDto
 import spring.webmvc.application.service.FlightService
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -95,6 +94,10 @@ class FlightControllerTest(
             )
         ).apply { Mockito.`when`(id).thenReturn(1L) }
 
+        val product = Mockito.spy(flight.product)
+            .apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(flight.product).thenReturn(product)
         Mockito.`when`(
             flightService.createFlight(
                 name = name,
@@ -137,63 +140,13 @@ class FlightControllerTest(
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("항공편명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("airline").description("항공사"),
-                        PayloadDocumentation.fieldWithPath("flightNumber").description("항공편 ID"),
-                        PayloadDocumentation.fieldWithPath("departureAirport").description("출발 공항"),
-                        PayloadDocumentation.fieldWithPath("arrivalAirport").description("도착 공항"),
-                        PayloadDocumentation.fieldWithPath("departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("arrivalTime").description("도착 시간")
-                    )
-                )
-            )
-    }
-
-    @Test
-    fun findFlight() {
-        val flightId = 1L
-        val flightDto = FlightDto(
-            id = flightId,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            airline = "airline",
-            flightNumber = "flightNumber",
-            departureAirport = "departureAirport",
-            arrivalAirport = "arrivalAirport",
-            departureTime = Instant.now(),
-            arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS),
-        )
-
-        Mockito.`when`(flightService.findFlight(flightId)).thenReturn(flightDto)
-
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/products/flights/{id}", flightId)
-                .header("Authorization", "Bearer access-token")
-        )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andDo(
-                MockMvcRestDocumentation.document(
-                    "flight-get",
-                    HeaderDocumentation.requestHeaders(
-                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
-                    ),
-                    RequestDocumentation.pathParameters(
-                        RequestDocumentation.parameterWithName("id").description("아이디")
-                    ),
-                    PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("name").description("항공편명"),
-                        PayloadDocumentation.fieldWithPath("description").description("설명"),
-                        PayloadDocumentation.fieldWithPath("price").description("가격"),
-                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("flightId").description("항공아이디"),
                         PayloadDocumentation.fieldWithPath("airline").description("항공사"),
                         PayloadDocumentation.fieldWithPath("flightNumber").description("항공편 ID"),
                         PayloadDocumentation.fieldWithPath("departureAirport").description("출발 공항"),
@@ -246,6 +199,10 @@ class FlightControllerTest(
             )
         ).apply { Mockito.`when`(id).thenReturn(1L) }
 
+        val product = Mockito.spy(flight.product)
+            .apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(flight.product).thenReturn(product)
         Mockito.`when`(
             flightService.updateFlight(
                 id = flightId,
@@ -292,11 +249,13 @@ class FlightControllerTest(
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("항공편명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("flightId").description("항공아이디"),
                         PayloadDocumentation.fieldWithPath("airline").description("항공사"),
                         PayloadDocumentation.fieldWithPath("flightNumber").description("항공편 ID"),
                         PayloadDocumentation.fieldWithPath("departureAirport").description("출발 공항"),

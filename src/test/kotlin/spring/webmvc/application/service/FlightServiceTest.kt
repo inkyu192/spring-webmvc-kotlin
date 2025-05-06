@@ -4,7 +4,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
-import spring.webmvc.application.dto.FlightDto
 import spring.webmvc.domain.cache.FlightCache
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.repository.FlightRepository
@@ -15,13 +14,7 @@ import java.time.temporal.ChronoUnit
 
 class FlightServiceTest : DescribeSpec({
     val flightRepository = mockk<FlightRepository>()
-    val flightCache = mockk<FlightCache>()
-    val jsonSupport = mockk<JsonSupport>()
-    val flightService = FlightService(
-        flightRepository = flightRepository,
-        flightCache = flightCache,
-        jsonSupport = jsonSupport,
-    )
+    val flightService = FlightService(flightRepository = flightRepository)
 
     describe("createFlight") {
         it("Flight 저장 후 반환한다") {
@@ -53,16 +46,16 @@ class FlightServiceTest : DescribeSpec({
 
             // When
             val result = flightService.createFlight(
-                name,
-                description,
-                price,
-                quantity,
-                airline,
-                flightNumber,
-                departureAirport,
-                arrivalAirport,
-                departureTime,
-                arrivalTime
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                airline = airline,
+                flightNumber = flightNumber,
+                departureAirport = departureAirport,
+                arrivalAirport = arrivalAirport,
+                departureTime = departureTime,
+                arrivalTime = arrivalTime,
             )
 
             result.product.name shouldBe name
@@ -74,93 +67,6 @@ class FlightServiceTest : DescribeSpec({
             result.departureTime shouldBe departureTime
             result.arrivalTime shouldBe arrivalTime
             result.airline shouldBe airline
-        }
-    }
-
-    describe("findFlight") {
-        context("Flight 없을 경우") {
-            it("EntityNotFoundException 발생한다") {
-                val flightId = 1L
-
-                every { flightCache.get(flightId) } returns null
-                every { flightRepository.findByIdOrNull(flightId) } returns null
-
-                shouldThrow<EntityNotFoundException> { flightService.findFlight(flightId) }
-            }
-        }
-
-        context("Flight cache 있을 경우") {
-            it("cache 반환한다") {
-                val flightId = 1L
-                val value = "value"
-                val flightDto = FlightDto(
-                    id = flightId,
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 5,
-                    createdAt = Instant.now(),
-                    airline = "airline",
-                    flightNumber = "flightNumber",
-                    departureAirport = "departureAirport",
-                    arrivalAirport = "arrivalAirport",
-                    departureTime = Instant.now(),
-                    arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS),
-                )
-
-                every { flightCache.get(flightId) } returns value
-                every { jsonSupport.readValue(value, FlightDto::class.java) } returns flightDto
-
-                val result = flightService.findFlight(flightId)
-
-                result.name shouldBe flightDto.name
-                result.description shouldBe flightDto.description
-                result.price shouldBe flightDto.price
-                result.quantity shouldBe flightDto.quantity
-                result.departureAirport shouldBe flightDto.departureAirport
-                result.arrivalAirport shouldBe flightDto.arrivalAirport
-                result.departureTime shouldBe flightDto.departureTime
-                result.arrivalTime shouldBe flightDto.arrivalTime
-                result.airline shouldBe flightDto.airline
-            }
-        }
-
-        context("Flight cache 없을 경우") {
-            it("repository 조회 후 반환한다") {
-                val flightId = 1L
-                val value = "value"
-                val flight = spyk(
-                    Flight.create(
-                        name = "name",
-                        description = "description",
-                        price = 1000,
-                        quantity = 5,
-                        airline = "airline",
-                        flightNumber = "flightNumber",
-                        departureAirport = "departureAirport",
-                        arrivalAirport = "arrivalAirport",
-                        departureTime = Instant.now(),
-                        arrivalTime = Instant.now().plus(1, ChronoUnit.DAYS),
-                    )
-                ).apply { every { id } returns flightId }
-
-                every { flightCache.get(flightId) } returns null
-                every { flightRepository.findByIdOrNull(flightId) } returns flight
-                every { jsonSupport.writeValueAsString(any<FlightDto>()) } returns value
-                every { flightCache.set(flightId, value) } just runs
-
-                val result = flightService.findFlight(flightId)
-
-                result.name shouldBe flight.product.name
-                result.description shouldBe flight.product.description
-                result.price shouldBe flight.product.price
-                result.quantity shouldBe flight.product.quantity
-                result.departureAirport shouldBe flight.departureAirport
-                result.arrivalAirport shouldBe flight.arrivalAirport
-                result.departureTime shouldBe flight.departureTime
-                result.arrivalTime shouldBe flight.arrivalTime
-                result.airline shouldBe flight.airline
-            }
         }
     }
 

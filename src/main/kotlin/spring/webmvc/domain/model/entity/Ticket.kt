@@ -56,7 +56,7 @@ class Ticket protected constructor(
             duration = duration,
             ageLimit = ageLimit,
             product = Product.create(
-                category = Category.FLIGHT,
+                category = Category.TICKET,
                 name = name,
                 description = description,
                 price = price,

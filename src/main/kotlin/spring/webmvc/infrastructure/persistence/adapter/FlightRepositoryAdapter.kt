@@ -9,8 +9,10 @@ import spring.webmvc.infrastructure.persistence.FlightJpaRepository
 @Component
 class FlightRepositoryAdapter(
     private val jpaRepository: FlightJpaRepository,
-): FlightRepository {
+) : FlightRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
+
+    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
 
     override fun save(flight: Flight) = jpaRepository.save(flight)
 

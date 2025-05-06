@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
-import spring.webmvc.application.dto.TicketDto
 import spring.webmvc.application.service.TicketService
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -89,6 +88,10 @@ class TicketControllerTest(
             )
         ).apply { Mockito.`when`(id).thenReturn(1L) }
 
+        val product = Mockito.spy(ticket.product)
+            .apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(ticket.product).thenReturn(product)
         Mockito.`when`(
             ticketService.createTicket(
                 name = name,
@@ -127,59 +130,13 @@ class TicketControllerTest(
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("티켓명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
-                        PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
-                        PayloadDocumentation.fieldWithPath("ageLimit").description("관람 연령")
-                    )
-                )
-            )
-    }
-
-    @Test
-    fun findTicket() {
-        val ticketId = 1L
-        val ticketDto = TicketDto(
-            id = ticketId,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 5,
-            createdAt = Instant.now(),
-            place = "place",
-            performanceTime = Instant.now(),
-            duration = "duration",
-            ageLimit = "ageLimit"
-        )
-
-        Mockito.`when`(ticketService.findTicket(ticketId)).thenReturn(ticketDto)
-
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/products/tickets/{id}", ticketId)
-                .header("Authorization", "Bearer access-token")
-        )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andDo(
-                MockMvcRestDocumentation.document(
-                    "ticket-get",
-                    HeaderDocumentation.requestHeaders(
-                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
-                    ),
-                    RequestDocumentation.pathParameters(
-                        RequestDocumentation.parameterWithName("id").description("아이디")
-                    ),
-                    PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("name").description("티켓명"),
-                        PayloadDocumentation.fieldWithPath("description").description("설명"),
-                        PayloadDocumentation.fieldWithPath("price").description("가격"),
-                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("ticketId").description("티켓아이디"),
                         PayloadDocumentation.fieldWithPath("place").description("장소"),
                         PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
                         PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
@@ -224,6 +181,10 @@ class TicketControllerTest(
             )
         ).apply { Mockito.`when`(id).thenReturn(1L) }
 
+        val product = Mockito.spy(ticket.product)
+            .apply { Mockito.`when`(id).thenReturn(1L) }
+
+        Mockito.`when`(ticket.product).thenReturn(product)
         Mockito.`when`(
             ticketService.updateTicket(
                 id = ticketId,
@@ -266,11 +227,13 @@ class TicketControllerTest(
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("티켓명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("ticketId").description("티켓아이디"),
                         PayloadDocumentation.fieldWithPath("place").description("장소"),
                         PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
                         PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),

@@ -1,44 +1,29 @@
 package spring.webmvc.presentation.dto.response
 
-import spring.webmvc.application.dto.TicketDto
+import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.domain.model.entity.Ticket
 import java.time.Instant
 
-data class TicketResponse(
-    val id: Long,
-    val name: String,
-    val description: String,
-    val price: Int,
-    val quantity: Int,
-    val createdAt: Instant,
-    val place: String,
-    val performanceTime: Instant,
-    val duration: String,
-    val ageLimit: String,
-) {
-    constructor(ticket: Ticket) : this(
-        id = checkNotNull(ticket.id),
-        name = ticket.product.name,
-        description = ticket.product.description,
-        price = ticket.product.price,
-        quantity = ticket.product.quantity,
-        createdAt = ticket.product.createdAt,
-        place = ticket.place,
-        performanceTime = ticket.performanceTime,
-        duration = ticket.duration,
-        ageLimit = ticket.ageLimit,
-    )
+class TicketResponse : ProductResponse {
+    val ticketId: Long
+    val place: String
+    val performanceTime: Instant
+    val duration: String
+    val ageLimit: String
 
-    constructor(ticketDto: TicketDto) : this(
-        id = ticketDto.id,
-        name = ticketDto.name,
-        description = ticketDto.description,
-        price = ticketDto.price,
-        quantity = ticketDto.quantity,
-        createdAt = ticketDto.createdAt,
-        place = ticketDto.place,
-        performanceTime = ticketDto.performanceTime,
-        duration = ticketDto.duration,
-        ageLimit = ticketDto.ageLimit,
-    )
+    constructor(ticketResult: TicketResult) : super(productResult = ticketResult) {
+        ticketId = ticketResult.id
+        place = ticketResult.place
+        performanceTime = ticketResult.performanceTime
+        duration = ticketResult.duration
+        ageLimit = ticketResult.ageLimit
+    }
+
+    constructor(ticket: Ticket) : super(product = ticket.product) {
+        ticketId = checkNotNull(ticket.id)
+        place = ticket.place
+        performanceTime = ticket.performanceTime
+        duration = ticket.duration
+        ageLimit = ticket.ageLimit
+    }
 }

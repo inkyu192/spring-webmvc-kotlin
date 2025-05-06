@@ -1,50 +1,35 @@
 package spring.webmvc.presentation.dto.response
 
-import spring.webmvc.application.dto.FlightDto
+import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.domain.model.entity.Flight
 import java.time.Instant
 
-data class FlightResponse(
-    val id: Long,
-    val name: String,
-    val description: String,
-    val price: Int,
-    val quantity: Int,
-    val createdAt: Instant,
-    val airline: String,
-    val flightNumber: String,
-    val departureAirport: String,
-    val arrivalAirport: String,
-    val departureTime: Instant,
-    val arrivalTime: Instant,
-) {
-    constructor(flight: Flight) : this(
-        id = checkNotNull(flight.id),
-        name = flight.product.name,
-        description = flight.product.description,
-        price = flight.product.price,
-        quantity = flight.product.quantity,
-        createdAt = flight.product.createdAt,
-        airline = flight.airline,
-        flightNumber = flight.flightNumber,
-        departureAirport = flight.departureAirport,
-        arrivalAirport = flight.arrivalAirport,
-        departureTime = flight.departureTime,
-        arrivalTime = flight.arrivalTime,
-    )
+class FlightResponse : ProductResponse {
+    val flightId: Long
+    val airline: String
+    val flightNumber: String
+    val departureAirport: String
+    val arrivalAirport: String
+    val departureTime: Instant
+    val arrivalTime: Instant
 
-    constructor(flightDto: FlightDto) : this(
-        id = flightDto.id,
-        name = flightDto.name,
-        description = flightDto.description,
-        price = flightDto.price,
-        quantity = flightDto.quantity,
-        createdAt = flightDto.createdAt,
-        airline = flightDto.airline,
-        flightNumber = flightDto.flightNumber,
-        departureAirport = flightDto.departureAirport,
-        arrivalAirport = flightDto.arrivalAirport,
-        departureTime = flightDto.departureTime,
-        arrivalTime = flightDto.arrivalTime,
-    )
+    constructor(flightResult: FlightResult) : super(productResult = flightResult) {
+        flightId = flightResult.id
+        airline = flightResult.airline
+        flightNumber = flightResult.flightNumber
+        departureAirport = flightResult.departureAirport
+        arrivalAirport = flightResult.arrivalAirport
+        departureTime = flightResult.departureTime
+        arrivalTime = flightResult.arrivalTime
+    }
+
+    constructor(flight: Flight) : super(product = flight.product) {
+        flightId = checkNotNull(flight.id)
+        airline = flight.airline
+        flightNumber = flight.flightNumber
+        departureAirport = flight.departureAirport
+        arrivalAirport = flight.arrivalAirport
+        departureTime = flight.departureTime
+        arrivalTime = flight.arrivalTime
+    }
 }

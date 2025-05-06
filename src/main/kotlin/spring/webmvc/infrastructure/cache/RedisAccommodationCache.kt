@@ -9,7 +9,7 @@ import java.time.Duration
 class RedisAccommodationCache(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : AccommodationCache {
-    private fun createKey(productId: Long) = "product:$productId"
+    private fun createKey(productId: Long) = "product:accommodation:$productId"
 
     override fun get(id: Long) = runCatching { redisTemplate.opsForValue().get(createKey(productId = id)) }.getOrNull()
 

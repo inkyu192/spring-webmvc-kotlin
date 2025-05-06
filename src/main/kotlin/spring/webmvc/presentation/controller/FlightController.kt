@@ -14,10 +14,6 @@ import spring.webmvc.presentation.dto.response.FlightResponse
 class FlightController(
     private val flightService: FlightService,
 ) {
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_READER')")
-    fun findFlight(@PathVariable id: Long) = FlightResponse(flightDto = flightService.findFlight(id))
-
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
     @ResponseStatus(HttpStatus.CREATED)

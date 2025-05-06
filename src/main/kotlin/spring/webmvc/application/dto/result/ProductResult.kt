@@ -1,11 +1,10 @@
-package spring.webmvc.presentation.dto.response
+package spring.webmvc.application.dto.result
 
-import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
-open class ProductResponse(
+open class ProductResult(
     val id: Long,
     val category: Category,
     val name: String,
@@ -14,16 +13,6 @@ open class ProductResponse(
     val quantity: Int,
     val createdAt: Instant
 ) {
-    constructor(productResult: ProductResult) : this(
-        id = productResult.id,
-        category = productResult.category,
-        name = productResult.name,
-        description = productResult.description,
-        price = productResult.price,
-        quantity = productResult.quantity,
-        createdAt = productResult.createdAt
-    )
-
     constructor(product: Product) : this(
         id = checkNotNull(product.id),
         category = product.category,

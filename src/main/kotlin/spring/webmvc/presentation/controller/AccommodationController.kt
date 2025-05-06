@@ -14,11 +14,6 @@ import spring.webmvc.presentation.dto.response.AccommodationResponse
 class AccommodationController(
     private val accommodationService: AccommodationService,
 ) {
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_READER')")
-    fun findAccommodation(@PathVariable id: Long) =
-        AccommodationResponse(accommodationDto = accommodationService.findAccommodation(id))
-
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
     @ResponseStatus(HttpStatus.CREATED)

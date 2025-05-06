@@ -9,7 +9,7 @@ import java.time.Duration
 class RedisTicketCache(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : TicketCache {
-    private fun createKey(productId: Long) = "product:$productId"
+    private fun createKey(productId: Long) = "product:ticket:$productId"
 
     override fun get(id: Long) = runCatching { redisTemplate.opsForValue().get(createKey(productId = id)) }.getOrNull()
 

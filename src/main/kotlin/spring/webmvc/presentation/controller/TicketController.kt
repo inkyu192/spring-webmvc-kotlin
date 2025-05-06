@@ -14,10 +14,6 @@ import spring.webmvc.presentation.dto.response.TicketResponse
 class TicketController(
     private val ticketService: TicketService,
 ) {
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_READER')")
-    fun findTicket(@PathVariable id: Long) = TicketResponse(ticketDto = ticketService.findTicket(id))
-
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
     @ResponseStatus(HttpStatus.CREATED)

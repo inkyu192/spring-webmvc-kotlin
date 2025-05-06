@@ -1,41 +1,26 @@
 package spring.webmvc.presentation.dto.response
 
-import spring.webmvc.application.dto.AccommodationDto
+import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.domain.model.entity.Accommodation
 import java.time.Instant
 
-data class AccommodationResponse(
-    val id: Long,
-    val name: String,
-    val description: String,
-    val price: Int,
-    val quantity: Int,
-    val createdAt: Instant,
-    val place: String,
-    val checkInTime: Instant,
-    val checkOutTime: Instant,
-) {
-    constructor(accommodation: Accommodation) : this(
-        id = checkNotNull(accommodation.id),
-        name = accommodation.product.name,
-        description = accommodation.product.description,
-        price = accommodation.product.price,
-        quantity = accommodation.product.quantity,
-        createdAt = accommodation.product.createdAt,
-        place = accommodation.place,
-        checkInTime = accommodation.checkInTime,
-        checkOutTime = accommodation.checkOutTime,
-    )
+class AccommodationResponse : ProductResponse {
+    val accommodationId: Long
+    val place: String
+    val checkInTime: Instant
+    val checkOutTime: Instant
 
-    constructor(accommodationDto: AccommodationDto) : this(
-        id = accommodationDto.id,
-        name = accommodationDto.name,
-        description = accommodationDto.description,
-        price = accommodationDto.price,
-        quantity = accommodationDto.quantity,
-        createdAt = accommodationDto.createdAt,
-        place = accommodationDto.place,
-        checkInTime = accommodationDto.checkInTime,
-        checkOutTime = accommodationDto.checkOutTime,
-    )
+    constructor(accommodationResult: AccommodationResult) : super(productResult = accommodationResult) {
+        accommodationId = accommodationResult.id
+        place = accommodationResult.place
+        checkInTime = accommodationResult.checkInTime
+        checkOutTime = accommodationResult.checkOutTime
+    }
+
+    constructor(accommodation: Accommodation) : super(product = accommodation.product) {
+        accommodationId = checkNotNull(accommodation.id)
+        place = accommodation.place
+        checkInTime = accommodation.checkInTime
+        checkOutTime = accommodation.checkOutTime
+    }
 }

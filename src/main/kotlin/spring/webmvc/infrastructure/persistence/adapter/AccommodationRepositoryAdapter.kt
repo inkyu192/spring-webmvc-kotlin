@@ -9,8 +9,10 @@ import spring.webmvc.infrastructure.persistence.AccommodationJpaRepository
 @Component
 class AccommodationRepositoryAdapter(
     private val jpaRepository: AccommodationJpaRepository,
-): AccommodationRepository {
+) : AccommodationRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
+
+    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
 
     override fun save(accommodation: Accommodation) = jpaRepository.save(accommodation)
 

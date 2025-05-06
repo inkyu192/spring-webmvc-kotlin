@@ -4,28 +4,16 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.runs
-import io.mockk.spyk
 import io.mockk.verify
-import spring.webmvc.application.dto.TicketDto
-import spring.webmvc.domain.cache.TicketCache
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.repository.TicketRepository
-import spring.webmvc.infrastructure.common.JsonSupport
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import java.time.Instant
 
 class TicketServiceTest : DescribeSpec({
     val tickerRepository = mockk<TicketRepository>()
-    val ticketCache = mockk<TicketCache>()
-    val jsonSupport = mockk<JsonSupport>()
-    val ticketService = TicketService(
-        ticketRepository = tickerRepository,
-        ticketCache = ticketCache,
-        jsonSupport = jsonSupport,
-    )
+    val ticketService = TicketService(ticketRepository = tickerRepository)
 
     describe("createTicket") {
         it("Ticket 저장 후 반환한다") {
@@ -49,17 +37,17 @@ class TicketServiceTest : DescribeSpec({
                 ageLimit = ageLimit,
             )
 
-            every { tickerRepository.save(any<Ticket>()) } returns ticket
+            every { tickerRepository.save(ticket = any<Ticket>()) } returns ticket
 
             val result = ticketService.createTicket(
-                name,
-                description,
-                price,
-                quantity,
-                place,
-                performanceTime,
-                duration,
-                ageLimit
+                name = name,
+                description = description,
+                price = price,
+                quantity = quantity,
+                place = place,
+                performanceTime = performanceTime,
+                duration = duration,
+                ageLimit = ageLimit,
             )
 
             result.product.name shouldBe name
@@ -70,87 +58,6 @@ class TicketServiceTest : DescribeSpec({
             result.performanceTime shouldBe performanceTime
             result.duration shouldBe duration
             result.ageLimit shouldBe ageLimit
-        }
-    }
-
-    describe("findTicket") {
-        context("Ticket 없을 경우") {
-            it("EntityNotFoundException 발생한다") {
-                val ticketId = 1L
-
-                every { ticketCache.get(ticketId) } returns null
-                every { tickerRepository.findByIdOrNull(ticketId) } returns null
-
-                shouldThrow<EntityNotFoundException> { ticketService.findTicket(ticketId) }
-            }
-        }
-
-        context("Ticket cache 있을 경우") {
-            it("cache 반환한다") {
-                val ticketId = 1L
-                val value = "value"
-                val ticketDto = TicketDto(
-                    id = 1L,
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 5,
-                    createdAt = Instant.now(),
-                    place = "place",
-                    performanceTime = Instant.now(),
-                    duration = "duration",
-                    ageLimit = "ageLimit"
-                )
-                every { ticketCache.get(ticketId) } returns value
-                every { jsonSupport.readValue(value, TicketDto::class.java) } returns ticketDto
-
-                val result = ticketService.findTicket(ticketId)
-
-                result.name shouldBe ticketDto.name
-                result.description shouldBe ticketDto.description
-                result.price shouldBe ticketDto.price
-                result.quantity shouldBe ticketDto.quantity
-                result.place shouldBe ticketDto.place
-                result.performanceTime shouldBe ticketDto.performanceTime
-                result.duration shouldBe ticketDto.duration
-                result.ageLimit shouldBe ticketDto.ageLimit
-            }
-        }
-
-        context("Ticket cache 없을 경우") {
-            it("repository 조회 후 반환한다") {
-                val ticketId = 1L
-                val value = "value"
-                val ticket = spyk(
-                    Ticket.create(
-                        name = "name",
-                        description = "description",
-                        price = 1000,
-                        quantity = 5,
-                        place = "place",
-                        performanceTime = Instant.now(),
-                        duration = "duration",
-                        ageLimit = "ageLimit"
-                    )
-                ).apply { every { id } returns ticketId }
-
-                every { ticketCache.get(ticketId) } returns null
-                every { tickerRepository.findByIdOrNull(ticketId) } returns ticket
-                every { jsonSupport.writeValueAsString(any<TicketDto>()) } returns value
-                every { ticketCache.set(ticketId, value) } just runs
-
-
-                val result = ticketService.findTicket(ticketId)
-
-                result.name shouldBe ticket.product.name
-                result.description shouldBe ticket.product.description
-                result.price shouldBe ticket.product.price
-                result.quantity shouldBe ticket.product.quantity
-                result.place shouldBe ticket.place
-                result.performanceTime shouldBe ticket.performanceTime
-                result.duration shouldBe ticket.duration
-                result.ageLimit shouldBe ticket.ageLimit
-            }
         }
     }
 
