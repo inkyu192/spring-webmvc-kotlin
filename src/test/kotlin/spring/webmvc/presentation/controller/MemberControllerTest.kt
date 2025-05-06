@@ -61,8 +61,8 @@ class MemberControllerTest(
         val name = "name"
         val phone = "010-1234-1234"
         val birthDate = LocalDate.now()
-        val roleIds = mutableListOf(1L)
-        val permissionIds = mutableListOf<Long>()
+        val roleIds = mutableListOf<Long>()
+        val permissionIds = mutableListOf(1L)
 
         val request = MemberCreateRequest(
             account = account,
@@ -130,7 +130,7 @@ class MemberControllerTest(
         Mockito.`when`(member.id).thenReturn(1L)
         Mockito.`when`(member.account).thenReturn("account")
         Mockito.`when`(member.name).thenReturn("name")
-        Mockito.`when`(member.phone).thenReturn("phone")
+        Mockito.`when`(member.phone).thenReturn("010-1234-1234")
         Mockito.`when`(member.birthDate).thenReturn(LocalDate.now())
         Mockito.`when`(member.createdAt).thenReturn(Instant.now())
 
