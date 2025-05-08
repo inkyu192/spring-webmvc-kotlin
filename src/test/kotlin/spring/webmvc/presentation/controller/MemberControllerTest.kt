@@ -1,11 +1,9 @@
 package spring.webmvc.presentation.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -25,8 +23,6 @@ import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.MemberService
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.dto.request.MemberCreateRequest
-import spring.webmvc.presentation.dto.request.MemberUpdateRequest
 import java.time.Instant
 import java.time.LocalDate
 
@@ -34,9 +30,7 @@ import java.time.LocalDate
 @WebMvcTest(MemberController::class)
 @Import(WebMvcTestConfig::class)
 @ExtendWith(RestDocumentationExtension::class)
-class MemberControllerTest(
-    @Autowired private val objectMapper: ObjectMapper,
-) {
+class MemberControllerTest() {
     @MockitoBean
     private lateinit var memberService: MemberService
 
@@ -64,16 +58,6 @@ class MemberControllerTest(
         val roleIds = mutableListOf<Long>()
         val permissionIds = mutableListOf(1L)
 
-        val request = MemberCreateRequest(
-            account = account,
-            password = password,
-            name = name,
-            phone = phone,
-            birthDate = birthDate,
-            roleIds = roleIds,
-            permissionIds = permissionIds,
-        )
-
         val member = Mockito.mock<Member>()
         Mockito.`when`(member.id).thenReturn(1L)
         Mockito.`when`(member.account).thenReturn(account)
@@ -97,7 +81,19 @@ class MemberControllerTest(
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/members")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "account": "$account",
+                          "password": "$password",
+                          "name": "$name",
+                          "phone": "$phone",
+                          "birthDate": "$birthDate",
+                          "roleIds": $roleIds,
+                          "permissionIds": $permissionIds
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andDo(
@@ -166,12 +162,6 @@ class MemberControllerTest(
         val phone = "010-1234-1234"
         val birthDate = LocalDate.now()
 
-        val request = MemberUpdateRequest(
-            password = password,
-            name = name,
-            phone = phone,
-            birthDate = birthDate,
-        )
         val member = Mockito.mock<Member>()
         Mockito.`when`(member.id).thenReturn(1L)
         Mockito.`when`(member.account).thenReturn("account")
@@ -193,7 +183,16 @@ class MemberControllerTest(
             RestDocumentationRequestBuilders.patch("/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer accessToken")
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "password": "$password",
+                          "name": "$name",
+                          "phone": "$phone",
+                          "birthDate": "$birthDate"
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(

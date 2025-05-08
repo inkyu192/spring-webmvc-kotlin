@@ -1,11 +1,9 @@
 package spring.webmvc.presentation.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -26,17 +24,13 @@ import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.FlightService
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.dto.request.FlightCreateRequest
-import spring.webmvc.presentation.dto.request.FlightUpdateRequest
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 @WebMvcTest(FlightController::class)
 @Import(WebMvcTestConfig::class)
 @ExtendWith(RestDocumentationExtension::class)
-class FlightControllerTest(
-    @Autowired private val objectMapper: ObjectMapper,
-) {
+class FlightControllerTest() {
     @MockitoBean
     private lateinit var flightService: FlightService
 
@@ -67,18 +61,6 @@ class FlightControllerTest(
         val departureTime = Instant.now()
         val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
 
-        val request = FlightCreateRequest(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            airline = airline,
-            flightNumber = flightNumber,
-            departureAirport = departureAirport,
-            arrivalAirport = arrivalAirport,
-            departureTime = departureTime,
-            arrivalTime = arrivalTime,
-        )
         val flight = Mockito.spy(
             Flight.create(
                 name = name,
@@ -116,7 +98,22 @@ class FlightControllerTest(
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/products/flights")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "name": "$name",
+                          "description": "$description",
+                          "price": $price,
+                          "quantity": $quantity,
+                          "airline": "$airline",
+                          "flightNumber": "$flightNumber",
+                          "departureAirport": "$departureAirport",
+                          "arrivalAirport": "$arrivalAirport",
+                          "departureTime": "$departureTime",
+                          "arrivalTime": "$arrivalTime"
+                        }
+                    """.trimIndent()
+                )
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -172,18 +169,6 @@ class FlightControllerTest(
         val departureTime = Instant.now()
         val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
 
-        val request = FlightUpdateRequest(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            airline = airline,
-            flightNumber = flightNumber,
-            departureAirport = departureAirport,
-            arrivalAirport = arrivalAirport,
-            departureTime = departureTime,
-            arrivalTime = arrivalTime,
-        )
         val flight = Mockito.spy(
             Flight.create(
                 name = name,
@@ -223,7 +208,22 @@ class FlightControllerTest(
             RestDocumentationRequestBuilders.patch("/products/flights/{id}", flightId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "name": "$name",
+                          "description": "$description",
+                          "price": $price,
+                          "quantity": $quantity,
+                          "airline": "$airline",
+                          "flightNumber": "$flightNumber",
+                          "departureAirport": "$departureAirport",
+                          "arrivalAirport": "$arrivalAirport",
+                          "departureTime": "$departureTime",
+                          "arrivalTime": "$arrivalTime"
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(

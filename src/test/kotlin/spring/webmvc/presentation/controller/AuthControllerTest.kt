@@ -1,11 +1,9 @@
 package spring.webmvc.presentation.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -23,15 +21,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.AuthService
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.dto.request.MemberLoginRequest
-import spring.webmvc.presentation.dto.request.TokenRequest
 
 @WebMvcTest(AuthController::class)
 @Import(WebMvcTestConfig::class)
 @ExtendWith(RestDocumentationExtension::class)
-class AuthControllerTest(
-    @Autowired private val objectMapper: ObjectMapper,
-) {
+class AuthControllerTest() {
     @MockitoBean
     private lateinit var authService: AuthService
 
@@ -56,7 +50,6 @@ class AuthControllerTest(
         val account = "test@gmail.com"
         val password = "password"
 
-        val request = MemberLoginRequest(account = "test@gmail.com", password = "password")
         val pair = Pair(accessToken, refreshToken)
 
         Mockito.`when`(authService.login(account = account, password = password)).thenReturn(pair)
@@ -64,7 +57,14 @@ class AuthControllerTest(
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "account": "$account",
+                          "password": "$password"
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
@@ -87,7 +87,6 @@ class AuthControllerTest(
         val accessToken = "accessToken"
         val refreshToken = "refreshToken"
 
-        val request = TokenRequest(accessToken = accessToken, refreshToken = refreshToken)
         val pair = Pair(accessToken, refreshToken)
 
         Mockito.`when`(authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken))
@@ -96,7 +95,14 @@ class AuthControllerTest(
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/token/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "accessToken": "$accessToken",
+                          "refreshToken": "$refreshToken"
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(

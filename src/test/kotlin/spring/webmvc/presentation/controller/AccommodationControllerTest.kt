@@ -1,11 +1,9 @@
 package spring.webmvc.presentation.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -26,17 +24,13 @@ import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.AccommodationService
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.dto.request.AccommodationCreateRequest
-import spring.webmvc.presentation.dto.request.AccommodationUpdateRequest
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 @WebMvcTest(AccommodationController::class)
 @Import(WebMvcTestConfig::class)
 @ExtendWith(RestDocumentationExtension::class)
-class AccommodationControllerTest(
-    @Autowired private val objectMapper: ObjectMapper,
-) {
+class AccommodationControllerTest() {
     @MockitoBean
     private lateinit var accommodationService: AccommodationService
 
@@ -64,15 +58,6 @@ class AccommodationControllerTest(
         val checkInTime = Instant.now()
         val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
 
-        val request = AccommodationCreateRequest(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            place = place,
-            checkInTime = checkInTime,
-            checkOutTime = checkOutTime,
-        )
         val accommodation = Mockito.spy(
             Accommodation.create(
                 name = name,
@@ -104,7 +89,19 @@ class AccommodationControllerTest(
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/products/accommodations")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "name": "$name",
+                          "description": "$description",
+                          "price": $price,
+                          "quantity": $quantity,
+                          "place": "$place",
+                          "checkInTime": "${checkInTime}",
+                          "checkOutTime": "${checkOutTime}"
+                        }
+                    """.trimIndent()
+                )
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -151,15 +148,6 @@ class AccommodationControllerTest(
         val checkInTime = Instant.now()
         val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
 
-        val request = AccommodationUpdateRequest(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            place = place,
-            checkInTime = checkInTime,
-            checkOutTime = checkOutTime,
-        )
         val accommodation = Mockito.spy(
             Accommodation.create(
                 name = name,
@@ -193,7 +181,19 @@ class AccommodationControllerTest(
             RestDocumentationRequestBuilders.patch("/products/accommodations/{id}", accommodationId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "name": "$name",
+                          "description": "$description",
+                          "price": $price,
+                          "quantity": $quantity,
+                          "place": "$place",
+                          "checkInTime": "$checkInTime",
+                          "checkOutTime": "$checkOutTime"
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(

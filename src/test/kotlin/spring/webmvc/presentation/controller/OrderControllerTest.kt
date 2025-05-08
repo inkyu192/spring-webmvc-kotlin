@@ -1,11 +1,9 @@
 package spring.webmvc.presentation.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
@@ -32,16 +30,12 @@ import spring.webmvc.domain.model.entity.OrderProduct
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.dto.request.OrderCreateRequest
-import spring.webmvc.presentation.dto.request.OrderProductCreateRequest
 import java.time.Instant
 
 @WebMvcTest(OrderController::class)
 @Import(WebMvcTestConfig::class)
 @ExtendWith(RestDocumentationExtension::class)
-class OrderControllerTest(
-    @Autowired private val objectMapper: ObjectMapper,
-) {
+class OrderControllerTest() {
     @MockitoBean
     private lateinit var orderService: OrderService
 
@@ -61,10 +55,9 @@ class OrderControllerTest(
 
     @Test
     fun createOrder() {
-        val request = OrderCreateRequest(
-            products = listOf(OrderProductCreateRequest(productId = 1L, quantity = 3)),
-        )
-        val productQuantities = listOf(1L to 3)
+        val productId = 1L
+        val quantity = 3
+        val productQuantities = listOf(productId to quantity)
 
         val order = Mockito.mock<Order>()
         val product = Mockito.mock<Product>()
@@ -84,7 +77,18 @@ class OrderControllerTest(
             RestDocumentationRequestBuilders.post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "products": [
+                            {
+                              "productId": $productId,
+                              "quantity": $quantity
+                            }
+                          ]
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andDo(

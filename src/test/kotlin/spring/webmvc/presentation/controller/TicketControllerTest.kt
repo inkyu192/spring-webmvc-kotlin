@@ -1,11 +1,9 @@
 package spring.webmvc.presentation.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -27,16 +25,12 @@ import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.TicketService
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.dto.request.TicketCreateRequest
-import spring.webmvc.presentation.dto.request.TicketUpdateRequest
 import java.time.Instant
 
 @WebMvcTest(TicketController::class)
 @Import(WebMvcTestConfig::class)
 @ExtendWith(RestDocumentationExtension::class)
-class TicketControllerTest(
-    @Autowired private val objectMapper: ObjectMapper,
-) {
+class TicketControllerTest() {
     @MockitoBean
     private lateinit var ticketService: TicketService
 
@@ -65,16 +59,6 @@ class TicketControllerTest(
         val duration = "duration"
         val ageLimit = "ageLimit"
 
-        val request = TicketCreateRequest(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            place = place,
-            performanceTime = performanceTime,
-            duration = duration,
-            ageLimit = ageLimit,
-        )
         val ticket = Mockito.spy(
             Ticket.create(
                 name = name,
@@ -108,7 +92,20 @@ class TicketControllerTest(
         mockMvc.perform(
             MockMvcRequestBuilders.post("/products/tickets")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "name": "$name",
+                          "description": "$description",
+                          "price": $price,
+                          "quantity": $quantity,
+                          "place": "$place",
+                          "performanceTime": "$performanceTime",
+                          "duration": "$duration",
+                          "ageLimit": "$ageLimit"
+                        }
+                    """.trimIndent()
+                )
                 .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -158,16 +155,6 @@ class TicketControllerTest(
         val duration = "duration"
         val ageLimit = "ageLimit"
 
-        val request = TicketUpdateRequest(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            place = place,
-            performanceTime = performanceTime,
-            duration = duration,
-            ageLimit = ageLimit,
-        )
         val ticket = Mockito.spy(
             Ticket.create(
                 name = name,
@@ -203,7 +190,20 @@ class TicketControllerTest(
             RestDocumentationRequestBuilders.patch("/products/tickets/{id}", ticketId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
-                .content(objectMapper.writeValueAsString(request))
+                .content(
+                    """
+                        {
+                          "name": "$name",
+                          "description": "$description",
+                          "price": $price,
+                          "quantity": $quantity,
+                          "place": "$place",
+                          "performanceTime": "$performanceTime",
+                          "duration": "$duration",
+                          "ageLimit": "$ageLimit"
+                        }
+                    """.trimIndent()
+                )
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
