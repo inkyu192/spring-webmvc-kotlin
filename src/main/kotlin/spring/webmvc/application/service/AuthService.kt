@@ -5,6 +5,7 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.domain.cache.TokenCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
@@ -20,7 +21,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder
 ) {
     @Transactional
-    fun login(account: String, password: String): Pair<String, String> {
+    fun login(account: String, password: String): TokenResult {
         val member = memberRepository.findByAccount(account)
             ?.takeIf { passwordEncoder.matches(password, it.password) }
             ?: throw BadCredentialsException("잘못된 아이디 또는 비밀번호입니다.")
@@ -35,10 +36,10 @@ class AuthService(
 
         tokenCache.set(memberId = memberId, value = refreshToken)
 
-        return accessToken to refreshToken
+        return TokenResult(accessToken = accessToken, refreshToken = refreshToken)
     }
 
-    fun refreshToken(accessToken: String, refreshToken: String): Pair<String, String> {
+    fun refreshToken(accessToken: String, refreshToken: String): TokenResult {
         val requestMemberId = extractMemberId(accessToken)
         jwtProvider.parseRefreshToken(refreshToken)
 
@@ -49,10 +50,13 @@ class AuthService(
             ?.takeIf { refreshToken == it }
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
 
-        return jwtProvider.createAccessToken(
-            memberId = checkNotNull(member.id),
-            permissions = getPermissions(member),
-        ) to refreshToken
+        return TokenResult(
+            accessToken = jwtProvider.createAccessToken(
+                memberId = checkNotNull(member.id),
+                permissions = getPermissions(member),
+            ),
+            refreshToken = refreshToken,
+        )
     }
 
     private fun extractMemberId(accessToken: String): Long {

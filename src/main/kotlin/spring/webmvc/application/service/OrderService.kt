@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.OrderItem
@@ -19,10 +20,10 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 class OrderService(
     private val memberRepository: MemberRepository,
     private val productRepository: ProductRepository,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
 ) {
     @Transactional
-    fun createOrder(productQuantities: List<Pair<Long, Int>>): Order {
+    fun createOrder(orderCreateCommand: OrderCreateCommand): Order {
         val memberId = SecurityContextUtil.getMemberId()
 
         val member = memberRepository.findByIdOrNull(id = memberId)
@@ -30,12 +31,15 @@ class OrderService(
 
         val order = Order.create(member = member)
 
-        val productMap = productRepository.findAllById(ids = productQuantities.map { it.first }).associateBy { it.id }
-        productQuantities.forEach {
-            val product = productMap[it.first]
-                ?: throw EntityNotFoundException(kClass = OrderItem::class, id = it.first)
+        val productMap = productRepository.findAllById(
+            ids = orderCreateCommand.products.map { it.productId }
+        ).associateBy { it.id }
 
-            order.addProduct(product = product, quantity = it.second)
+        orderCreateCommand.products.forEach {
+            val product = productMap[it.productId]
+                ?: throw EntityNotFoundException(kClass = OrderItem::class, id = it.productId)
+
+            order.addProduct(product = product, quantity = it.quantity)
         }
 
         return orderRepository.save(order = order)

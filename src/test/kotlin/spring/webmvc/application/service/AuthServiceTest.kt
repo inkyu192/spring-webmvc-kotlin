@@ -71,8 +71,8 @@ class AuthServiceTest : DescribeSpec({
                 val result = authService.login(account = account, password = password)
 
                 verify(exactly = 1) { tokenCache.set(memberId = any(), value = any()) }
-                result.first shouldBe accessToken
-                result.second shouldBe refreshToken
+                result.accessToken shouldBe accessToken
+                result.refreshToken shouldBe refreshToken
             }
         }
     }
@@ -153,8 +153,8 @@ class AuthServiceTest : DescribeSpec({
 
                 val result = authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken)
 
-                result.first shouldNotBe accessToken
-                result.second shouldBe refreshToken
+                result.accessToken shouldNotBe accessToken
+                result.refreshToken shouldBe refreshToken
             }
         }
     }

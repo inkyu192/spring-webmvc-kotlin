@@ -17,11 +17,19 @@ class AuthController(
 ) {
     @PostMapping("/login")
     fun login(@RequestBody @Validated memberLoginRequest: MemberLoginRequest) =
-        authService.login(account = memberLoginRequest.account, password = memberLoginRequest.password)
-            .let { TokenResponse(accessToken = it.first, refreshToken = it.second) }
+        TokenResponse(
+            tokenResult = authService.login(
+                account = memberLoginRequest.account,
+                password = memberLoginRequest.password
+            )
+        )
 
     @PostMapping("/token/refresh")
     fun refreshToken(@RequestBody @Validated tokenRequest: TokenRequest) =
-        authService.refreshToken(accessToken = tokenRequest.accessToken, refreshToken = tokenRequest.refreshToken)
-            .let { TokenResponse(accessToken = it.first, refreshToken = it.second) }
+        TokenResponse(
+            tokenResult = authService.refreshToken(
+                accessToken = tokenRequest.accessToken,
+                refreshToken = tokenRequest.refreshToken
+            )
+        )
 }

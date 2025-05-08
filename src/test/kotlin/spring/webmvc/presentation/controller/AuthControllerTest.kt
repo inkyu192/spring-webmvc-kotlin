@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.application.service.AuthService
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 
@@ -50,9 +51,9 @@ class AuthControllerTest() {
         val account = "test@gmail.com"
         val password = "password"
 
-        val pair = Pair(accessToken, refreshToken)
+        val tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
 
-        Mockito.`when`(authService.login(account = account, password = password)).thenReturn(pair)
+        Mockito.`when`(authService.login(account = account, password = password)).thenReturn(tokenResult)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/login")
@@ -87,10 +88,10 @@ class AuthControllerTest() {
         val accessToken = "accessToken"
         val refreshToken = "refreshToken"
 
-        val pair = Pair(accessToken, refreshToken)
+        val tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
 
         Mockito.`when`(authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken))
-            .thenReturn(pair)
+            .thenReturn(tokenResult)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/token/refresh")

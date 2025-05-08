@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.application.dto.command.OrderCreateCommand
+import spring.webmvc.application.dto.command.OrderProductCreateCommand
 import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.OrderProduct
@@ -57,7 +59,9 @@ class OrderControllerTest() {
     fun createOrder() {
         val productId = 1L
         val quantity = 3
-        val productQuantities = listOf(productId to quantity)
+
+        val orderProductCreateCommand = OrderProductCreateCommand(productId = productId, quantity = quantity)
+        val orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))
 
         val order = Mockito.mock<Order>()
         val product = Mockito.mock<Product>()
@@ -71,7 +75,7 @@ class OrderControllerTest() {
         Mockito.`when`(orderProduct.quantity).thenReturn(3)
         Mockito.`when`(orderProduct.orderPrice).thenReturn(5000)
         Mockito.`when`(orderProduct.product).thenReturn(product)
-        Mockito.`when`(orderService.createOrder(productQuantities)).thenReturn(order)
+        Mockito.`when`(orderService.createOrder(orderCreateCommand)).thenReturn(order)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/orders")
