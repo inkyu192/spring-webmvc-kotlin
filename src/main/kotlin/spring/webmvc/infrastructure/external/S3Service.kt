@@ -16,7 +16,7 @@ import java.util.*
 class S3Service(
     private val s3Client: S3Client,
 ) {
-    private val log = LoggerFactory.getLogger(S3Service::class.java)
+    private val logger = LoggerFactory.getLogger(S3Service::class.java)
 
     fun putObject(bucket: String, directory: String, file: MultipartFile): String {
         val filename = requireNotNull(file.originalFilename)
@@ -32,7 +32,7 @@ class S3Service(
         runCatching {
             s3Client.putObject(request, RequestBody.fromInputStream(file.inputStream, file.size))
         }.onFailure { throwable ->
-            log.error("Failed to put object to S3", throwable)
+            logger.error("Failed to put object to S3", throwable)
             throw AwsIntegrationException(serviceName = "S3", throwable = throwable)
         }
 

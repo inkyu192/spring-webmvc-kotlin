@@ -18,7 +18,7 @@ data class HttpLog(
     val requestBody: String,
     val responseBody: String
 ) {
-    private val log = LoggerFactory.getLogger(HttpLog::class.java)
+    private val logger = LoggerFactory.getLogger(HttpLog::class.java)
 
     constructor(
         transactionId: String,
@@ -70,6 +70,6 @@ data class HttpLog(
         """.trimMargin()
             .let { "\n$it" }
 
-        log.info(message)
+        logger.info(message)
     }
 }
