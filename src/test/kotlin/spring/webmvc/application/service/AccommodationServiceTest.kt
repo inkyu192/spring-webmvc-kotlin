@@ -7,7 +7,6 @@ import io.mockk.*
 import spring.webmvc.domain.cache.AccommodationCache
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.repository.AccommodationRepository
-import spring.webmvc.infrastructure.common.JsonSupport
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import java.time.Instant
 import java.time.temporal.ChronoUnit

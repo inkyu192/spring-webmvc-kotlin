@@ -3,10 +3,12 @@ package spring.webmvc.application.service
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.strategy.ProductStrategy
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.presentation.exception.StrategyNotImplementedException
 
 @Service
 @Transactional(readOnly = true)
@@ -18,10 +20,19 @@ class ProductService(
         productRepository.findAll(pageable = pageable, name = name).map { ProductResult(product = it) }
 
     fun findProduct(id: Long, category: Category): ProductResult {
-        val productStrategy = productStrategies
-            .firstOrNull { it.supports(category) }
-            ?: throw IllegalStateException()
+        val productStrategy = getProductStrategy(category)
 
-        return productStrategy.findByProductId(id)
+        return productStrategy.findByProductId(productId = id)
     }
+
+    @Transactional
+    fun createProduct(command: ProductCreateCommand): ProductResult {
+        val productStrategy = getProductStrategy(category = command.category)
+
+        return productStrategy.createProduct(productCreateCommand = command)
+    }
+
+    private fun getProductStrategy(category: Category) =
+        productStrategies.firstOrNull { it.supports(category) }
+            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
 }

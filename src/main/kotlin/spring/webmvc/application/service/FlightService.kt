@@ -13,33 +13,6 @@ class FlightService(
     private val flightRepository: FlightRepository,
 ) {
     @Transactional
-    fun createFlight(
-        name: String,
-        description: String,
-        price: Int,
-        quantity: Int,
-        airline: String,
-        flightNumber: String,
-        departureAirport: String,
-        arrivalAirport: String,
-        departureTime: Instant,
-        arrivalTime: Instant,
-    ) = flightRepository.save(
-        Flight.create(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            flightNumber = flightNumber,
-            airline = airline,
-            departureAirport = departureAirport,
-            arrivalAirport = arrivalAirport,
-            departureTime = departureTime,
-            arrivalTime = arrivalTime,
-        )
-    )
-
-    @Transactional
     fun updateFlight(
         id: Long,
         name: String,

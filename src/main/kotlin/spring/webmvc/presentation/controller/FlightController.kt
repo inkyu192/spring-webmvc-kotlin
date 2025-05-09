@@ -5,7 +5,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.FlightService
-import spring.webmvc.presentation.dto.request.FlightCreateRequest
 import spring.webmvc.presentation.dto.request.FlightUpdateRequest
 import spring.webmvc.presentation.dto.response.FlightResponse
 
@@ -14,25 +13,6 @@ import spring.webmvc.presentation.dto.response.FlightResponse
 class FlightController(
     private val flightService: FlightService,
 ) {
-    @PostMapping
-    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createFlight(@RequestBody @Validated flightCreateRequest: FlightCreateRequest) =
-        FlightResponse(
-            flight = flightService.createFlight(
-                name = flightCreateRequest.name,
-                description = flightCreateRequest.description,
-                price = flightCreateRequest.price,
-                quantity = flightCreateRequest.quantity,
-                airline = flightCreateRequest.airline,
-                flightNumber = flightCreateRequest.flightNumber,
-                departureAirport = flightCreateRequest.departureAirport,
-                arrivalAirport = flightCreateRequest.arrivalAirport,
-                departureTime = flightCreateRequest.departureTime,
-                arrivalTime = flightCreateRequest.arrivalTime,
-            )
-        )
-
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
     fun updateFlight(

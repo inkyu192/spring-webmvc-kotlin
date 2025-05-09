@@ -13,27 +13,6 @@ class AccommodationService(
     private val accommodationRepository: AccommodationRepository,
 ) {
     @Transactional
-    fun createAccommodation(
-        name: String,
-        description: String,
-        price: Int,
-        quantity: Int,
-        place: String,
-        checkInTime: Instant,
-        checkOutTime: Instant,
-    ) = accommodationRepository.save(
-        Accommodation.create(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            place = place,
-            checkInTime = checkInTime,
-            checkOutTime = checkOutTime,
-        )
-    )
-
-    @Transactional
     fun updateAccommodation(
         id: Long,
         name: String,

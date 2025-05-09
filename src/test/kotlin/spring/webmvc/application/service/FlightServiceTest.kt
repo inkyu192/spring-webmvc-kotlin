@@ -7,7 +7,6 @@ import io.mockk.*
 import spring.webmvc.domain.cache.FlightCache
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.repository.FlightRepository
-import spring.webmvc.infrastructure.common.JsonSupport
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import java.time.Instant
 import java.time.temporal.ChronoUnit

@@ -5,7 +5,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.AccommodationService
-import spring.webmvc.presentation.dto.request.AccommodationCreateRequest
 import spring.webmvc.presentation.dto.request.AccommodationUpdateRequest
 import spring.webmvc.presentation.dto.response.AccommodationResponse
 
@@ -14,22 +13,6 @@ import spring.webmvc.presentation.dto.response.AccommodationResponse
 class AccommodationController(
     private val accommodationService: AccommodationService,
 ) {
-    @PostMapping
-    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createAccommodation(@RequestBody @Validated accommodationCreateRequest: AccommodationCreateRequest) =
-        AccommodationResponse(
-            accommodation = accommodationService.createAccommodation(
-                name = accommodationCreateRequest.name,
-                description = accommodationCreateRequest.description,
-                price = accommodationCreateRequest.price,
-                quantity = accommodationCreateRequest.quantity,
-                place = accommodationCreateRequest.place,
-                checkInTime = accommodationCreateRequest.checkInTime,
-                checkOutTime = accommodationCreateRequest.checkOutTime,
-            )
-        )
-
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
     fun updateAccommodation(

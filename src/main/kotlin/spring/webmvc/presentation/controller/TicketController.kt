@@ -5,7 +5,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.TicketService
-import spring.webmvc.presentation.dto.request.TicketCreateRequest
 import spring.webmvc.presentation.dto.request.TicketUpdateRequest
 import spring.webmvc.presentation.dto.response.TicketResponse
 
@@ -14,23 +13,6 @@ import spring.webmvc.presentation.dto.response.TicketResponse
 class TicketController(
     private val ticketService: TicketService,
 ) {
-    @PostMapping
-    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createTicket(@RequestBody @Validated ticketCreateRequest: TicketCreateRequest) =
-        TicketResponse(
-            ticket = ticketService.createTicket(
-                name = ticketCreateRequest.name,
-                description = ticketCreateRequest.description,
-                price = ticketCreateRequest.price,
-                quantity = ticketCreateRequest.quantity,
-                place = ticketCreateRequest.place,
-                performanceTime = ticketCreateRequest.performanceTime,
-                duration = ticketCreateRequest.duration,
-                ageLimit = ticketCreateRequest.ageLimit,
-            )
-        )
-
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
     fun updateTicket(

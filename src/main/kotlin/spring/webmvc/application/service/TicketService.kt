@@ -13,29 +13,6 @@ class TicketService(
     private val ticketRepository: TicketRepository,
 ) {
     @Transactional
-    fun createTicket(
-        name: String,
-        description: String,
-        price: Int,
-        quantity: Int,
-        place: String,
-        performanceTime: Instant,
-        duration: String,
-        ageLimit: String,
-    ) = ticketRepository.save(
-        Ticket.create(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            place = place,
-            performanceTime = performanceTime,
-            duration = duration,
-            ageLimit = ageLimit,
-        )
-    )
-
-    @Transactional
     fun updateTicket(
         id: Long,
         name: String,
