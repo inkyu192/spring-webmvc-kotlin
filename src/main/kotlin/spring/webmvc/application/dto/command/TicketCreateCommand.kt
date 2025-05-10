@@ -1,18 +1,18 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.presentation.dto.request.NewTicketCreateRequest
+import spring.webmvc.presentation.dto.request.TicketCreateRequest
 
 class TicketCreateCommand(
-    newTicketCreateRequest: NewTicketCreateRequest
+    ticketCreateRequest: TicketCreateRequest
 ) : ProductCreateCommand(
-    category = newTicketCreateRequest.category,
-    name = newTicketCreateRequest.name,
-    description = newTicketCreateRequest.description,
-    price = newTicketCreateRequest.price,
-    quantity = newTicketCreateRequest.quantity
+    category = ticketCreateRequest.category,
+    name = ticketCreateRequest.name,
+    description = ticketCreateRequest.description,
+    price = ticketCreateRequest.price,
+    quantity = ticketCreateRequest.quantity
 ) {
-    val place = newTicketCreateRequest.place
-    val performanceTime = newTicketCreateRequest.performanceTime
-    val duration = newTicketCreateRequest.duration
-    val ageLimit = newTicketCreateRequest.ageLimit
+    val place = ticketCreateRequest.place
+    val performanceTime = ticketCreateRequest.performanceTime
+    val duration = ticketCreateRequest.duration
+    val ageLimit = ticketCreateRequest.ageLimit
 }

@@ -1,20 +1,20 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.presentation.dto.request.NewFlightCreateRequest
+import spring.webmvc.presentation.dto.request.FlightCreateRequest
 
 class FlightCreateCommand(
-    newFlightCreateRequest: NewFlightCreateRequest
+    flightCreateRequest: FlightCreateRequest
 ) : ProductCreateCommand(
-    category = newFlightCreateRequest.category,
-    name = newFlightCreateRequest.name,
-    description = newFlightCreateRequest.description,
-    price = newFlightCreateRequest.price,
-    quantity = newFlightCreateRequest.quantity
+    category = flightCreateRequest.category,
+    name = flightCreateRequest.name,
+    description = flightCreateRequest.description,
+    price = flightCreateRequest.price,
+    quantity = flightCreateRequest.quantity
 ) {
-    val airline = newFlightCreateRequest.airline
-    val flightNumber = newFlightCreateRequest.flightNumber
-    val departureAirport = newFlightCreateRequest.departureAirport
-    val arrivalAirport = newFlightCreateRequest.arrivalAirport
-    val departureTime = newFlightCreateRequest.departureTime
-    val arrivalTime = newFlightCreateRequest.arrivalTime
+    val airline = flightCreateRequest.airline
+    val flightNumber = flightCreateRequest.flightNumber
+    val departureAirport = flightCreateRequest.departureAirport
+    val arrivalAirport = flightCreateRequest.arrivalAirport
+    val departureTime = flightCreateRequest.departureTime
+    val arrivalTime = flightCreateRequest.arrivalTime
 }

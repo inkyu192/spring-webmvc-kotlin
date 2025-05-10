@@ -1,17 +1,17 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.presentation.dto.request.NewAccommodationCreateRequest
+import spring.webmvc.presentation.dto.request.AccommodationCreateRequest
 
 class AccommodationCreateCommand(
-    newAccommodationCreateRequest: NewAccommodationCreateRequest
+    accommodationCreateRequest: AccommodationCreateRequest
 ) : ProductCreateCommand(
-    category = newAccommodationCreateRequest.category,
-    name = newAccommodationCreateRequest.name,
-    description = newAccommodationCreateRequest.description,
-    price = newAccommodationCreateRequest.price,
-    quantity = newAccommodationCreateRequest.quantity
+    category = accommodationCreateRequest.category,
+    name = accommodationCreateRequest.name,
+    description = accommodationCreateRequest.description,
+    price = accommodationCreateRequest.price,
+    quantity = accommodationCreateRequest.quantity
 ) {
-    val place = newAccommodationCreateRequest.place
-    val checkInTime = newAccommodationCreateRequest.checkInTime
-    val checkOutTime = newAccommodationCreateRequest.checkOutTime
+    val place = accommodationCreateRequest.place
+    val checkInTime = accommodationCreateRequest.checkInTime
+    val checkOutTime = accommodationCreateRequest.checkOutTime
 }
