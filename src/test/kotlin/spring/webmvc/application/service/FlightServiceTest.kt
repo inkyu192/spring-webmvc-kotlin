@@ -15,60 +15,6 @@ class FlightServiceTest : DescribeSpec({
     val flightRepository = mockk<FlightRepository>()
     val flightService = FlightService(flightRepository = flightRepository)
 
-    describe("createFlight") {
-        it("Flight 저장 후 반환한다") {
-            val name = "name"
-            val description = "description"
-            val price = 1000
-            val quantity = 5
-            val airline = "airline"
-            val flightNumber = "flightNumber"
-            val departureAirport = "departureAirport"
-            val arrivalAirport = "arrivalAirport"
-            val departureTime = Instant.now()
-            val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
-
-            val flight = Flight.create(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                airline = airline,
-                flightNumber = flightNumber,
-                departureAirport = departureAirport,
-                arrivalAirport = arrivalAirport,
-                departureTime = departureTime,
-                arrivalTime = arrivalTime,
-            )
-
-            every { flightRepository.save(flight = any<Flight>()) } returns flight
-
-            // When
-            val result = flightService.createFlight(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                airline = airline,
-                flightNumber = flightNumber,
-                departureAirport = departureAirport,
-                arrivalAirport = arrivalAirport,
-                departureTime = departureTime,
-                arrivalTime = arrivalTime,
-            )
-
-            result.product.name shouldBe name
-            result.product.description shouldBe description
-            result.product.price shouldBe price
-            result.product.quantity shouldBe quantity
-            result.departureAirport shouldBe departureAirport
-            result.arrivalAirport shouldBe arrivalAirport
-            result.departureTime shouldBe departureTime
-            result.arrivalTime shouldBe arrivalTime
-            result.airline shouldBe airline
-        }
-    }
-
     describe("updateFlight") {
         context("Flight 없을 경우") {
             it("EntityNotFoundException 발생한다") {

@@ -15,52 +15,6 @@ class TicketServiceTest : DescribeSpec({
     val tickerRepository = mockk<TicketRepository>()
     val ticketService = TicketService(ticketRepository = tickerRepository)
 
-    describe("createTicket") {
-        it("Ticket 저장 후 반환한다") {
-            val name = "name"
-            val description = "description"
-            val price = 1000
-            val quantity = 5
-            val place = "place"
-            val performanceTime = Instant.now()
-            val duration = "duration"
-            val ageLimit = "ageLimit"
-
-            val ticket = Ticket.create(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                performanceTime = performanceTime,
-                duration = duration,
-                ageLimit = ageLimit,
-            )
-
-            every { tickerRepository.save(ticket = any<Ticket>()) } returns ticket
-
-            val result = ticketService.createTicket(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                performanceTime = performanceTime,
-                duration = duration,
-                ageLimit = ageLimit,
-            )
-
-            result.product.name shouldBe name
-            result.product.description shouldBe description
-            result.product.price shouldBe price
-            result.product.quantity shouldBe quantity
-            result.place shouldBe place
-            result.performanceTime shouldBe performanceTime
-            result.duration shouldBe duration
-            result.ageLimit shouldBe ageLimit
-        }
-    }
-
     describe("updateTicket") {
         context("Ticket 없을 경우") {
             it("EntityNotFoundException 발생한다") {

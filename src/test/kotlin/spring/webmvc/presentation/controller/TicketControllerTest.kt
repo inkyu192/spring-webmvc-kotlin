@@ -3,7 +3,9 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -17,7 +19,6 @@ import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -49,101 +50,6 @@ class TicketControllerTest() {
     }
 
     @Test
-    fun createTicket() {
-        val name = "name"
-        val description = "description"
-        val price = 1000
-        val quantity = 5
-        val place = "place"
-        val performanceTime = Instant.now()
-        val duration = "duration"
-        val ageLimit = "ageLimit"
-
-        val ticket = Mockito.spy(
-            Ticket.create(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                performanceTime = performanceTime,
-                duration = duration,
-                ageLimit = ageLimit,
-            )
-        ).apply { Mockito.`when`(id).thenReturn(1L) }
-
-        val product = Mockito.spy(ticket.product)
-            .apply { Mockito.`when`(id).thenReturn(1L) }
-
-        Mockito.`when`(ticket.product).thenReturn(product)
-        Mockito.`when`(
-            ticketService.createTicket(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                performanceTime = performanceTime,
-                duration = duration,
-                ageLimit = ageLimit,
-            )
-        ).thenReturn(ticket)
-
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/products/tickets")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
-                        {
-                          "name": "$name",
-                          "description": "$description",
-                          "price": $price,
-                          "quantity": $quantity,
-                          "place": "$place",
-                          "performanceTime": "$performanceTime",
-                          "duration": "$duration",
-                          "ageLimit": "$ageLimit"
-                        }
-                    """.trimIndent()
-                )
-                .header("Authorization", "Bearer accessToken")
-        )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andDo(
-                MockMvcRestDocumentation.document(
-                    "ticket-create",
-                    HeaderDocumentation.requestHeaders(
-                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
-                    ),
-                    PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("name").description("티켓명"),
-                        PayloadDocumentation.fieldWithPath("description").description("설명"),
-                        PayloadDocumentation.fieldWithPath("price").description("가격"),
-                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
-                        PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
-                        PayloadDocumentation.fieldWithPath("ageLimit").description("관람 연령")
-                    ),
-                    PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
-                        PayloadDocumentation.fieldWithPath("name").description("티켓명"),
-                        PayloadDocumentation.fieldWithPath("description").description("설명"),
-                        PayloadDocumentation.fieldWithPath("price").description("가격"),
-                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("ticketId").description("티켓아이디"),
-                        PayloadDocumentation.fieldWithPath("place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
-                        PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
-                        PayloadDocumentation.fieldWithPath("ageLimit").description("관람 연령")
-                    )
-                )
-            )
-    }
-
-    @Test
     fun updateTicket() {
         val ticketId = 1L
         val name = "name"
@@ -155,7 +61,7 @@ class TicketControllerTest() {
         val duration = "duration"
         val ageLimit = "ageLimit"
 
-        val ticket = Mockito.spy(
+        val ticket = spy(
             Ticket.create(
                 name = name,
                 description = description,
@@ -166,13 +72,13 @@ class TicketControllerTest() {
                 duration = duration,
                 ageLimit = ageLimit,
             )
-        ).apply { Mockito.`when`(id).thenReturn(1L) }
+        ).apply { whenever(id).thenReturn(1L) }
 
-        val product = Mockito.spy(ticket.product)
-            .apply { Mockito.`when`(id).thenReturn(1L) }
+        val product = spy(ticket.product)
+            .apply { whenever(id).thenReturn(1L) }
 
-        Mockito.`when`(ticket.product).thenReturn(product)
-        Mockito.`when`(
+        whenever(ticket.product).thenReturn(product)
+        whenever(
             ticketService.updateTicket(
                 id = ticketId,
                 name = name,
@@ -247,7 +153,7 @@ class TicketControllerTest() {
     fun deleteTicket() {
         val ticketId = 1L
 
-        Mockito.doNothing().`when`(ticketService).deleteTicket(ticketId)
+        doNothing().whenever(ticketService).deleteTicket(ticketId)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/products/tickets/{id}", ticketId)

@@ -3,12 +3,15 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.http.MediaType
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation
@@ -23,6 +26,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.application.dto.command.AccommodationCreateCommand
+import spring.webmvc.application.dto.command.FlightCreateCommand
+import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.application.dto.result.ProductResult
@@ -89,7 +95,7 @@ class ProductControllerTest() {
         )
         val page = PageImpl(response, pageable, response.size.toLong())
 
-        Mockito.`when`(productService.findProducts(pageable = pageable, name = name)).thenReturn(page)
+        whenever(productService.findProducts(pageable = pageable, name = name)).thenReturn(page)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products")
@@ -164,9 +170,8 @@ class ProductControllerTest() {
             ageLimit = "ageLimit"
         )
 
-        Mockito.`when`(productService.findProduct(id = productId, category = category)).thenReturn(ticketResult)
+        whenever(productService.findProduct(id = productId, category = category)).thenReturn(ticketResult)
 
-        // When & Then
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/{id}", productId)
                 .header("Authorization", "Bearer access-token")
@@ -223,9 +228,8 @@ class ProductControllerTest() {
             arrivalTime = Instant.now().plus(1, ChronoUnit.DAYS)
         )
 
-        Mockito.`when`(productService.findProduct(id = productId, category = category)).thenReturn(flightResult)
+        whenever(productService.findProduct(id = productId, category = category)).thenReturn(flightResult)
 
-        // When & Then
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/{id}", productId)
                 .header("Authorization", "Bearer access-token")
@@ -281,9 +285,8 @@ class ProductControllerTest() {
             checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
         )
 
-        Mockito.`when`(productService.findProduct(id = productId, category = category)).thenReturn(accommodationResult)
+        whenever(productService.findProduct(id = productId, category = category)).thenReturn(accommodationResult)
 
-        // When & Then
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/{id}", productId)
                 .header("Authorization", "Bearer access-token")
@@ -306,6 +309,269 @@ class ProductControllerTest() {
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
                         PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("티켓명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("accommodationId").description("숙소아이디"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun createTicket() {
+        val productId = 1L
+        val category = Category.TICKET
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val place = "place"
+        val performanceTime = Instant.now()
+        val duration = "duration"
+        val ageLimit = "ageLimit"
+        val createdAt = Instant.now()
+
+        val ticketResult = mock<TicketResult>()
+        whenever(ticketResult.id).thenReturn(productId)
+        whenever(ticketResult.category).thenReturn(category)
+        whenever(ticketResult.name).thenReturn(name)
+        whenever(ticketResult.description).thenReturn(description)
+        whenever(ticketResult.price).thenReturn(price)
+        whenever(ticketResult.quantity).thenReturn(quantity)
+        whenever(ticketResult.place).thenReturn(place)
+        whenever(ticketResult.performanceTime).thenReturn(performanceTime)
+        whenever(ticketResult.duration).thenReturn(duration)
+        whenever(ticketResult.ageLimit).thenReturn(ageLimit)
+        whenever(ticketResult.createdAt).thenReturn(createdAt)
+
+        whenever(productService.createProduct(any<TicketCreateCommand>())).thenReturn(ticketResult)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+						{
+						  "category": "$category",
+						  "name": "$name",
+						  "description": "$description",
+						  "price": $price,
+						  "quantity": $quantity,
+						  "place": "$place",
+						  "performanceTime": "$performanceTime",
+						  "duration": "$duration",
+						  "ageLimit": "$ageLimit"
+						}
+						
+						""".trimIndent()
+                )
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "ticket-create",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
+                        PayloadDocumentation.fieldWithPath("name").description("티켓명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
+                        PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
+                        PayloadDocumentation.fieldWithPath("ageLimit").description("관람 연령")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
+                        PayloadDocumentation.fieldWithPath("name").description("티켓명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("ticketId").description("티켓아이디"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
+                        PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
+                        PayloadDocumentation.fieldWithPath("ageLimit").description("관람 연령")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun createFlight() {
+        val productId = 1L
+        val category = Category.FLIGHT
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val airline = "airline"
+        val flightNumber = "flightNumber"
+        val departureAirport = "departureAirport"
+        val arrivalAirport = "arrivalAirport"
+        val departureTime = Instant.now()
+        val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
+        val createdAt = Instant.now()
+
+        val flightResult = mock<FlightResult>()
+        whenever(flightResult.id).thenReturn(productId)
+        whenever(flightResult.category).thenReturn(category)
+        whenever(flightResult.name).thenReturn(name)
+        whenever(flightResult.description).thenReturn(description)
+        whenever(flightResult.price).thenReturn(price)
+        whenever(flightResult.quantity).thenReturn(quantity)
+        whenever(flightResult.airline).thenReturn(airline)
+        whenever(flightResult.flightNumber).thenReturn(flightNumber)
+        whenever(flightResult.departureAirport).thenReturn(departureAirport)
+        whenever(flightResult.arrivalAirport).thenReturn(arrivalAirport)
+        whenever(flightResult.departureTime).thenReturn(departureTime)
+        whenever(flightResult.arrivalTime).thenReturn(arrivalTime)
+        whenever(flightResult.createdAt).thenReturn(createdAt)
+
+        whenever(productService.createProduct(any<FlightCreateCommand>())).thenReturn(flightResult)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+						{
+						  "category": "$category",
+						  "name": "$name",
+						  "description": "$description",
+						  "price": $price,
+						  "quantity": $quantity,
+						  "airline": "$airline",
+						  "flightNumber": "$flightNumber",
+						  "departureAirport": "$departureAirport",
+						  "arrivalAirport": "$arrivalAirport",
+						  "departureTime": "$departureTime",
+						  "arrivalTime": "$arrivalTime"
+						}
+						
+						""".trimIndent()
+                )
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "flight-create",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
+                        PayloadDocumentation.fieldWithPath("name").description("항공편명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("airline").description("항공사"),
+                        PayloadDocumentation.fieldWithPath("flightNumber").description("항공편 ID"),
+                        PayloadDocumentation.fieldWithPath("departureAirport").description("출발 공항"),
+                        PayloadDocumentation.fieldWithPath("arrivalAirport").description("도착 공항"),
+                        PayloadDocumentation.fieldWithPath("departureTime").description("출발 시간"),
+                        PayloadDocumentation.fieldWithPath("arrivalTime").description("도착 시간")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
+                        PayloadDocumentation.fieldWithPath("name").description("항공편명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("flightId").description("항공아이디"),
+                        PayloadDocumentation.fieldWithPath("airline").description("항공사"),
+                        PayloadDocumentation.fieldWithPath("flightNumber").description("항공편 ID"),
+                        PayloadDocumentation.fieldWithPath("departureAirport").description("출발 공항"),
+                        PayloadDocumentation.fieldWithPath("arrivalAirport").description("도착 공항"),
+                        PayloadDocumentation.fieldWithPath("departureTime").description("출발 시간"),
+                        PayloadDocumentation.fieldWithPath("arrivalTime").description("도착 시간")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun createAccommodation() {
+        val productId = 1L
+        val category = Category.ACCOMMODATION
+        val name = "name"
+        val description = "description"
+        val price = 1000
+        val quantity = 5
+        val place = "place"
+        val checkInTime = Instant.now()
+        val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+        val createdAt = Instant.now()
+
+        val accommodationResult = mock<AccommodationResult>()
+        whenever(accommodationResult.id).thenReturn(productId)
+        whenever(accommodationResult.category).thenReturn(category)
+        whenever(accommodationResult.name).thenReturn(name)
+        whenever(accommodationResult.description).thenReturn(description)
+        whenever(accommodationResult.price).thenReturn(price)
+        whenever(accommodationResult.quantity).thenReturn(quantity)
+        whenever(accommodationResult.place).thenReturn(place)
+        whenever(accommodationResult.checkInTime).thenReturn(checkInTime)
+        whenever(accommodationResult.checkOutTime).thenReturn(checkOutTime)
+        whenever(accommodationResult.createdAt).thenReturn(createdAt)
+
+        whenever(productService.createProduct(any<AccommodationCreateCommand>())).thenReturn(accommodationResult)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+						{
+						  "category": "$category",
+						  "name": "$name",
+						  "description": "$description",
+						  "price": $price,
+						  "quantity": $quantity,
+						  "place": "$place",
+						  "checkInTime": "$checkInTime",
+						  "checkOutTime": "$checkOutTime"
+						}
+						
+						""".trimIndent()
+                )
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "accommodation-create",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
+                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
+                        PayloadDocumentation.fieldWithPath("description").description("설명"),
+                        PayloadDocumentation.fieldWithPath("price").description("가격"),
+                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
+                        PayloadDocumentation.fieldWithPath("place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
+                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),

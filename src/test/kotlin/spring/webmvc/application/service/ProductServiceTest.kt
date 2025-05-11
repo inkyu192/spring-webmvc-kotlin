@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.spyk
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.strategy.ProductStrategy
 import spring.webmvc.domain.model.entity.Product
@@ -117,6 +118,45 @@ class ProductServiceTest : DescribeSpec({
                 ticket.performanceTime shouldBe ticketResult.performanceTime
                 ticket.duration shouldBe ticketResult.duration
                 ticket.ageLimit shouldBe ticketResult.ageLimit
+            }
+        }
+    }
+
+    describe("createProduct") {
+        it("Product 저장 후 반환한다") {
+            val productId = 1L
+            val category = Category.TICKET
+
+            val ticketCreateCommand = mockk<TicketCreateCommand>()
+            every { ticketCreateCommand.category } returns category
+
+            val ticketResult = TicketResult(
+                id = productId,
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 10, createdAt = Instant.now(),
+                ticketId = 1L,
+                place = "place",
+                performanceTime = Instant.now(),
+                duration = "duration",
+                ageLimit = "ageLimit"
+            )
+
+            every { productStrategy.supports(category) } returns true
+            every { productStrategy.createProduct(productCreateCommand = ticketCreateCommand) } returns ticketResult
+
+            val result = productService.createProduct(ticketCreateCommand)
+
+            result.shouldBeInstanceOf<TicketResult>().apply {
+                name shouldBe ticketResult.name
+                description shouldBe ticketResult.description
+                price shouldBe ticketResult.price
+                quantity shouldBe ticketResult.quantity
+                place shouldBe ticketResult.place
+                performanceTime shouldBe ticketResult.performanceTime
+                duration shouldBe ticketResult.duration
+                ageLimit shouldBe ticketResult.ageLimit
             }
         }
     }

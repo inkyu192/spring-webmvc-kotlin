@@ -3,7 +3,9 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -58,15 +60,15 @@ class MemberControllerTest() {
         val roleIds = mutableListOf<Long>()
         val permissionIds = mutableListOf(1L)
 
-        val member = Mockito.mock<Member>()
-        Mockito.`when`(member.id).thenReturn(1L)
-        Mockito.`when`(member.account).thenReturn(account)
-        Mockito.`when`(member.name).thenReturn(name)
-        Mockito.`when`(member.phone).thenReturn(phone)
-        Mockito.`when`(member.birthDate).thenReturn(birthDate)
-        Mockito.`when`(member.createdAt).thenReturn(Instant.now())
+        val member = mock<Member>()
+        whenever(member.id).thenReturn(1L)
+        whenever(member.account).thenReturn(account)
+        whenever(member.name).thenReturn(name)
+        whenever(member.phone).thenReturn(phone)
+        whenever(member.birthDate).thenReturn(birthDate)
+        whenever(member.createdAt).thenReturn(Instant.now())
 
-        Mockito.`when`(
+        whenever(
             memberService.createMember(
                 account = account,
                 password = password,
@@ -122,15 +124,15 @@ class MemberControllerTest() {
 
     @Test
     fun findMember() {
-        val member = Mockito.mock<Member>()
-        Mockito.`when`(member.id).thenReturn(1L)
-        Mockito.`when`(member.account).thenReturn("account")
-        Mockito.`when`(member.name).thenReturn("name")
-        Mockito.`when`(member.phone).thenReturn("010-1234-1234")
-        Mockito.`when`(member.birthDate).thenReturn(LocalDate.now())
-        Mockito.`when`(member.createdAt).thenReturn(Instant.now())
+        val member = mock<Member>()
+        whenever(member.id).thenReturn(1L)
+        whenever(member.account).thenReturn("account")
+        whenever(member.name).thenReturn("name")
+        whenever(member.phone).thenReturn("010-1234-1234")
+        whenever(member.birthDate).thenReturn(LocalDate.now())
+        whenever(member.createdAt).thenReturn(Instant.now())
 
-        Mockito.`when`(memberService.findMember()).thenReturn(member)
+        whenever(memberService.findMember()).thenReturn(member)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/members")
@@ -162,15 +164,15 @@ class MemberControllerTest() {
         val phone = "010-1234-1234"
         val birthDate = LocalDate.now()
 
-        val member = Mockito.mock<Member>()
-        Mockito.`when`(member.id).thenReturn(1L)
-        Mockito.`when`(member.account).thenReturn("account")
-        Mockito.`when`(member.name).thenReturn(name)
-        Mockito.`when`(member.phone).thenReturn(phone)
-        Mockito.`when`(member.birthDate).thenReturn(birthDate)
-        Mockito.`when`(member.createdAt).thenReturn(Instant.now())
+        val member = mock<Member>()
+        whenever(member.id).thenReturn(1L)
+        whenever(member.account).thenReturn("account")
+        whenever(member.name).thenReturn(name)
+        whenever(member.phone).thenReturn(phone)
+        whenever(member.birthDate).thenReturn(birthDate)
+        whenever(member.createdAt).thenReturn(Instant.now())
 
-        Mockito.`when`(
+        whenever(
             memberService.updateMember(
                 password = password,
                 name = name,
@@ -221,7 +223,7 @@ class MemberControllerTest() {
 
     @Test
     fun deleteMember() {
-        Mockito.doNothing().`when`(memberService).deleteMember()
+        doNothing().whenever(memberService).deleteMember()
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/members")

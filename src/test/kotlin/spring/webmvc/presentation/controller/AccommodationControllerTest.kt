@@ -3,7 +3,9 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -49,95 +51,6 @@ class AccommodationControllerTest() {
     }
 
     @Test
-    fun createAccommodation() {
-        val name = "name"
-        val description = "description"
-        val price = 1000
-        val quantity = 5
-        val place = "place"
-        val checkInTime = Instant.now()
-        val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-
-        val accommodation = Mockito.spy(
-            Accommodation.create(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                checkInTime = checkInTime,
-                checkOutTime = checkOutTime,
-            ),
-        ).apply { Mockito.`when`(id).thenReturn(1L) }
-
-        val product = Mockito.spy(accommodation.product)
-            .apply { Mockito.`when`(id).thenReturn(1L) }
-
-        Mockito.`when`(accommodation.product).thenReturn(product)
-        Mockito.`when`(
-            accommodationService.createAccommodation(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                checkInTime = checkInTime,
-                checkOutTime = checkOutTime,
-            )
-        ).thenReturn(accommodation)
-
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.post("/products/accommodations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
-                        {
-                          "name": "$name",
-                          "description": "$description",
-                          "price": $price,
-                          "quantity": $quantity,
-                          "place": "$place",
-                          "checkInTime": "${checkInTime}",
-                          "checkOutTime": "${checkOutTime}"
-                        }
-                    """.trimIndent()
-                )
-                .header("Authorization", "Bearer access-token")
-        )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andDo(
-                MockMvcRestDocumentation.document(
-                    "accommodation-create",
-                    HeaderDocumentation.requestHeaders(
-                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
-                    ),
-                    PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
-                        PayloadDocumentation.fieldWithPath("description").description("설명"),
-                        PayloadDocumentation.fieldWithPath("price").description("가격"),
-                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
-                    ),
-                    PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
-                        PayloadDocumentation.fieldWithPath("name").description("숙소명"),
-                        PayloadDocumentation.fieldWithPath("description").description("설명"),
-                        PayloadDocumentation.fieldWithPath("price").description("가격"),
-                        PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("accommodationId").description("숙소아이디"),
-                        PayloadDocumentation.fieldWithPath("place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
-                    )
-                )
-            )
-    }
-
-    @Test
     fun updateAccommodation() {
         val accommodationId = 1L
         val name = "name"
@@ -148,7 +61,7 @@ class AccommodationControllerTest() {
         val checkInTime = Instant.now()
         val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
 
-        val accommodation = Mockito.spy(
+        val accommodation = spy(
             Accommodation.create(
                 name = name,
                 description = description,
@@ -158,13 +71,13 @@ class AccommodationControllerTest() {
                 checkInTime = checkInTime,
                 checkOutTime = checkOutTime,
             )
-        ).apply { Mockito.`when`(id).thenReturn(1L) }
+        ).apply { whenever(id).thenReturn(1L) }
 
-        val product = Mockito.spy(accommodation.product)
-            .apply { Mockito.`when`(id).thenReturn(1L) }
+        val product = spy(accommodation.product)
+            .apply { whenever(id).thenReturn(1L) }
 
-        Mockito.`when`(accommodation.product).thenReturn(product)
-        Mockito.`when`(
+        whenever(accommodation.product).thenReturn(product)
+        whenever(
             accommodationService.updateAccommodation(
                 id = accommodationId,
                 name = name,
@@ -235,7 +148,7 @@ class AccommodationControllerTest() {
     fun deleteAccommodation() {
         val accommodationId = 1L
 
-        Mockito.doNothing().`when`(accommodationService).deleteAccommodation(accommodationId)
+        doNothing().whenever(accommodationService).deleteAccommodation(accommodationId)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/products/accommodations/{id}", accommodationId)

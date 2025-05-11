@@ -3,7 +3,7 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito
+import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -53,7 +53,7 @@ class AuthControllerTest() {
 
         val tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
 
-        Mockito.`when`(authService.login(account = account, password = password)).thenReturn(tokenResult)
+        whenever(authService.login(account = account, password = password)).thenReturn(tokenResult)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/login")
@@ -90,7 +90,7 @@ class AuthControllerTest() {
 
         val tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
 
-        Mockito.`when`(authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken))
+        whenever(authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken))
             .thenReturn(tokenResult)
 
         mockMvc.perform(

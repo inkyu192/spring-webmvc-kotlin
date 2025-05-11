@@ -3,8 +3,9 @@ package spring.webmvc.application.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
-import spring.webmvc.domain.cache.AccommodationCache
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.repository.AccommodationRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
@@ -14,48 +15,6 @@ import java.time.temporal.ChronoUnit
 class AccommodationServiceTest : DescribeSpec({
     val accommodationRepository = mockk<AccommodationRepository>()
     val accommodationService = AccommodationService(accommodationRepository = accommodationRepository)
-
-    describe("createAccommodation") {
-        it("Accommodation 저장 후 반환한다") {
-            val name = "name"
-            val description = "description"
-            val price = 1000
-            val quantity = 5
-            val place = "place"
-            val checkInTime = Instant.now()
-            val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
-
-            val accommodation = Accommodation.create(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                checkInTime = checkInTime,
-                checkOutTime = checkOutTime,
-            )
-
-            every { accommodationRepository.save(accommodation = any<Accommodation>()) } returns accommodation
-
-            val result = accommodationService.createAccommodation(
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity,
-                place = place,
-                checkInTime = checkInTime,
-                checkOutTime = checkOutTime,
-            )
-
-            result.product.name shouldBe name
-            result.product.description shouldBe description
-            result.product.price shouldBe price
-            result.product.quantity shouldBe quantity
-            result.place shouldBe place
-            result.checkInTime shouldBe checkInTime
-            result.checkOutTime shouldBe checkOutTime
-        }
-    }
 
     describe("updateAccommodation") {
         context("Accommodation 없을 경우") {

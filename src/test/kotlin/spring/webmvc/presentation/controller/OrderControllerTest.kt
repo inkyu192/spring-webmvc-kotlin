@@ -3,7 +3,8 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
@@ -63,19 +64,19 @@ class OrderControllerTest() {
         val orderProductCreateCommand = OrderProductCreateCommand(productId = productId, quantity = quantity)
         val orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))
 
-        val order = Mockito.mock<Order>()
-        val product = Mockito.mock<Product>()
-        val orderProduct = Mockito.mock<OrderProduct>()
+        val order = mock<Order>()
+        val product = mock<Product>()
+        val orderProduct = mock<OrderProduct>()
 
-        Mockito.`when`(order.id).thenReturn(1L)
-        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
-        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
-        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
-        Mockito.`when`(product.name).thenReturn("name")
-        Mockito.`when`(orderProduct.quantity).thenReturn(3)
-        Mockito.`when`(orderProduct.orderPrice).thenReturn(5000)
-        Mockito.`when`(orderProduct.product).thenReturn(product)
-        Mockito.`when`(orderService.createOrder(orderCreateCommand)).thenReturn(order)
+        whenever(order.id).thenReturn(1L)
+        whenever(order.orderedAt).thenReturn(Instant.now())
+        whenever(order.status).thenReturn(OrderStatus.ORDER)
+        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
+        whenever(product.name).thenReturn("name")
+        whenever(orderProduct.quantity).thenReturn(3)
+        whenever(orderProduct.orderPrice).thenReturn(5000)
+        whenever(orderProduct.product).thenReturn(product)
+        whenever(orderService.createOrder(orderCreateCommand)).thenReturn(order)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/orders")
@@ -123,22 +124,22 @@ class OrderControllerTest() {
         val memberId = 1L
         val orderStatus = OrderStatus.ORDER
 
-        val order = Mockito.mock<Order>()
-        val product = Mockito.mock<Product>()
-        val orderProduct = Mockito.mock<OrderProduct>()
+        val order = mock<Order>()
+        val product = mock<Product>()
+        val orderProduct = mock<OrderProduct>()
 
         val response = listOf(order)
         val page = PageImpl(response, pageable, response.size.toLong())
 
-        Mockito.`when`(order.id).thenReturn(1L)
-        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
-        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
-        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
-        Mockito.`when`(product.name).thenReturn("name")
-        Mockito.`when`(orderProduct.quantity).thenReturn(3)
-        Mockito.`when`(orderProduct.orderPrice).thenReturn(5000)
-        Mockito.`when`(orderProduct.product).thenReturn(product)
-        Mockito.`when`(orderService.findOrders(pageable = pageable, orderStatus = orderStatus)).thenReturn(page)
+        whenever(order.id).thenReturn(1L)
+        whenever(order.orderedAt).thenReturn(Instant.now())
+        whenever(order.status).thenReturn(OrderStatus.ORDER)
+        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
+        whenever(product.name).thenReturn("name")
+        whenever(orderProduct.quantity).thenReturn(3)
+        whenever(orderProduct.orderPrice).thenReturn(5000)
+        whenever(orderProduct.product).thenReturn(product)
+        whenever(orderService.findOrders(pageable = pageable, orderStatus = orderStatus)).thenReturn(page)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders")
@@ -201,19 +202,19 @@ class OrderControllerTest() {
     fun findOrder() {
         val orderId = 1L
 
-        val order = Mockito.mock<Order>()
-        val product = Mockito.mock<Product>()
-        val orderProduct = Mockito.mock<OrderProduct>()
+        val order = mock<Order>()
+        val product = mock<Product>()
+        val orderProduct = mock<OrderProduct>()
 
-        Mockito.`when`(order.id).thenReturn(1L)
-        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
-        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
-        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
-        Mockito.`when`(product.name).thenReturn("name")
-        Mockito.`when`(orderProduct.quantity).thenReturn(3)
-        Mockito.`when`(orderProduct.orderPrice).thenReturn(5000)
-        Mockito.`when`(orderProduct.product).thenReturn(product)
-        Mockito.`when`(orderService.findOrder(id = orderId)).thenReturn(order)
+        whenever(order.id).thenReturn(1L)
+        whenever(order.orderedAt).thenReturn(Instant.now())
+        whenever(order.status).thenReturn(OrderStatus.ORDER)
+        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
+        whenever(product.name).thenReturn("name")
+        whenever(orderProduct.quantity).thenReturn(3)
+        whenever(orderProduct.orderPrice).thenReturn(5000)
+        whenever(orderProduct.product).thenReturn(product)
+        whenever(orderService.findOrder(id = orderId)).thenReturn(order)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders/{id}", orderId)
@@ -245,19 +246,19 @@ class OrderControllerTest() {
     fun cancelOder() {
         val orderId = 1L
 
-        val order = Mockito.mock<Order>()
-        Mockito.`when`(order.orderedAt).thenReturn(Instant.now())
-        Mockito.`when`(order.status).thenReturn(OrderStatus.ORDER)
+        val order = mock<Order>()
+        whenever(order.orderedAt).thenReturn(Instant.now())
+        whenever(order.status).thenReturn(OrderStatus.ORDER)
 
-        val product = Mockito.mock<Product>()
-        Mockito.`when`(product.name).thenReturn("name")
+        val product = mock<Product>()
+        whenever(product.name).thenReturn("name")
 
-        val orderProduct = Mockito.mock<OrderProduct>()
+        val orderProduct = mock<OrderProduct>()
 
-        Mockito.`when`(orderProduct.product).thenReturn(product)
-        Mockito.`when`(order.orderProducts).thenReturn(listOf(orderProduct))
+        whenever(orderProduct.product).thenReturn(product)
+        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
 
-        Mockito.`when`(orderService.cancelOrder(id = orderId)).thenReturn(order)
+        whenever(orderService.cancelOrder(id = orderId)).thenReturn(order)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/orders/{id}", orderId)
