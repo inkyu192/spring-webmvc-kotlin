@@ -11,9 +11,9 @@ import java.util.*
 class JwtProvider(
     jwtProperties: JwtProperties,
 ) {
-    private val accessTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.accessToken.key))
+    private val accessTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(jwtProperties.accessToken.key))
     private val accessTokenExpirationTime = jwtProperties.accessToken.expiration.toMillis()
-    private val refreshTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.refreshToken.key))
+    private val refreshTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(jwtProperties.refreshToken.key))
     private val refreshTokenExpirationTime = jwtProperties.refreshToken.expiration.toMillis()
 
     fun createAccessToken(memberId: Long, permissions: List<String>): String =
