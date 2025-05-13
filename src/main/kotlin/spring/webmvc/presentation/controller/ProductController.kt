@@ -48,7 +48,7 @@ class ProductController(
     fun findProduct(
         @PathVariable id: Long,
         @RequestParam category: Category,
-    ) = toProductResponse(productResult = productService.findProduct(id, category))
+    ) = toProductResponse(productResult = productService.findProduct(category = category, id = id))
 
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
@@ -77,9 +77,16 @@ class ProductController(
             Category.ACCOMMODATION -> AccommodationUpdateCommand(productUpdateRequest as AccommodationUpdateRequest)
         }
 
-        val productResult = productService.updateProduct(productId = id, productUpdateCommand = command)
+        val productResult = productService.updateProduct(id = id, productUpdateCommand = command)
 
         return toProductResponse(productResult)
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteProduct(@PathVariable id: Long, @RequestParam category: Category) {
+        productService.deleteProduct(category = category, id = id)
     }
 
     private fun toProductResponse(productResult: ProductResult): ProductResponse {

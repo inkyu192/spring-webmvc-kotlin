@@ -86,4 +86,11 @@ class AccommodationStrategy(
 
         return AccommodationResult(accommodation)
     }
+
+    override fun deleteProduct(productId: Long) {
+        val accommodation = accommodationRepository.findByProductId(productId)
+            ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
+
+        accommodationRepository.delete(accommodation)
+    }
 }

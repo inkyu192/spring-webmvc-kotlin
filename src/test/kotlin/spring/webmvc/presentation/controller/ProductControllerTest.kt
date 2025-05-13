@@ -3,10 +3,7 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
@@ -613,7 +610,7 @@ class ProductControllerTest() {
 
         whenever(
             productService.updateProduct(
-                productId = eq(productId),
+                id = eq(productId),
                 productUpdateCommand = any<TicketUpdateCommand>()
             )
         ).thenReturn(ticketResult)
@@ -708,7 +705,7 @@ class ProductControllerTest() {
 
         whenever(
             productService.updateProduct(
-                productId = eq(productId),
+                id = eq(productId),
                 productUpdateCommand = any<FlightUpdateCommand>()
             )
         ).thenReturn(flightResult)
@@ -803,7 +800,7 @@ class ProductControllerTest() {
 
         whenever(
             productService.updateProduct(
-                productId = eq(productId),
+                id = eq(productId),
                 productUpdateCommand = any<AccommodationUpdateCommand>()
             )
         ).thenReturn(accommodationResult)
@@ -857,6 +854,78 @@ class ProductControllerTest() {
                         PayloadDocumentation.fieldWithPath("place").description("장소"),
                         PayloadDocumentation.fieldWithPath("checkInTime").description("체크인 시간"),
                         PayloadDocumentation.fieldWithPath("checkOutTime").description("체크아웃 시간")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun deleteTicket() {
+        val productId = 1L
+        val category = Category.TICKET
+
+        doNothing().whenever(productService).deleteProduct(category = category, id = productId)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.delete("/products/{id}", productId)
+                .param("category", category.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "ticket-delete",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun deleteFlight() {
+        val productId = 1L
+        val category = Category.FLIGHT
+
+        doNothing().whenever(productService).deleteProduct(category = category, id = productId)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.delete("/products/{id}", productId)
+                .param("category", category.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "flight-delete",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun deleteAccommodation() {
+        val productId = 1L
+        val category = Category.ACCOMMODATION
+
+        doNothing().whenever(productService).deleteProduct(category = category, id = productId)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.delete("/products/{id}", productId)
+                .param("category", category.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer access-token")
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "accommodation-delete",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     )
                 )
             )

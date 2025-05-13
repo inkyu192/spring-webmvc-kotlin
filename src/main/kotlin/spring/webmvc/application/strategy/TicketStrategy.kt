@@ -88,4 +88,11 @@ class TicketStrategy(
 
         return TicketResult(ticket)
     }
+
+    override fun deleteProduct(productId: Long) {
+        val ticket = ticketRepository.findByProductId(productId)
+            ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
+
+        ticketRepository.delete(ticket)
+    }
 }

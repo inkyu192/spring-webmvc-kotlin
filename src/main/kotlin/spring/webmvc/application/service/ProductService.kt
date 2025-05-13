@@ -22,7 +22,7 @@ class ProductService(
     fun findProducts(pageable: Pageable, name: String?) =
         productRepository.findAll(pageable = pageable, name = name).map { ProductResult(product = it) }
 
-    fun findProduct(id: Long, category: Category): ProductResult {
+    fun findProduct(category: Category, id: Long): ProductResult {
         val productStrategy = getProductStrategy(category)
 
         return productStrategy.findByProductId(productId = id)
@@ -36,13 +36,23 @@ class ProductService(
     }
 
     @Transactional
-    fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
-        productRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Product::class, id = productId)
+    fun updateProduct(id: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
+        productRepository.findByIdOrNull(id)
+            ?: throw EntityNotFoundException(kClass = Product::class, id = id)
 
         val productStrategy = getProductStrategy(category = productUpdateCommand.category)
 
-        return productStrategy.updateProduct(productId = productId, productUpdateCommand = productUpdateCommand)
+        return productStrategy.updateProduct(productId = id, productUpdateCommand = productUpdateCommand)
+    }
+
+    @Transactional
+    fun deleteProduct(category: Category, id: Long) {
+        productRepository.findByIdOrNull(id)
+            ?: throw EntityNotFoundException(kClass = Product::class, id = id)
+
+        val productStrategy = getProductStrategy(category = category)
+
+        productStrategy.deleteProduct(productId = id)
     }
 
     private fun getProductStrategy(category: Category) =

@@ -10,4 +10,5 @@ interface ProductStrategy {
     fun findByProductId(productId: Long): ProductResult
     fun createProduct(productCreateCommand: ProductCreateCommand): ProductResult
     fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult
+    fun deleteProduct(productId: Long)
 }

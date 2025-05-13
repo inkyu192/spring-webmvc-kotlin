@@ -92,4 +92,11 @@ class FlightStrategy(
 
         return FlightResult(flight)
     }
+
+    override fun deleteProduct(productId: Long) {
+        val flight = flightRepository.findByProductId(productId)
+            ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
+
+        flightRepository.delete(flight)
+    }
 }

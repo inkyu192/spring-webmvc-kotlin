@@ -8,6 +8,7 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
+import io.mockk.verify
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import spring.webmvc.application.dto.command.TicketCreateCommand
@@ -174,7 +175,7 @@ class ProductServiceTest : DescribeSpec({
                 every { productRepository.findByIdOrNull(productId) } returns null
 
                 shouldThrow<EntityNotFoundException> {
-                    productService.updateProduct(productId = productId, productUpdateCommand = ticketUpdateCommand)
+                    productService.updateProduct(id = productId, productUpdateCommand = ticketUpdateCommand)
                 }
             }
         }
@@ -203,10 +204,15 @@ class ProductServiceTest : DescribeSpec({
 
                 every { productRepository.findByIdOrNull(productId) } returns product
                 every { productStrategy.supports(category) } returns true
-                every { productStrategy.updateProduct(productId = productId, productUpdateCommand = ticketUpdateCommand) } returns ticketResult
+                every {
+                    productStrategy.updateProduct(
+                        productId = productId,
+                        productUpdateCommand = ticketUpdateCommand
+                    )
+                } returns ticketResult
 
                 val result = productService.updateProduct(
-                    productId = productId,
+                    id = productId,
                     productUpdateCommand = ticketUpdateCommand,
                 )
 
@@ -220,6 +226,41 @@ class ProductServiceTest : DescribeSpec({
                     duration shouldBe ticketResult.duration
                     ageLimit shouldBe ticketResult.ageLimit
                 }
+            }
+        }
+    }
+
+    describe("deleteProduct") {
+        context("Product 없을 경우") {
+            it("EntityNotFoundException 발생한다") {
+                val category = Category.TICKET
+                val productId = 1L
+
+                every { productRepository.findByIdOrNull(productId) } returns null
+
+                shouldThrow<EntityNotFoundException> {
+                    productService.deleteProduct(
+                        category = category,
+                        id = productId
+                    )
+                }
+            }
+        }
+
+        context("Product 있을 경우") {
+            it("삭제한다") {
+                val category = Category.TICKET
+                val productId = 1L
+
+                val product = mockk<Product>()
+
+                every { productRepository.findByIdOrNull(productId) } returns product
+                every { productStrategy.supports(category) } returns true
+                every { productStrategy.deleteProduct(productId) } returns Unit
+
+                productService.deleteProduct(category = category, id = productId)
+
+                verify(exactly = 1) { productStrategy.deleteProduct(productId) }
             }
         }
     }
