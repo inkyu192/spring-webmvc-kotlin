@@ -33,5 +33,5 @@ class ProductQuerydslRepository(
         return PageImpl(content, pageable, count)
     }
 
-    private fun likeName(name: String?) = name.takeIf { !it.isNullOrBlank() }?.let { product.name.like("%$it%") }
+    private fun likeName(name: String?) = if (name.isNullOrBlank()) null else product.name.like("%$name%")
 }
