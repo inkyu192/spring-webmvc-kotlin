@@ -7,8 +7,11 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.dto.command.AccommodationCreateCommand
+import spring.webmvc.application.dto.command.AccommodationUpdateCommand
 import spring.webmvc.application.dto.command.FlightCreateCommand
+import spring.webmvc.application.dto.command.FlightUpdateCommand
 import spring.webmvc.application.dto.command.TicketCreateCommand
+import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.application.dto.result.ProductResult
@@ -16,9 +19,13 @@ import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.presentation.dto.request.AccommodationCreateRequest
+import spring.webmvc.presentation.dto.request.AccommodationUpdateRequest
 import spring.webmvc.presentation.dto.request.FlightCreateRequest
+import spring.webmvc.presentation.dto.request.FlightUpdateRequest
 import spring.webmvc.presentation.dto.request.TicketCreateRequest
 import spring.webmvc.presentation.dto.request.ProductCreateRequest
+import spring.webmvc.presentation.dto.request.ProductUpdateRequest
+import spring.webmvc.presentation.dto.request.TicketUpdateRequest
 import spring.webmvc.presentation.dto.response.AccommodationResponse
 import spring.webmvc.presentation.dto.response.FlightResponse
 import spring.webmvc.presentation.dto.response.ProductResponse
@@ -53,7 +60,26 @@ class ProductController(
             Category.ACCOMMODATION -> AccommodationCreateCommand(productCreateRequest as AccommodationCreateRequest)
         }
 
-        return toProductResponse(productResult = productService.createProduct(command))
+        val productResult = productService.createProduct(command)
+
+        return toProductResponse(productResult)
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
+    fun updateProduct(
+        @PathVariable id: Long,
+        @RequestBody @Validated productUpdateRequest: ProductUpdateRequest
+    ): ProductResponse {
+        val command = when (productUpdateRequest.category) {
+            Category.TICKET -> TicketUpdateCommand(productUpdateRequest as TicketUpdateRequest)
+            Category.FLIGHT -> FlightUpdateCommand(productUpdateRequest as FlightUpdateRequest)
+            Category.ACCOMMODATION -> AccommodationUpdateCommand(productUpdateRequest as AccommodationUpdateRequest)
+        }
+
+        val productResult = productService.updateProduct(productId = id, productUpdateCommand = command)
+
+        return toProductResponse(productResult)
     }
 
     private fun toProductResponse(productResult: ProductResult): ProductResponse {

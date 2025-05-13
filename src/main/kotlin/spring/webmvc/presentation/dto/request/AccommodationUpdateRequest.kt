@@ -1,17 +1,15 @@
 package spring.webmvc.presentation.dto.request
 
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
+import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
-data class AccommodationUpdateRequest(
-    val name: String,
-    val description: String,
-    @field:Min(100)
-    val price: Int,
-    @field:Max(9999)
-    val quantity: Int,
+class AccommodationUpdateRequest(
+    category: Category,
+    name: String,
+    description: String,
+    price: Int,
+    quantity: Int,
     val place: String,
     val checkInTime: Instant,
-    val checkOutTime: Instant,
-)
+    val checkOutTime: Instant
+) : ProductUpdateRequest(category, name, description, price, quantity)

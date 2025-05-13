@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.FlightCreateCommand
+import spring.webmvc.application.dto.command.FlightUpdateCommand
 import spring.webmvc.application.dto.command.ProductCreateCommand
+import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.domain.cache.FlightCache
@@ -64,6 +66,28 @@ class FlightStrategy(
                 departureTime = flightCreateCommand.departureTime,
                 arrivalTime = flightCreateCommand.arrivalTime,
             )
+        )
+
+        return FlightResult(flight)
+    }
+
+    override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
+        val flightUpdateCommand = productUpdateCommand as FlightUpdateCommand
+
+        val flight = flightRepository.findByProductId(productId)
+            ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
+
+        flight.update(
+            name = flightUpdateCommand.name,
+            description = flightUpdateCommand.description,
+            price = flightUpdateCommand.price,
+            quantity = flightUpdateCommand.quantity,
+            airline = flightUpdateCommand.airline,
+            flightNumber = flightUpdateCommand.flightNumber,
+            departureAirport = flightUpdateCommand.departureAirport,
+            arrivalAirport = flightUpdateCommand.arrivalAirport,
+            departureTime = flightUpdateCommand.departureTime,
+            arrivalTime = flightUpdateCommand.arrivalTime,
         )
 
         return FlightResult(flight)

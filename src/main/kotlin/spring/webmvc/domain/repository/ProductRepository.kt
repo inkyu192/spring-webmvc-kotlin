@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable
 import spring.webmvc.domain.model.entity.Product
 
 interface ProductRepository {
+    fun findByIdOrNull(id: Long): Product?
     fun findAll(pageable: Pageable, name: String?): Page<Product>
     fun findAllById(ids: Iterable<Long>): List<Product>
 }

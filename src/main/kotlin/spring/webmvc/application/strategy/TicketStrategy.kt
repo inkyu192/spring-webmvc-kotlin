@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.ProductCreateCommand
+import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.command.TicketCreateCommand
+import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.domain.cache.TicketCache
@@ -62,6 +64,26 @@ class TicketStrategy(
                 duration = ticketCreateCommand.duration,
                 ageLimit = ticketCreateCommand.ageLimit,
             )
+        )
+
+        return TicketResult(ticket)
+    }
+
+    override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
+        val ticketUpdateCommand = productUpdateCommand as TicketUpdateCommand
+
+        val ticket = ticketRepository.findByProductId(productId)
+            ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
+
+        ticket.update(
+            name = ticketUpdateCommand.name,
+            description = ticketUpdateCommand.description,
+            price = ticketUpdateCommand.price,
+            quantity = ticketUpdateCommand.quantity,
+            place = ticketUpdateCommand.place,
+            performanceTime = ticketUpdateCommand.performanceTime,
+            duration = ticketUpdateCommand.duration,
+            ageLimit = ticketUpdateCommand.ageLimit,
         )
 
         return TicketResult(ticket)

@@ -11,6 +11,7 @@ import io.mockk.spyk
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import spring.webmvc.application.dto.command.TicketCreateCommand
+import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.strategy.ProductStrategy
 import spring.webmvc.domain.model.entity.Product
@@ -157,6 +158,68 @@ class ProductServiceTest : DescribeSpec({
                 performanceTime shouldBe ticketResult.performanceTime
                 duration shouldBe ticketResult.duration
                 ageLimit shouldBe ticketResult.ageLimit
+            }
+        }
+    }
+
+    describe("updateProduct") {
+        context("Product 없을 경우") {
+            it("EntityNotFoundException 발생한다") {
+                val productId = 1L
+                val category = Category.TICKET
+
+                val ticketUpdateCommand = mockk<TicketUpdateCommand>()
+                every { ticketUpdateCommand.category } returns category
+
+                every { productRepository.findByIdOrNull(productId) } returns null
+
+                shouldThrow<EntityNotFoundException> {
+                    productService.updateProduct(productId = productId, productUpdateCommand = ticketUpdateCommand)
+                }
+            }
+        }
+
+        context("Product 있을 경우") {
+            it("수정 후 반환한다") {
+                val productId = 1L
+                val category = Category.TICKET
+
+                val ticketUpdateCommand = mockk<TicketUpdateCommand>()
+                every { ticketUpdateCommand.category } returns category
+
+                val product = mockk<Product>()
+                val ticketResult = TicketResult(
+                    id = productId,
+                    name = "name",
+                    description = "description",
+                    price = 1000,
+                    quantity = 10, createdAt = Instant.now(),
+                    ticketId = 1L,
+                    place = "place",
+                    performanceTime = Instant.now(),
+                    duration = "duration",
+                    ageLimit = "ageLimit"
+                )
+
+                every { productRepository.findByIdOrNull(productId) } returns product
+                every { productStrategy.supports(category) } returns true
+                every { productStrategy.updateProduct(productId = productId, productUpdateCommand = ticketUpdateCommand) } returns ticketResult
+
+                val result = productService.updateProduct(
+                    productId = productId,
+                    productUpdateCommand = ticketUpdateCommand,
+                )
+
+                result.shouldBeInstanceOf<TicketResult>().apply {
+                    name shouldBe ticketResult.name
+                    description shouldBe ticketResult.description
+                    price shouldBe ticketResult.price
+                    quantity shouldBe ticketResult.quantity
+                    place shouldBe ticketResult.place
+                    performanceTime shouldBe ticketResult.performanceTime
+                    duration shouldBe ticketResult.duration
+                    ageLimit shouldBe ticketResult.ageLimit
+                }
             }
         }
     }

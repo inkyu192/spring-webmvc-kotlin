@@ -2,7 +2,6 @@ package spring.webmvc.application.service
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -14,86 +13,6 @@ import java.time.Instant
 class TicketServiceTest : DescribeSpec({
     val tickerRepository = mockk<TicketRepository>()
     val ticketService = TicketService(ticketRepository = tickerRepository)
-
-    describe("updateTicket") {
-        context("Ticket 없을 경우") {
-            it("EntityNotFoundException 발생한다") {
-                val ticketId = 1L
-                val name = "name"
-                val description = "description"
-                val price = 1000
-                val quantity = 5
-                val place = "place"
-                val performanceTime = Instant.now()
-                val duration = "duration"
-                val ageLimit = "ageLimit"
-
-                every { tickerRepository.findByIdOrNull(ticketId) } returns null
-
-                shouldThrow<EntityNotFoundException> {
-                    ticketService.updateTicket(
-                        id = ticketId,
-                        name = name,
-                        description = description,
-                        price = price,
-                        quantity = quantity,
-                        place = place,
-                        performanceTime = performanceTime,
-                        duration = duration,
-                        ageLimit = ageLimit,
-                    )
-                }
-            }
-        }
-
-        context("Ticket 있을 경우") {
-            it("수정 후 반환한다") {
-                val ticketId = 1L
-                val name = "name"
-                val description = "description"
-                val price = 1000
-                val quantity = 5
-                val place = "place"
-                val performanceTime = Instant.now()
-                val duration = "duration"
-                val ageLimit = "ageLimit"
-
-                val ticket = Ticket.create(
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 5,
-                    place = "place",
-                    performanceTime = performanceTime,
-                    duration = "duration",
-                    ageLimit = "ageLimit"
-                )
-
-                every { tickerRepository.findByIdOrNull(ticketId) } returns ticket
-
-                val result = ticketService.updateTicket(
-                    id = ticketId,
-                    name = name,
-                    description = description,
-                    price = price,
-                    quantity = quantity,
-                    place = place,
-                    performanceTime = performanceTime,
-                    duration = duration,
-                    ageLimit = ageLimit,
-                )
-
-                result.product.name shouldBe ticket.product.name
-                result.product.description shouldBe ticket.product.description
-                result.product.price shouldBe ticket.product.price
-                result.product.quantity shouldBe ticket.product.quantity
-                result.place shouldBe ticket.place
-                result.performanceTime shouldBe ticket.performanceTime
-                result.duration shouldBe ticket.duration
-                result.ageLimit shouldBe ticket.ageLimit
-            }
-        }
-    }
 
     describe("deleteTicket") {
         context("Ticket 없을 경우") {
