@@ -4,24 +4,23 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.server.PathContainer
+import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingRequestWrapper
 import org.springframework.web.util.ContentCachingResponseWrapper
-import org.springframework.web.util.pattern.PathPattern
 import org.springframework.web.util.pattern.PathPatternParser
-import java.util.*
 
-class HttpLogFilter: OncePerRequestFilter() {
-    companion object {
-        const val TRANSACTION_ID = "transactionId"
-    }
-
-    private val pathPatternParser = PathPatternParser()
-    private val logExcludeList: List<PathPattern> = listOf(
+@Component
+class HttpLogFilter(
+    private val httpLog: HttpLog,
+    pathPatternParser: PathPatternParser,
+) : OncePerRequestFilter() {
+    private val excludedPatterns = listOf(
         pathPatternParser.parse("/actuator/**"),
         pathPatternParser.parse("/favicon.ico"),
         pathPatternParser.parse("/static/**"),
-        pathPatternParser.parse("/public/**")
+        pathPatternParser.parse("/public/**"),
+        pathPatternParser.parse("/docs/index.html"),
     )
 
     override fun doFilterInternal(
@@ -37,20 +36,16 @@ class HttpLogFilter: OncePerRequestFilter() {
         val requestWrapper = ContentCachingRequestWrapper(request)
         val responseWrapper = ContentCachingResponseWrapper(response)
 
-        val transactionId = UUID.randomUUID().toString()
-        request.setAttribute(TRANSACTION_ID, transactionId)
-
         val startTime = System.currentTimeMillis()
         filterChain.doFilter(requestWrapper, responseWrapper)
         val endTime = System.currentTimeMillis()
 
-        val httpLog = HttpLog(
-            transactionId = transactionId,
+        httpLog.write(
             requestWrapper = requestWrapper,
             responseWrapper = responseWrapper,
-            elapsedTime = (endTime - startTime) / 1000.0
+            startTime = startTime,
+            endTime = endTime,
         )
-        httpLog.log()
 
         responseWrapper.copyBodyToResponse()
     }
@@ -58,6 +53,6 @@ class HttpLogFilter: OncePerRequestFilter() {
     private fun isLogExclude(request: HttpServletRequest): Boolean {
         val uri = request.requestURI
         val pathContainer = PathContainer.parsePath(uri)
-        return logExcludeList.any { it.matches(pathContainer) }
+        return excludedPatterns.any { it.matches(pathContainer) }
     }
 }

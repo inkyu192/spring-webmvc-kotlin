@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.domain.cache.TokenCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
-import spring.webmvc.infrastructure.config.security.JwtProvider
+import spring.webmvc.infrastructure.security.JwtProvider
 
 class AuthServiceTest : DescribeSpec({
     val jwtProvider = mockk<JwtProvider>()

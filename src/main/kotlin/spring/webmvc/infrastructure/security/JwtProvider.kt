@@ -1,10 +1,11 @@
-package spring.webmvc.infrastructure.config.security
+package spring.webmvc.infrastructure.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Component
+import spring.webmvc.infrastructure.properties.JwtProperties
 import java.util.*
 
 @Component

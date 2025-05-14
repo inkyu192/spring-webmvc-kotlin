@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.config.security
+package spring.webmvc.infrastructure.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,6 +11,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import spring.webmvc.infrastructure.properties.CorsProperties
+import spring.webmvc.infrastructure.security.JwtAuthenticationFilter
 import spring.webmvc.presentation.exception.handler.AccessDeniedExceptionHandler
 import spring.webmvc.presentation.exception.handler.AuthenticationExceptionHandler
 import spring.webmvc.presentation.exception.handler.JwtExceptionHandler

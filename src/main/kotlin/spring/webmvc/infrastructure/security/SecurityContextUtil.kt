@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.util
+package spring.webmvc.infrastructure.security
 
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.context.SecurityContextHolder

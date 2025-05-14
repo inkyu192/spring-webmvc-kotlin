@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.config.security
+package spring.webmvc.infrastructure.security
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest

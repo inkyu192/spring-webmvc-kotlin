@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.springframework.stereotype.Component
 import spring.webmvc.application.service.RequestLockService
-import spring.webmvc.infrastructure.util.SecurityContextUtil
+import spring.webmvc.infrastructure.security.SecurityContextUtil
 
 @Aspect
 @Component

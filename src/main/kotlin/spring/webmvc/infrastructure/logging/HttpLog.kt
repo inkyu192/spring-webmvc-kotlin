@@ -1,75 +1,69 @@
 package spring.webmvc.infrastructure.logging
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpMethod
+import org.springframework.stereotype.Component
 import org.springframework.web.util.ContentCachingRequestWrapper
 import org.springframework.web.util.ContentCachingResponseWrapper
 import java.nio.charset.StandardCharsets
 
-data class HttpLog(
-    val transactionId: String,
-    val httpMethod: HttpMethod,
-    val requestUri: String,
-    val remoteAddr: String,
-    val elapsedTime: Double,
-    val requestHeader: String,
-    val requestParam: String,
-    val requestBody: String,
-    val responseBody: String
+@Component
+class HttpLog(
+    private val objectMapper: ObjectMapper,
 ) {
     private val logger = LoggerFactory.getLogger(HttpLog::class.java)
 
-    constructor(
-        transactionId: String,
+    fun write(
         requestWrapper: ContentCachingRequestWrapper,
         responseWrapper: ContentCachingResponseWrapper,
-        elapsedTime: Double
-    ): this(
-        transactionId = transactionId,
-        httpMethod = HttpMethod.valueOf(requestWrapper.method),
-        requestUri = requestWrapper.requestURI,
-        remoteAddr = requestWrapper.remoteAddr,
-        elapsedTime = elapsedTime,
-        requestHeader = getHeader(requestWrapper),
-        requestParam = getParameter(requestWrapper),
-        requestBody = convertByteArrayToString(requestWrapper.contentAsByteArray),
-        responseBody = convertByteArrayToString(responseWrapper.contentAsByteArray)
-    )
-
-    companion object {
-        private fun getHeader(requestWrapper: ContentCachingRequestWrapper) =
-            requestWrapper.headerNames.asSequence()
-                .joinToString { "\n  ${it}: ${requestWrapper.getHeader(it)}" }
-
-        private fun getParameter(requestWrapper: ContentCachingRequestWrapper) =
-            requestWrapper.parameterNames.asSequence()
-                .joinToString { "\n  ${it}: ${requestWrapper.getParameter(it)}" }
-
-        private fun convertByteArrayToString(content: ByteArray) =
-            if (content.isNotEmpty()) setPretty(String(content, StandardCharsets.UTF_8)) else ""
-
-        private fun setPretty(body: String) =
-            runCatching {
-                val objectMapper = ObjectMapper()
-                val objectWriter = objectMapper.writerWithDefaultPrettyPrinter()
-                val json = objectMapper.readValue(body, Any::class.java)
-                objectWriter.writeValueAsString(json)
-            }.getOrDefault(body)
-    }
-
-    fun log() {
+        startTime: Long,
+        endTime: Long,
+    ) {
         val message = """
-            |>> REQUEST: $httpMethod $requestUri ($elapsedTime)
-            |>> TRANSACTION_ID: $transactionId
-            |>> CLIENT_IP: $remoteAddr
-            |>> REQUEST_HEADER: $requestHeader
-            |>> REQUEST_PARAMETER: $requestParam
-            |>> REQUEST_BODY: $requestBody
-            |>> RESPONSE_BODY: $responseBody
-        """.trimMargin()
-            .let { "\n$it" }
+            |>> REQUEST: ${requestWrapper.method} ${requestWrapper.requestURI} (${(endTime - startTime) / 1000.0} s)
+            |>> CLIENT_IP: ${requestWrapper.remoteAddr}
+            |>> REQUEST_HEADER: ${extractHeaders(request = requestWrapper)}
+            |>> REQUEST_PARAMETER: ${extractParameters(request = requestWrapper)}
+            |>> REQUEST_BODY: ${readBody(content = requestWrapper.contentAsByteArray)}
+            |>> RESPONSE_BODY: ${readBody(content = responseWrapper.contentAsByteArray)}
+        """.trimIndent()
 
         logger.info(message)
+    }
+
+    private fun extractHeaders(request: HttpServletRequest): String {
+        val builder = StringBuilder()
+        val names = request.headerNames
+        while (names.hasMoreElements()) {
+            val name = names.nextElement()
+            val value = request.getHeader(name)
+            builder.append("\n  $name: $value")
+        }
+        return builder.toString()
+    }
+
+    private fun extractParameters(request: HttpServletRequest): String {
+        val builder = StringBuilder()
+        val names = request.parameterNames
+        while (names.hasMoreElements()) {
+            val name = names.nextElement()
+            val value = request.getParameter(name)
+            builder.append("\n  $name: $value")
+        }
+        return builder.toString()
+    }
+
+    private fun readBody(content: ByteArray): String {
+        if (content.isEmpty()) return ""
+
+        val body = String(bytes = content, charset = StandardCharsets.UTF_8)
+        return try {
+            val json = objectMapper.readValue(body, Any::class.java)
+            val writer = objectMapper.writerWithDefaultPrettyPrinter()
+            writer.writeValueAsString(json)
+        } catch (e: Exception) {
+            body
+        }
     }
 }

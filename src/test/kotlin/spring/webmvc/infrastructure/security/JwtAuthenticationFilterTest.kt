@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.config.security
+package spring.webmvc.infrastructure.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
