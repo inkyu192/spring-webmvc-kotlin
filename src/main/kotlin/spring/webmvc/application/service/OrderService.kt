@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.entity.Order
-import spring.webmvc.domain.model.entity.OrderItem
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.OrderRepository
@@ -37,7 +37,7 @@ class OrderService(
 
         orderCreateCommand.products.forEach {
             val product = productMap[it.productId]
-                ?: throw EntityNotFoundException(kClass = OrderItem::class, id = it.productId)
+                ?: throw EntityNotFoundException(kClass = Product::class, id = it.productId)
 
             order.addProduct(product = product, quantity = it.quantity)
         }
