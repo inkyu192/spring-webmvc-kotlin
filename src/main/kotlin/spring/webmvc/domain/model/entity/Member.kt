@@ -18,29 +18,29 @@ class Member protected constructor(
     var id: Long? = null
         protected set
 
-    var password: String = password
+    var password = password
         protected set
 
     @Convert(converter = CryptoAttributeConverter::class)
-    var name: String = name
+    var name = name
         protected set
 
     @Convert(converter = CryptoAttributeConverter::class)
-    var phone: String = phone
+    var phone = phone
         protected set
 
-    var birthDate: LocalDate = birthDate
+    var birthDate = birthDate
         protected set
 
     @OneToMany(mappedBy = "member", cascade = [(CascadeType.ALL)])
-    private val _memberRoles: MutableList<MemberRole> = mutableListOf()
+    private val _memberRoles = mutableListOf<MemberRole>()
 
     @get:Transient
     val memberRoles: List<MemberRole>
         get() = _memberRoles.toList()
 
     @OneToMany(mappedBy = "member", cascade = [(CascadeType.ALL)])
-    private val _memberPermissions: MutableList<MemberPermission> = mutableListOf()
+    private val _memberPermissions = mutableListOf<MemberPermission>()
 
     @get:Transient
     val memberPermissions: List<MemberPermission>

@@ -21,11 +21,11 @@ class Order protected constructor(
         protected set
 
     @Enumerated(EnumType.STRING)
-    var status: OrderStatus = status
+    var status = status
         protected set
 
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
-    private val _orderProducts: MutableList<OrderProduct> = mutableListOf()
+    private val _orderProducts = mutableListOf<OrderProduct>()
 
     @get:Transient
     val orderProducts: List<OrderProduct>

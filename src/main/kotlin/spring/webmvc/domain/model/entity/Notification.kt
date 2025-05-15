@@ -18,7 +18,7 @@ class Notification protected constructor(
     var id: Long? = null
         protected set
 
-    var isRead: Boolean = isRead
+    var isRead = isRead
         protected set
 
     companion object {

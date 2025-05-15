@@ -28,16 +28,16 @@ class Ticket protected constructor(
     var id: Long? = null
         protected set
 
-    var place: String = place
+    var place = place
         protected set
 
-    var performanceTime: Instant = performanceTime
+    var performanceTime = performanceTime
         protected set
 
-    var duration: String = duration
+    var duration = duration
         protected set
 
-    var ageLimit: String = ageLimit
+    var ageLimit = ageLimit
         protected set
 
     companion object {

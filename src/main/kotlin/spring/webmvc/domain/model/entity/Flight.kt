@@ -30,22 +30,22 @@ class Flight protected constructor(
     var id: Long? = null
         protected set
 
-    var airline: String = airline
+    var airline = airline
         protected set
 
-    var flightNumber: String = flightNumber
+    var flightNumber = flightNumber
         protected set
 
-    var departureAirport: String = departureAirport
+    var departureAirport = departureAirport
         protected set
 
-    var arrivalAirport: String = arrivalAirport
+    var arrivalAirport = arrivalAirport
         protected set
 
-    var departureTime: Instant = departureTime
+    var departureTime = departureTime
         protected set
 
-    var arrivalTime: Instant = arrivalTime
+    var arrivalTime = arrivalTime
         protected set
 
     companion object {

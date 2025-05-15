@@ -18,16 +18,16 @@ class Product protected constructor(
     var id: Long? = null
         protected set
 
-    var name: String = name
+    var name = name
         protected set
 
-    var description: String = description
+    var description = description
         protected set
 
-    var price: Int = price
+    var price = price
         protected set
 
-    var quantity: Int = quantity
+    var quantity = quantity
         protected set
 
     companion object {

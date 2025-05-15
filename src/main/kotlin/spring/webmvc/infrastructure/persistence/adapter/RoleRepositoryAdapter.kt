@@ -11,5 +11,7 @@ class RoleRepositoryAdapter(
 ) : RoleRepository {
     override fun save(role: Role) = jpaRepository.save(role)
 
+    override fun saveAll(roles: Iterable<Role>) = jpaRepository.saveAll(roles)
+
     override fun findAllById(ids: Iterable<Long>): List<Role> = jpaRepository.findAllById(ids)
 }

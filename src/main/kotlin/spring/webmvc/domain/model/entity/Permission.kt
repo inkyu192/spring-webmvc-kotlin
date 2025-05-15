@@ -12,4 +12,8 @@ class Permission protected constructor(
     @GeneratedValue
     var id: Long? = null
         protected set
+
+    companion object {
+        fun of(name: String) = Permission(name)
+    }
 }

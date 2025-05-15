@@ -11,11 +11,11 @@ class Role protected constructor(
     var id: Long? = null
         protected set
 
-    var name: String = name
+    var name = name
         protected set
 
     @OneToMany(mappedBy = "role", cascade = [(CascadeType.ALL)])
-    private val _rolePermissions: MutableList<RolePermission> = mutableListOf()
+    private val _rolePermissions = mutableListOf<RolePermission>()
 
     @get:Transient
     val rolePermissions: List<RolePermission>

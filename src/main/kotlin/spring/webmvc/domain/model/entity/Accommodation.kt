@@ -19,13 +19,13 @@ class Accommodation protected constructor(
     var id: Long? = null
         protected set
 
-    var place: String = place
+    var place = place
         protected set
 
-    var checkInTime: Instant = checkInTime
+    var checkInTime = checkInTime
         protected set
 
-    var checkOutTime: Instant = checkOutTime
+    var checkOutTime = checkOutTime
         protected set
 
     companion object {
