@@ -9,7 +9,8 @@ import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.dto.result.TicketResult
-import spring.webmvc.domain.cache.TicketCache
+import spring.webmvc.domain.cache.CacheKey
+import spring.webmvc.domain.cache.KeyValueCache
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.TicketRepository
@@ -17,7 +18,7 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class TicketStrategy(
-    private val ticketCache: TicketCache,
+    private val keyValueCache: KeyValueCache,
     private val ticketRepository: TicketRepository,
     private val objectMapper: ObjectMapper,
 ) : ProductStrategy {
@@ -26,7 +27,9 @@ class TicketStrategy(
     override fun supports(category: Category) = category == Category.TICKET
 
     override fun findByProductId(productId: Long): ProductResult {
-        val cache = ticketCache.get(productId)
+        val key = CacheKey.PRODUCT.generate(productId)
+
+        val cache = keyValueCache.get(key)
             ?.let { value ->
                 runCatching { objectMapper.readValue(value, TicketResult::class.java) }
                     .onFailure {
@@ -44,7 +47,7 @@ class TicketStrategy(
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
         runCatching { objectMapper.writeValueAsString(ticketResult) }
-            .onSuccess { value -> ticketCache.set(id = productId, value = value) }
+            .onSuccess { value -> keyValueCache.set(key = key, value = value, timeout = CacheKey.PRODUCT.timeOut) }
             .onFailure { logger.warn("Failed to serialize cache for productId={}: {}", productId, it.message) }
 
         return ticketResult

@@ -6,7 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.result.TokenResult
-import spring.webmvc.domain.cache.TokenCache
+import spring.webmvc.domain.cache.CacheKey
+import spring.webmvc.domain.cache.KeyValueCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.infrastructure.security.JwtProvider
@@ -16,9 +17,9 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 @Transactional(readOnly = true)
 class AuthService(
     private val jwtProvider: JwtProvider,
-    private val tokenCache: TokenCache,
+    private val keyValueCache: KeyValueCache,
     private val memberRepository: MemberRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
 ) {
     @Transactional
     fun login(account: String, password: String): TokenResult {
@@ -34,25 +35,29 @@ class AuthService(
         )
         val refreshToken = jwtProvider.createRefreshToken()
 
-        tokenCache.set(memberId = memberId, value = refreshToken)
+        keyValueCache.set(
+            key = CacheKey.REFRESH_TOKEN.generate(memberId),
+            value = refreshToken,
+            timeout = CacheKey.REFRESH_TOKEN.timeOut
+        )
 
         return TokenResult(accessToken = accessToken, refreshToken = refreshToken)
     }
 
     fun refreshToken(accessToken: String, refreshToken: String): TokenResult {
-        val requestMemberId = extractMemberId(accessToken)
+        val memberId = extractMemberId(accessToken)
         jwtProvider.parseRefreshToken(refreshToken)
 
-        val member = memberRepository.findByIdOrNull(requestMemberId)
-            ?: throw EntityNotFoundException(kClass = Member::class, id = requestMemberId)
+        val member = memberRepository.findByIdOrNull(memberId)
+            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
-        tokenCache.get(requestMemberId)
-            ?.takeIf { refreshToken == it }
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
+        if (!keyValueCache.get(CacheKey.REFRESH_TOKEN.generate(memberId)).equals(refreshToken)) {
+            throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
+        }
 
         return TokenResult(
             accessToken = jwtProvider.createAccessToken(
-                memberId = checkNotNull(member.id),
+                memberId = memberId,
                 permissions = getPermissions(member),
             ),
             refreshToken = refreshToken,

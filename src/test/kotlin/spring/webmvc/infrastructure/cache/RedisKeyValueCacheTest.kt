@@ -6,36 +6,38 @@ import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.core.RedisTemplate
 import spring.webmvc.infrastructure.config.RedisTestContainerConfig
+import java.time.Duration
 
 @DataRedisTest
 @Import(RedisTestContainerConfig::class)
-class RedisRequestLockCacheTest(
+class RedisKeyValueCacheTest(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : DescribeSpec({
-    val redisRequestLockCache = RedisRequestLockCache(redisTemplate)
+    val redisKeyValueCache = RedisKeyValueCache(redisTemplate)
 
     describe("setIfAbsent") {
-        val memberId = 1L
-        val method = "GET"
-        val uri = "/members"
+        val key = "testKey"
+        val value = "testValue"
+        val duration = Duration.ofSeconds(1)
 
-        context("RequestLock 있을 경우") {
+        context("value 있을 경우") {
             it("false 반환한다") {
-                redisRequestLockCache.setIfAbsent(memberId = memberId, method = method, uri = uri)
+                redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
-                val result = redisRequestLockCache.setIfAbsent(memberId = memberId, method = method, uri = uri)
+                // When
+                val result = redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
                 result shouldBe false
             }
         }
 
-        context("RequestLock 없을 경우") {
+        context("value 없을 경우") {
             it("저장 후 true 반환한다") {
-                redisRequestLockCache.setIfAbsent(memberId = memberId, method = method, uri = uri)
+                redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
                 Thread.sleep(1000)
 
-                val result = redisRequestLockCache.setIfAbsent(memberId = memberId, method = method, uri = uri)
+                val result = redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
                 result shouldBe true
             }

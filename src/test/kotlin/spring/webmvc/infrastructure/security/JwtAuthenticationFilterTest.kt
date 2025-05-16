@@ -60,7 +60,7 @@ class JwtAuthenticationFilterTest : DescribeSpec({
                 val token = "valid.jwt.token"
                 val claims = mockk<Claims>(relaxed = true)
                 val memberId = 1L
-                val permissions = listOf("ITEM_READ")
+                val permissions = listOf("PRODUCT_READER")
 
                 every { jwtProvider.parseAccessToken(any()) } returns claims
                 every { claims["memberId"] } returns memberId

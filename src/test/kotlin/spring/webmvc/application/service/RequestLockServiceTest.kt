@@ -5,12 +5,13 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import spring.webmvc.domain.cache.RequestLockCache
+import spring.webmvc.domain.cache.CacheKey
+import spring.webmvc.domain.cache.KeyValueCache
 import spring.webmvc.presentation.exception.DuplicateRequestException
 
 class RequestLockServiceTest : DescribeSpec({
-    val requestLockCache = mockk<RequestLockCache>()
-    val requestLockService = RequestLockService(requestLockCache)
+    val keyValueCache = mockk<KeyValueCache>()
+    val requestLockService = RequestLockService(keyValueCache)
 
     describe("validate") {
         context("RequestLock 없을 경우") {
@@ -19,23 +20,15 @@ class RequestLockServiceTest : DescribeSpec({
                 val method = "GET"
                 val uri = "/members"
 
-                every {
-                    requestLockCache.setIfAbsent(
-                        memberId = memberId,
-                        method = method,
-                        uri = uri
-                    )
-                } returns true
+                val key = CacheKey.REQUEST_LOCK.generate(memberId, method, uri)
+                val value = "1"
+                val timeout = CacheKey.REQUEST_LOCK.timeOut
+
+                every { keyValueCache.setIfAbsent(key = key, value = value, timeout = timeout) } returns true
 
                 requestLockService.validate(memberId = memberId, method = method, uri = uri)
 
-                verify(exactly = 1) {
-                    requestLockCache.setIfAbsent(
-                        memberId = memberId,
-                        method = method,
-                        uri = uri
-                    )
-                }
+                verify(exactly = 1) { keyValueCache.setIfAbsent(key = key, value = value, timeout = timeout) }
             }
         }
 
@@ -45,13 +38,11 @@ class RequestLockServiceTest : DescribeSpec({
                 val method = "GET"
                 val uri = "/members"
 
-                every {
-                    requestLockCache.setIfAbsent(
-                        memberId = memberId,
-                        method = method,
-                        uri = uri
-                    )
-                } returns false
+                val key = CacheKey.REQUEST_LOCK.generate(memberId, method, uri)
+                val value = "1"
+                val timeout = CacheKey.REQUEST_LOCK.timeOut
+
+                every { keyValueCache.setIfAbsent(key = key, value = value, timeout = timeout) } returns false
 
                 shouldThrow<DuplicateRequestException> {
                     requestLockService.validate(

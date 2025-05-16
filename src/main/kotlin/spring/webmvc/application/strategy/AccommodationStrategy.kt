@@ -9,7 +9,8 @@ import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.ProductResult
-import spring.webmvc.domain.cache.AccommodationCache
+import spring.webmvc.domain.cache.CacheKey
+import spring.webmvc.domain.cache.KeyValueCache
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.AccommodationRepository
@@ -17,7 +18,7 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class AccommodationStrategy(
-    private val accommodationCache: AccommodationCache,
+    private val keyValueCache: KeyValueCache,
     private val accommodationRepository: AccommodationRepository,
     private val objectMapper: ObjectMapper,
 ) : ProductStrategy {
@@ -26,7 +27,9 @@ class AccommodationStrategy(
     override fun supports(category: Category) = category == Category.ACCOMMODATION
 
     override fun findByProductId(productId: Long): ProductResult {
-        val cache = accommodationCache.get(productId)
+        val key = CacheKey.PRODUCT.generate(productId)
+
+        val cache = keyValueCache.get(key)
             ?.let { value ->
                 runCatching { objectMapper.readValue(value, AccommodationResult::class.java) }
                     .onFailure {
@@ -44,7 +47,7 @@ class AccommodationStrategy(
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
         runCatching { objectMapper.writeValueAsString(accommodationResult) }
-            .onSuccess { value -> accommodationCache.set(id = productId, value = value) }
+            .onSuccess { value -> keyValueCache.set(key = key, value = value, timeout = CacheKey.PRODUCT.timeOut) }
             .onFailure { logger.warn("Failed to serialize cache for productId={}: {}", productId, it.message) }
 
         return accommodationResult
