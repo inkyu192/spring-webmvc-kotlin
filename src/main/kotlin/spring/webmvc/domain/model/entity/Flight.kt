@@ -52,8 +52,8 @@ class Flight protected constructor(
         fun create(
             name: String,
             description: String,
-            price: Int,
-            quantity: Int,
+            price: Long,
+            quantity: Long,
             airline: String,
             flightNumber: String,
             departureAirport: String,
@@ -80,8 +80,8 @@ class Flight protected constructor(
     fun update(
         name: String,
         description: String,
-        price: Int,
-        quantity: Int,
+        price: Long,
+        quantity: Long,
         airline: String,
         flightNumber: String,
         departureAirport: String,

@@ -9,8 +9,8 @@ open class ProductResult(
     val category: Category,
     val name: String,
     val description: String,
-    val price: Int,
-    val quantity: Int,
+    val price: Long,
+    val quantity: Long,
     val createdAt: Instant
 ) {
     constructor(product: Product) : this(

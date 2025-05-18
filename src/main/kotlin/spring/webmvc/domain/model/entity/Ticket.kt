@@ -44,8 +44,8 @@ class Ticket protected constructor(
         fun create(
             name: String,
             description: String,
-            price: Int,
-            quantity: Int,
+            price: Long,
+            quantity: Long,
             place: String,
             performanceTime: Instant,
             duration: String,
@@ -68,8 +68,8 @@ class Ticket protected constructor(
     fun update(
         name: String,
         description: String,
-        price: Int,
-        quantity: Int,
+        price: Long,
+        quantity: Long,
         place: String,
         performanceTime: Instant,
         duration: String,

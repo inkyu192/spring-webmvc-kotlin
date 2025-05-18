@@ -10,8 +10,8 @@ open class ProductResponse(
     val category: Category,
     val name: String,
     val description: String,
-    val price: Int,
-    val quantity: Int,
+    val price: Long,
+    val quantity: Long,
     val createdAt: Instant
 ) {
     constructor(productResult: ProductResult) : this(

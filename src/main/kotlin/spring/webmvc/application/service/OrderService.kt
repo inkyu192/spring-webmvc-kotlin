@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.command.OrderCreateCommand
+import spring.webmvc.domain.cache.CacheKey
+import spring.webmvc.domain.cache.KeyValueCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.Product
@@ -14,10 +16,12 @@ import spring.webmvc.domain.repository.OrderRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.infrastructure.security.SecurityContextUtil
 import spring.webmvc.presentation.exception.EntityNotFoundException
+import spring.webmvc.presentation.exception.InsufficientQuantityException
 
 @Service
 @Transactional(readOnly = true)
 class OrderService(
+    private val keyValueCache: KeyValueCache,
     private val memberRepository: MemberRepository,
     private val productRepository: ProductRepository,
     private val orderRepository: OrderRepository,
@@ -25,24 +29,43 @@ class OrderService(
     @Transactional
     fun createOrder(orderCreateCommand: OrderCreateCommand): Order {
         val memberId = SecurityContextUtil.getMemberId()
-
         val member = memberRepository.findByIdOrNull(id = memberId)
             ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
-        val order = Order.create(member = member)
+        val productMap = productRepository.findAllById(ids = orderCreateCommand.products.map { it.productId })
+            .associateBy { it.id }
 
-        val productMap = productRepository.findAllById(
-            ids = orderCreateCommand.products.map { it.productId }
-        ).associateBy { it.id }
+        val order = Order.create(member = member)
 
         orderCreateCommand.products.forEach {
             val product = productMap[it.productId]
                 ?: throw EntityNotFoundException(kClass = Product::class, id = it.productId)
 
+            val key = CacheKey.PRODUCT_STOCK.generate(it.productId)
+            val stock = keyValueCache.decrement(key = key, delta = it.quantity)
+
+            if (stock == null || stock < 0) {
+                if (stock != null) {
+                    keyValueCache.increment(key = key, delta = it.quantity)
+                }
+                throw InsufficientQuantityException(
+                    productName = product.name,
+                    requestedQuantity = it.quantity,
+                    availableStock = keyValueCache.get(key)?.toLong() ?: 0L
+                )
+            }
+
             order.addProduct(product = product, quantity = it.quantity)
         }
 
-        return orderRepository.save(order = order)
+        return runCatching { orderRepository.save(order) }
+            .getOrElse { e ->
+                orderCreateCommand.products.forEach {
+                    val key = CacheKey.PRODUCT_STOCK.generate(it.productId)
+                    keyValueCache.increment(key = key, delta = it.quantity)
+                }
+                throw e
+            }
     }
 
     fun findOrders(pageable: Pageable, orderStatus: OrderStatus?): Page<Order> {

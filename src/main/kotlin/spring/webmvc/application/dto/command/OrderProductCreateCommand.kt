@@ -4,7 +4,7 @@ import spring.webmvc.presentation.dto.request.OrderProductCreateRequest
 
 data class OrderProductCreateCommand(
     val productId: Long,
-    val quantity: Int,
+    val quantity: Long,
 ) {
     constructor(orderProductCreateRequest: OrderProductCreateRequest) : this(
         productId = orderProductCreateRequest.productId,

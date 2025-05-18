@@ -7,8 +7,8 @@ class AccommodationUpdateRequest(
     category: Category,
     name: String,
     description: String,
-    price: Int,
-    quantity: Int,
+    price: Long,
+    quantity: Long,
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant

@@ -28,4 +28,10 @@ class RedisKeyValueCache(
 
         return result == true
     }
+
+    override fun delete(key: String) = redisTemplate.delete(key)
+
+    override fun increment(key: String, delta: Long) = redisTemplate.opsForValue().increment(key, delta)
+
+    override fun decrement(key: String, delta: Long) = redisTemplate.opsForValue().decrement(key, delta)
 }

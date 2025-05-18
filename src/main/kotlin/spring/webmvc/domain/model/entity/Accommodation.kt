@@ -32,8 +32,8 @@ class Accommodation protected constructor(
         fun create(
             name: String,
             description: String,
-            price: Int,
-            quantity: Int,
+            price: Long,
+            quantity: Long,
             place: String,
             checkInTime: Instant,
             checkOutTime: Instant,
@@ -54,8 +54,8 @@ class Accommodation protected constructor(
     fun update(
         name: String,
         description: String,
-        price: Int,
-        quantity: Int,
+        price: Long,
+        quantity: Long,
         place: String,
         checkInTime: Instant,
         checkOutTime: Instant,

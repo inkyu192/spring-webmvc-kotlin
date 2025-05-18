@@ -21,7 +21,7 @@ open class ProductCreateRequest(
     val name: String,
     val description: String,
     @field:Min(100)
-    val price: Int,
+    val price: Long,
     @field:Max(9999)
-    val quantity: Int,
+    val quantity: Long,
 )

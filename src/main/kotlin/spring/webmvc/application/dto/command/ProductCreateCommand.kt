@@ -6,6 +6,6 @@ open class ProductCreateCommand(
     val category: Category,
     val name: String,
     val description: String,
-    val price: Int,
-    val quantity: Int
+    val price: Long,
+    val quantity: Long,
 )

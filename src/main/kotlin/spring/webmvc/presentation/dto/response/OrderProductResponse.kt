@@ -4,8 +4,8 @@ import spring.webmvc.domain.model.entity.OrderProduct
 
 data class OrderProductResponse(
     val name: String,
-    val price: Int,
-    val quantity: Int,
+    val price: Long,
+    val quantity: Long,
 ) {
     constructor(orderProduct: OrderProduct) : this(
         name = orderProduct.product.name,
