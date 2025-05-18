@@ -59,7 +59,7 @@ class OrderControllerTest() {
     @Test
     fun createOrder() {
         val productId = 1L
-        val quantity = 3
+        val quantity = 3L
 
         val orderProductCreateCommand = OrderProductCreateCommand(productId = productId, quantity = quantity)
         val orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))

@@ -324,8 +324,8 @@ class ProductControllerTest() {
         val category = Category.TICKET
         val name = "name"
         val description = "description"
-        val price = 1000
-        val quantity = 5
+        val price = 1000L
+        val quantity = 5L
         val place = "place"
         val performanceTime = Instant.now()
         val duration = "duration"
@@ -410,8 +410,8 @@ class ProductControllerTest() {
         val category = Category.FLIGHT
         val name = "name"
         val description = "description"
-        val price = 1000
-        val quantity = 5
+        val price = 1000L
+        val quantity = 5L
         val airline = "airline"
         val flightNumber = "flightNumber"
         val departureAirport = "departureAirport"
@@ -506,8 +506,8 @@ class ProductControllerTest() {
         val category = Category.ACCOMMODATION
         val name = "name"
         val description = "description"
-        val price = 1000
-        val quantity = 5
+        val price = 1000L
+        val quantity = 5L
         val place = "place"
         val checkInTime = Instant.now()
         val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
@@ -587,8 +587,8 @@ class ProductControllerTest() {
         val category = Category.TICKET
         val name = "name"
         val description = "description"
-        val price = 1000
-        val quantity = 5
+        val price = 1000L
+        val quantity = 5L
         val place = "place"
         val performanceTime = Instant.now()
         val duration = "duration"
@@ -678,8 +678,8 @@ class ProductControllerTest() {
         val category = Category.FLIGHT
         val name = "name"
         val description = "description"
-        val price = 1000
-        val quantity = 5
+        val price = 1000L
+        val quantity = 5L
         val airline = "airline"
         val flightNumber = "flightNumber"
         val departureAirport = "departureAirport"
@@ -779,8 +779,8 @@ class ProductControllerTest() {
         val category = Category.ACCOMMODATION
         val name = "name"
         val description = "description"
-        val price = 1000
-        val quantity = 5
+        val price = 1000L
+        val quantity = 5L
         val place = "place"
         val checkInTime = Instant.now()
         val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
