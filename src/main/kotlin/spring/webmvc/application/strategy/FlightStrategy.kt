@@ -71,6 +71,9 @@ class FlightStrategy(
             )
         )
 
+        val key = CacheKey.PRODUCT_STOCK.generate(checkNotNull(flight.product.id))
+        keyValueCache.set(key = key, value = flight.product.quantity.toString())
+
         return FlightResult(flight)
     }
 
@@ -93,12 +96,18 @@ class FlightStrategy(
             arrivalTime = flightUpdateCommand.arrivalTime,
         )
 
+        val key = CacheKey.PRODUCT_STOCK.generate(productId)
+        keyValueCache.set(key = key, value = flight.product.quantity.toString())
+
         return FlightResult(flight)
     }
 
     override fun deleteProduct(productId: Long) {
         val flight = flightRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
+
+        val key = CacheKey.PRODUCT_STOCK.generate(productId)
+        keyValueCache.delete(key = key)
 
         flightRepository.delete(flight)
     }

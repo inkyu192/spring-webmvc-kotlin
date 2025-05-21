@@ -68,6 +68,9 @@ class AccommodationStrategy(
             )
         )
 
+        val key = CacheKey.PRODUCT_STOCK.generate(checkNotNull(accommodation.product.id))
+        keyValueCache.set(key = key, value = accommodation.product.quantity.toString())
+
         return AccommodationResult(accommodation)
     }
 
@@ -87,12 +90,18 @@ class AccommodationStrategy(
             checkOutTime = accommodationUpdateCommand.checkOutTime,
         )
 
+        val key = CacheKey.PRODUCT_STOCK.generate(productId)
+        keyValueCache.set(key = key, value = accommodation.product.quantity.toString())
+
         return AccommodationResult(accommodation)
     }
 
     override fun deleteProduct(productId: Long) {
         val accommodation = accommodationRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
+
+        val key = CacheKey.PRODUCT_STOCK.generate(productId)
+        keyValueCache.delete(key = key)
 
         accommodationRepository.delete(accommodation)
     }

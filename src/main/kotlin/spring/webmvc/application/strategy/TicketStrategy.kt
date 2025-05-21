@@ -69,6 +69,9 @@ class TicketStrategy(
             )
         )
 
+        val key = CacheKey.PRODUCT_STOCK.generate(checkNotNull(ticket.product.id))
+        keyValueCache.set(key = key, value = ticket.product.quantity.toString())
+
         return TicketResult(ticket)
     }
 
@@ -89,12 +92,18 @@ class TicketStrategy(
             ageLimit = ticketUpdateCommand.ageLimit,
         )
 
+        val key = CacheKey.PRODUCT_STOCK.generate(productId)
+        keyValueCache.set(key = key, value = ticket.product.quantity.toString())
+
         return TicketResult(ticket)
     }
 
     override fun deleteProduct(productId: Long) {
         val ticket = ticketRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
+
+        val key = CacheKey.PRODUCT_STOCK.generate(productId)
+        keyValueCache.delete(key = key)
 
         ticketRepository.delete(ticket)
     }
