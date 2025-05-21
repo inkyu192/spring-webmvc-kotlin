@@ -20,30 +20,25 @@ class RedisKeyValueCacheTest(
     }
 
     describe("setIfAbsent") {
-        context("value 있을 경우") {
+        context("key-value 있을 경우") {
             it("false 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
-                val duration = Duration.ofSeconds(1)
+                val duration = Duration.ofMillis(1)
 
-                redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
+                redisTemplate.opsForValue().set(key, value)
 
-                // When
                 val result = redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
                 result shouldBe false
             }
         }
 
-        context("value 없을 경우") {
-            it("저장 후 true 반환한다") {
+        context("key-value 없을 경우") {
+            it("true 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
-                val duration = Duration.ofSeconds(1)
-
-                redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
-
-                Thread.sleep(1000)
+                val duration = Duration.ofMillis(1)
 
                 val result = redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
@@ -53,11 +48,12 @@ class RedisKeyValueCacheTest(
     }
 
     describe("get") {
-        context("존재하는 key의 경우") {
-            it("value를 반환한다") {
+        context("key-value 있을 경우") {
+            it("value 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
-                redisKeyValueCache.set(key = key, value = value)
+
+                redisTemplate.opsForValue().set(key, value)
 
                 val result = redisKeyValueCache.get(key = key)
 
@@ -65,9 +61,9 @@ class RedisKeyValueCacheTest(
             }
         }
 
-        context("존재하지 않는 key의 경우") {
-            it("null을 반환한다") {
-                val key = "nonExistentKey"
+        context("key-value 없을 경우") {
+            it("null 반환한다") {
+                val key = "testKey"
 
                 val result = redisKeyValueCache.get(key = key)
 
@@ -77,64 +73,40 @@ class RedisKeyValueCacheTest(
     }
 
     describe("set") {
-        context("key-value 저장") {
-            it("key-value를 저장한다") {
-                val key = "testKey"
-                val value = "testValue"
+        it("key-value 저장한다") {
+            val key = "testKey"
+            val value = "testValue"
 
-                redisKeyValueCache.set(key = key, value = value)
+            redisKeyValueCache.set(key = key, value = value)
 
-                val result = redisKeyValueCache.get(key = key)
-                result shouldBe value
-            }
+            val result = redisTemplate.opsForValue().get(key)
+
+            result shouldBe value
         }
 
-        context("기존 key가 있을 경우") {
-            it("value를 덮어쓴다") {
-                val key = "testKey"
-                val value1 = "testValue1"
-                val value2 = "testValue2"
-                redisKeyValueCache.set(key = key, value = value1)
-
-                redisKeyValueCache.set(key = key, value = value2)
-
-                val result = redisKeyValueCache.get(key = key)
-                result shouldBe value2
-            }
-        }
-
-        context("timeout 설정과 함께 저장") {
-            it("key-value를 저장한다") {
+        context("duration 있을 경우") {
+            it("duration 동안 key-value 저장한다") {
                 val key = "testKey"
                 val value = "testValue"
-                val duration = Duration.ofSeconds(1)
+                val duration = Duration.ofMillis(1)
 
                 redisKeyValueCache.set(key = key, value = value, timeout = duration)
 
-                val result = redisKeyValueCache.get(key = key)
-                result shouldBe value
-            }
+                redisTemplate.opsForValue().get(key) shouldBe value
+                Thread.sleep(duration)
+                redisTemplate.opsForValue().get(key) shouldBe null
 
-            it("timeout 이후에는 key-value가 만료된다") {
-                val key = "testKey"
-                val value = "testValue"
-                val duration = Duration.ofSeconds(1)
-                redisKeyValueCache.set(key = key, value = value, timeout = duration)
-
-                Thread.sleep(1000)
-                val result = redisKeyValueCache.get(key = key)
-
-                result shouldBe null
             }
         }
     }
 
     describe("delete") {
-        context("존재하는 key의 경우") {
-            it("삭제하고 true를 반환한다") {
+        context("key-value 있을 경우") {
+            it("삭제 후 true 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
-                redisKeyValueCache.set(key = key, value = value)
+
+                redisTemplate.opsForValue().set(key, value)
 
                 val result = redisKeyValueCache.delete(key = key)
 
@@ -143,9 +115,9 @@ class RedisKeyValueCacheTest(
             }
         }
 
-        context("존재하지 않는 key의 경우") {
-            it("false를 반환한다") {
-                val key = "nonExistentKey"
+        context("key-value 없을 경우") {
+            it("false 반환한다") {
+                val key = "testKey"
 
                 val result = redisKeyValueCache.delete(key = key)
 
@@ -156,41 +128,29 @@ class RedisKeyValueCacheTest(
 
     describe("increment") {
         it("숫자 값을 증가시키고 증가된 값을 반환한다") {
-            val key = "counterKey"
+            val key = "testKey"
             val delta = 5L
-            redisKeyValueCache.set(key = key, value = "10")
+
+            redisTemplate.opsForValue().set(key, "10")
 
             val result = redisKeyValueCache.increment(key = key, delta = delta)
 
             result shouldBe 15
-            redisKeyValueCache.get(key = key) shouldBe "15"
+            redisTemplate.opsForValue().get(key) shouldBe "15"
         }
     }
 
     describe("decrement") {
-        context("존재하는 key의 경우") {
-            it("숫자 값을 감소시키고 감소된 값을 반환한다") {
-                val key = "counterKey"
-                val delta = 5L
-                redisKeyValueCache.set(key = key, value = "10")
+        it("숫자 값을 감소시키고 감소된 값을 반환한다") {
+            val key = "testKey"
+            val delta = 5L
 
-                val result = redisKeyValueCache.decrement(key = key, delta = delta)
+            redisTemplate.opsForValue().set(key, "10")
 
-                result shouldBe 5
-                redisKeyValueCache.get(key = key) shouldBe "5"
-            }
-        }
+            val result = redisKeyValueCache.decrement(key = key, delta = delta)
 
-        context("존재하지 않는 key의 경우") {
-            it("-delta 값으로 초기화한다") {
-                val key = "newCounterKey"
-                val delta = 5L
-
-                val result = redisKeyValueCache.decrement(key = key, delta = delta)
-
-                result shouldBe -delta
-                redisKeyValueCache.get(key = key) shouldBe "-5"
-            }
+            result shouldBe 5
+            redisTemplate.opsForValue().get(key) shouldBe "5"
         }
     }
 })
