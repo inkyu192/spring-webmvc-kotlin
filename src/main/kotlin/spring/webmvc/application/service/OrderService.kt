@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.KeyValueCache
+import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.Product
@@ -21,7 +21,7 @@ import spring.webmvc.presentation.exception.InsufficientQuantityException
 @Service
 @Transactional(readOnly = true)
 class OrderService(
-    private val keyValueCache: KeyValueCache,
+    private val valueCache: ValueCache,
     private val memberRepository: MemberRepository,
     private val productRepository: ProductRepository,
     private val orderRepository: OrderRepository,
@@ -42,16 +42,16 @@ class OrderService(
                 ?: throw EntityNotFoundException(kClass = Product::class, id = it.productId)
 
             val key = CacheKey.PRODUCT_STOCK.generate(it.productId)
-            val stock = keyValueCache.decrement(key = key, delta = it.quantity)
+            val stock = valueCache.decrement(key = key, delta = it.quantity)
 
             if (stock == null || stock < 0) {
                 if (stock != null) {
-                    keyValueCache.increment(key = key, delta = it.quantity)
+                    valueCache.increment(key = key, delta = it.quantity)
                 }
                 throw InsufficientQuantityException(
                     productName = product.name,
                     requestedQuantity = it.quantity,
-                    availableStock = keyValueCache.get(key)?.toLong() ?: 0L
+                    availableStock = valueCache.get(key = key, clazz = Long::class.java) ?: 0L
                 )
             }
 
@@ -62,7 +62,7 @@ class OrderService(
             .getOrElse { e ->
                 orderCreateCommand.products.forEach {
                     val key = CacheKey.PRODUCT_STOCK.generate(it.productId)
-                    keyValueCache.increment(key = key, delta = it.quantity)
+                    valueCache.increment(key = key, delta = it.quantity)
                 }
                 throw e
             }

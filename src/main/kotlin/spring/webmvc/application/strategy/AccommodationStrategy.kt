@@ -1,7 +1,5 @@
 package spring.webmvc.application.strategy
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.AccommodationCreateCommand
 import spring.webmvc.application.dto.command.AccommodationUpdateCommand
@@ -10,7 +8,7 @@ import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.KeyValueCache
+import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.AccommodationRepository
@@ -18,25 +16,14 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class AccommodationStrategy(
-    private val keyValueCache: KeyValueCache,
+    private val valueCache: ValueCache,
     private val accommodationRepository: AccommodationRepository,
-    private val objectMapper: ObjectMapper,
 ) : ProductStrategy {
-    private val logger = LoggerFactory.getLogger(AccommodationStrategy::class.java)
-
     override fun supports(category: Category) = category == Category.ACCOMMODATION
 
     override fun findByProductId(productId: Long): ProductResult {
         val key = CacheKey.PRODUCT.generate(productId)
-
-        val cache = keyValueCache.get(key)
-            ?.let { value ->
-                runCatching { objectMapper.readValue(value, AccommodationResult::class.java) }
-                    .onFailure {
-                        logger.warn("Failed to deserialize cache for productId={}: {}", productId, it.message)
-                    }
-                    .getOrNull()
-            }
+        val cache = valueCache.get(key = key, clazz = AccommodationResult::class.java)
 
         if (cache != null) {
             return cache
@@ -46,9 +33,7 @@ class AccommodationStrategy(
             ?.let { AccommodationResult(accommodation = it) }
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
-        runCatching { objectMapper.writeValueAsString(accommodationResult) }
-            .onSuccess { value -> keyValueCache.set(key = key, value = value, timeout = CacheKey.PRODUCT.timeOut) }
-            .onFailure { logger.warn("Failed to serialize cache for productId={}: {}", productId, it.message) }
+        valueCache.set(key = key, value = accommodationResult, timeout = CacheKey.PRODUCT.timeOut)
 
         return accommodationResult
     }
@@ -69,7 +54,7 @@ class AccommodationStrategy(
         )
 
         val key = CacheKey.PRODUCT_STOCK.generate(checkNotNull(accommodation.product.id))
-        keyValueCache.set(key = key, value = accommodation.product.quantity.toString())
+        valueCache.set(key = key, value = accommodation.product.quantity)
 
         return AccommodationResult(accommodation)
     }
@@ -91,7 +76,7 @@ class AccommodationStrategy(
         )
 
         val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        keyValueCache.set(key = key, value = accommodation.product.quantity.toString())
+        valueCache.set(key = key, value = accommodation.product.quantity)
 
         return AccommodationResult(accommodation)
     }
@@ -101,7 +86,7 @@ class AccommodationStrategy(
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
         val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        keyValueCache.delete(key = key)
+        valueCache.delete(key = key)
 
         accommodationRepository.delete(accommodation)
     }

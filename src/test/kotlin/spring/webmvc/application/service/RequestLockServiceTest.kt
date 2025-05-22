@@ -6,12 +6,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.KeyValueCache
+import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.presentation.exception.DuplicateRequestException
 
 class RequestLockServiceTest : DescribeSpec({
-    val keyValueCache = mockk<KeyValueCache>()
-    val requestLockService = RequestLockService(keyValueCache)
+    val valueCache = mockk<ValueCache>()
+    val requestLockService = RequestLockService(valueCache)
 
     describe("validate") {
         context("RequestLock 없을 경우") {
@@ -24,11 +24,11 @@ class RequestLockServiceTest : DescribeSpec({
                 val value = "1"
                 val timeout = CacheKey.REQUEST_LOCK.timeOut
 
-                every { keyValueCache.setIfAbsent(key = key, value = value, timeout = timeout) } returns true
+                every { valueCache.setIfAbsent(key = key, value = value, timeout = timeout) } returns true
 
                 requestLockService.validate(memberId = memberId, method = method, uri = uri)
 
-                verify(exactly = 1) { keyValueCache.setIfAbsent(key = key, value = value, timeout = timeout) }
+                verify(exactly = 1) { valueCache.setIfAbsent(key = key, value = value, timeout = timeout) }
             }
         }
 
@@ -42,7 +42,7 @@ class RequestLockServiceTest : DescribeSpec({
                 val value = "1"
                 val timeout = CacheKey.REQUEST_LOCK.timeOut
 
-                every { keyValueCache.setIfAbsent(key = key, value = value, timeout = timeout) } returns false
+                every { valueCache.setIfAbsent(key = key, value = value, timeout = timeout) } returns false
 
                 shouldThrow<DuplicateRequestException> {
                     requestLockService.validate(

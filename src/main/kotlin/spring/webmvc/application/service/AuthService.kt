@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.KeyValueCache
+import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.infrastructure.security.JwtProvider
@@ -17,7 +17,7 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 @Transactional(readOnly = true)
 class AuthService(
     private val jwtProvider: JwtProvider,
-    private val keyValueCache: KeyValueCache,
+    private val valueCache: ValueCache,
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
@@ -35,7 +35,7 @@ class AuthService(
         )
         val refreshToken = jwtProvider.createRefreshToken()
 
-        keyValueCache.set(
+        valueCache.set(
             key = CacheKey.REFRESH_TOKEN.generate(memberId),
             value = refreshToken,
             timeout = CacheKey.REFRESH_TOKEN.timeOut
@@ -51,7 +51,7 @@ class AuthService(
         val member = memberRepository.findByIdOrNull(memberId)
             ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
-        if (!keyValueCache.get(CacheKey.REFRESH_TOKEN.generate(memberId)).equals(refreshToken)) {
+        if (!valueCache.get(CacheKey.REFRESH_TOKEN.generate(memberId)).equals(refreshToken)) {
             throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
         }
 

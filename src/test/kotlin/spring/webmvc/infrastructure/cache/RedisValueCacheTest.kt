@@ -1,5 +1,6 @@
 package spring.webmvc.infrastructure.cache
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest
@@ -10,10 +11,10 @@ import java.time.Duration
 
 @DataRedisTest
 @Import(RedisTestContainerConfig::class)
-class RedisKeyValueCacheTest(
+class RedisValueCacheTest(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : DescribeSpec({
-    val redisKeyValueCache = RedisKeyValueCache(redisTemplate)
+    val redisValueCache = RedisValueCache(redisTemplate = redisTemplate, objectMapper = ObjectMapper())
 
     beforeTest {
         redisTemplate.connectionFactory?.connection?.serverCommands()?.flushAll()
@@ -28,7 +29,7 @@ class RedisKeyValueCacheTest(
 
                 redisTemplate.opsForValue().set(key, value)
 
-                val result = redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
+                val result = redisValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
                 result shouldBe false
             }
@@ -40,7 +41,7 @@ class RedisKeyValueCacheTest(
                 val value = "testValue"
                 val duration = Duration.ofMillis(1)
 
-                val result = redisKeyValueCache.setIfAbsent(key = key, value = value, timeout = duration)
+                val result = redisValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
                 result shouldBe true
             }
@@ -55,7 +56,7 @@ class RedisKeyValueCacheTest(
 
                 redisTemplate.opsForValue().set(key, value)
 
-                val result = redisKeyValueCache.get(key = key)
+                val result = redisValueCache.get(key = key)
 
                 result shouldBe value
             }
@@ -65,7 +66,7 @@ class RedisKeyValueCacheTest(
             it("null 반환한다") {
                 val key = "testKey"
 
-                val result = redisKeyValueCache.get(key = key)
+                val result = redisValueCache.get(key = key)
 
                 result shouldBe null
             }
@@ -77,7 +78,7 @@ class RedisKeyValueCacheTest(
             val key = "testKey"
             val value = "testValue"
 
-            redisKeyValueCache.set(key = key, value = value)
+            redisValueCache.set(key = key, value = value)
 
             val result = redisTemplate.opsForValue().get(key)
 
@@ -90,7 +91,7 @@ class RedisKeyValueCacheTest(
                 val value = "testValue"
                 val duration = Duration.ofMillis(1)
 
-                redisKeyValueCache.set(key = key, value = value, timeout = duration)
+                redisValueCache.set(key = key, value = value, timeout = duration)
 
                 redisTemplate.opsForValue().get(key) shouldBe value
                 Thread.sleep(duration)
@@ -108,10 +109,10 @@ class RedisKeyValueCacheTest(
 
                 redisTemplate.opsForValue().set(key, value)
 
-                val result = redisKeyValueCache.delete(key = key)
+                val result = redisValueCache.delete(key = key)
 
                 result shouldBe true
-                redisKeyValueCache.get(key = key) shouldBe null
+                redisTemplate.opsForValue().get(key) shouldBe null
             }
         }
 
@@ -119,7 +120,7 @@ class RedisKeyValueCacheTest(
             it("false 반환한다") {
                 val key = "testKey"
 
-                val result = redisKeyValueCache.delete(key = key)
+                val result = redisValueCache.delete(key = key)
 
                 result shouldBe false
             }
@@ -133,7 +134,7 @@ class RedisKeyValueCacheTest(
 
             redisTemplate.opsForValue().set(key, "10")
 
-            val result = redisKeyValueCache.increment(key = key, delta = delta)
+            val result = redisValueCache.increment(key = key, delta = delta)
 
             result shouldBe 15
             redisTemplate.opsForValue().get(key) shouldBe "15"
@@ -147,7 +148,7 @@ class RedisKeyValueCacheTest(
 
             redisTemplate.opsForValue().set(key, "10")
 
-            val result = redisKeyValueCache.decrement(key = key, delta = delta)
+            val result = redisValueCache.decrement(key = key, delta = delta)
 
             result shouldBe 5
             redisTemplate.opsForValue().get(key) shouldBe "5"
