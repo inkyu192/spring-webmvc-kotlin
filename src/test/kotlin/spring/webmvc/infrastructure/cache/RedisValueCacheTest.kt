@@ -21,7 +21,7 @@ class RedisValueCacheTest(
     }
 
     describe("setIfAbsent") {
-        context("key-value 있을 경우") {
+        context("key, value 있을 경우") {
             it("false 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
@@ -35,7 +35,7 @@ class RedisValueCacheTest(
             }
         }
 
-        context("key-value 없을 경우") {
+        context("key, value 없을 경우") {
             it("true 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
@@ -49,7 +49,7 @@ class RedisValueCacheTest(
     }
 
     describe("get") {
-        context("key-value 있을 경우") {
+        context("key, value 있을 경우") {
             it("value 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
@@ -74,7 +74,7 @@ class RedisValueCacheTest(
     }
 
     describe("set") {
-        it("key-value 저장한다") {
+        it("key, value 저장한다") {
             val key = "testKey"
             val value = "testValue"
 
@@ -86,7 +86,7 @@ class RedisValueCacheTest(
         }
 
         context("duration 있을 경우") {
-            it("duration 동안 key-value 저장한다") {
+            it("key, value, duration 저장한다") {
                 val key = "testKey"
                 val value = "testValue"
                 val duration = Duration.ofMillis(1)

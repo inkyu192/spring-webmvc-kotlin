@@ -17,21 +17,17 @@ class RedisValueCache(
     override fun get(key: String) = redisTemplate.opsForValue().get(key)
 
     override fun <T> get(key: String, clazz: Class<T>): T? {
-        val value = redisTemplate.opsForValue().get(key) ?: return null
-        return deserialize(key, value, clazz)
+        val value = redisTemplate.opsForValue().get(key)
+        return if (value != null) deserialize(key = key, value = value, clazz = clazz) else null
     }
 
     override fun <T> set(key: String, value: T, timeout: Duration?) {
-        val stringValue = serialize(key, value)
-
-        if (stringValue == null) {
-            return
-        }
-
-        if (timeout == null) {
-            redisTemplate.opsForValue().set(key, stringValue)
-        } else {
-            redisTemplate.opsForValue().set(key, stringValue, timeout)
+        serialize(key = key, value = value)?.let {
+            if (timeout == null) {
+                redisTemplate.opsForValue().set(key, it)
+            } else {
+                redisTemplate.opsForValue().set(key, it, timeout)
+            }
         }
     }
 
@@ -57,18 +53,17 @@ class RedisValueCache(
         }
 
         return runCatching { objectMapper.writeValueAsString(value) }
-            .onFailure { logger.warn("Failed to serialize cache for key={}, value={}: {}", key, value, it.message) }
+            .onFailure { logger.warn("Failed to serialize value for key={}, value={}: {}", key, value, it.message) }
             .getOrNull()
     }
 
-    private fun <T> deserialize(key: String, value: String, clazz: Class<T>) =
-        runCatching {
-            if (clazz == String::class.java) {
-                clazz.cast(value) as T
-            } else {
-                objectMapper.readValue(value, clazz)
-            }
-        }.onFailure {
-            logger.warn("Failed to deserialize cache for key={}, value={}: {}", key, value, it.message)
-        }.getOrNull()
+    private fun <T> deserialize(key: String, value: String, clazz: Class<T>): T? {
+        if (clazz == String::class.java) {
+            return clazz.cast(value) as T
+        }
+
+        return runCatching { objectMapper.readValue(value, clazz) }
+            .onFailure { logger.warn("Failed to deserialize value for key={}, value={}: {}", key, value, it.message) }
+            .getOrNull()
+    }
 }
