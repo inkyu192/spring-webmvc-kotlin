@@ -3,11 +3,11 @@ package spring.webmvc.application.dto.command
 import spring.webmvc.presentation.dto.request.OrderProductCreateRequest
 
 data class OrderProductCreateCommand(
-    val productId: Long,
+    val id: Long,
     val quantity: Long,
 ) {
     constructor(orderProductCreateRequest: OrderProductCreateRequest) : this(
-        productId = orderProductCreateRequest.productId,
+        id = orderProductCreateRequest.id,
         quantity = orderProductCreateRequest.quantity,
     )
 }

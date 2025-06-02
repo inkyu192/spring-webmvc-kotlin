@@ -3,7 +3,7 @@ package spring.webmvc.presentation.dto.request
 import jakarta.validation.constraints.Min
 
 data class OrderProductCreateRequest(
-    val productId: Long,
+    val id: Long,
     @field:Min(1)
     val quantity: Long,
 )

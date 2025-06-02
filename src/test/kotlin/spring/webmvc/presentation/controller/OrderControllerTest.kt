@@ -61,7 +61,7 @@ class OrderControllerTest() {
         val productId = 1L
         val quantity = 3L
 
-        val orderProductCreateCommand = OrderProductCreateCommand(productId = productId, quantity = quantity)
+        val orderProductCreateCommand = OrderProductCreateCommand(id = productId, quantity = quantity)
         val orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))
 
         val order = mock<Order>()
@@ -87,7 +87,7 @@ class OrderControllerTest() {
                         {
                           "products": [
                             {
-                              "productId": $productId,
+                              "id": $productId,
                               "quantity": $quantity
                             }
                           ]
@@ -103,7 +103,7 @@ class OrderControllerTest() {
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("products[].productId").description("상품아이디"),
+                        PayloadDocumentation.fieldWithPath("products[].id").description("상품아이디"),
                         PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")
                     ),
                     PayloadDocumentation.responseFields(

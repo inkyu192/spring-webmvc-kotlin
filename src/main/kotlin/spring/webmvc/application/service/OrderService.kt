@@ -32,16 +32,16 @@ class OrderService(
         val member = memberRepository.findByIdOrNull(id = memberId)
             ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
-        val productMap = productRepository.findAllById(ids = orderCreateCommand.products.map { it.productId })
+        val productMap = productRepository.findAllById(ids = orderCreateCommand.products.map { it.id })
             .associateBy { it.id }
 
         val order = Order.create(member = member)
 
         orderCreateCommand.products.forEach {
-            val product = productMap[it.productId]
-                ?: throw EntityNotFoundException(kClass = Product::class, id = it.productId)
+            val product = productMap[it.id]
+                ?: throw EntityNotFoundException(kClass = Product::class, id = it.id)
 
-            val key = CacheKey.PRODUCT_STOCK.generate(it.productId)
+            val key = CacheKey.PRODUCT_STOCK.generate(it.id)
             val stock = valueCache.decrement(key = key, delta = it.quantity)
 
             if (stock == null || stock < 0) {
@@ -61,7 +61,7 @@ class OrderService(
         return runCatching { orderRepository.save(order) }
             .getOrElse { e ->
                 orderCreateCommand.products.forEach {
-                    val key = CacheKey.PRODUCT_STOCK.generate(it.productId)
+                    val key = CacheKey.PRODUCT_STOCK.generate(it.id)
                     valueCache.increment(key = key, delta = it.quantity)
                 }
                 throw e
