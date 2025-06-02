@@ -14,16 +14,13 @@ class RedisZSetCache(
 ) : ZSetCache {
     private val logger = LoggerFactory.getLogger(RedisZSetCache::class.java)
 
-    override fun <T> add(key: String, value: T, score: Double, duration: Duration?) {
+    override fun <T> add(key: String, value: T, score: Double) {
         serialize(key = key, value = value)?.let {
-            if (duration == null) {
-                redisTemplate.opsForZSet().add(key, it, score)
-            } else {
-                redisTemplate.opsForZSet().add(key, it, score)
-                redisTemplate.expire(key, duration)
-            }
+            redisTemplate.opsForZSet().add(key, it, score)
         }
     }
+
+    override fun expire(key: String, timeout: Duration) = redisTemplate.expire(key, timeout) ?: false
 
     override fun <T> range(key: String, start: Long, end: Long, clazz: Class<T>) =
         redisTemplate.opsForZSet().range(key, start, end)

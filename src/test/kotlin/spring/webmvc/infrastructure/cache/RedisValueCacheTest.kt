@@ -25,7 +25,7 @@ class RedisValueCacheTest(
             it("false 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
-                val duration = Duration.ofMillis(1)
+                val duration = Duration.ofMillis(100)
 
                 redisTemplate.opsForValue().set(key, value)
 
@@ -39,7 +39,7 @@ class RedisValueCacheTest(
             it("true 반환한다") {
                 val key = "testKey"
                 val value = "testValue"
-                val duration = Duration.ofMillis(1)
+                val duration = Duration.ofMillis(100)
 
                 val result = redisValueCache.setIfAbsent(key = key, value = value, timeout = duration)
 
@@ -89,7 +89,7 @@ class RedisValueCacheTest(
             it("key, value, duration 저장한다") {
                 val key = "testKey"
                 val value = "testValue"
-                val duration = Duration.ofMillis(1)
+                val duration = Duration.ofMillis(100)
 
                 redisValueCache.set(key = key, value = value, timeout = duration)
 

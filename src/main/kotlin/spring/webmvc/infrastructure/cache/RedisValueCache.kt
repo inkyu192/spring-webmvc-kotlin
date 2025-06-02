@@ -38,7 +38,7 @@ class RedisValueCache(
             redisTemplate.opsForValue().setIfAbsent(key, value, timeout)
         }
 
-        return result == true
+        return result ?: false
     }
 
     override fun delete(key: String) = redisTemplate.delete(key)

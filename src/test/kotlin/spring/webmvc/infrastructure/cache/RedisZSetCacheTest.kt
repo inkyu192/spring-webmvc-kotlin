@@ -34,14 +34,17 @@ class RedisZSetCacheTest(
             val result = redisTemplate.opsForZSet().range(key, 0, -1)
             result?.shouldContain(value)
         }
+    }
 
-        it("key, value, score, duration 저장한다") {
+    describe("expire") {
+        it("duration 지나면 key 사라진다") {
             val key = "testKey"
             val value = "testValue"
             val score = 1.0
-            val duration = Duration.ofMillis(1)
+            val duration = Duration.ofMillis(100)
+            redisTemplate.opsForZSet().add(key, value, score)
 
-            redisZSetCache.add(key = key, value = value, score = score, duration = duration)
+            redisZSetCache.expire(key = key, timeout = duration)
 
             redisTemplate.opsForZSet().range(key, 0, -1)?.shouldContain(value)
             Thread.sleep(duration)
