@@ -6,6 +6,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.redis.core.RedisTemplate
@@ -49,6 +50,19 @@ class RedisZSetCacheTest(
             redisTemplate.opsForZSet().range(key, 0, -1)?.shouldContain(value)
             Thread.sleep(duration)
             redisTemplate.opsForZSet().range(key, 0, -1)?.shouldBeEmpty()
+        }
+    }
+
+    describe("size") {
+        it("저장된 요소 개수 반환한다") {
+            val key = "testKey"
+            redisTemplate.opsForZSet().add(key, "value1", 1.0)
+            redisTemplate.opsForZSet().add(key, "value2", 2.0)
+            redisTemplate.opsForZSet().add(key, "value3", 3.0)
+
+            val result = redisZSetCache.size(key)
+
+            result shouldBe 3
         }
     }
 

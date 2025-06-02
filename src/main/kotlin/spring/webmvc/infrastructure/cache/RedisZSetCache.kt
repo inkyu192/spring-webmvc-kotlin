@@ -22,6 +22,8 @@ class RedisZSetCache(
 
     override fun expire(key: String, timeout: Duration) = redisTemplate.expire(key, timeout) ?: false
 
+    override fun size(key: String) = redisTemplate.opsForZSet().size(key) ?: 0L
+
     override fun <T> range(key: String, start: Long, end: Long, clazz: Class<T>) =
         redisTemplate.opsForZSet().range(key, start, end)
             ?.mapNotNull { deserialize(key = key, value = it, clazz = clazz) }
