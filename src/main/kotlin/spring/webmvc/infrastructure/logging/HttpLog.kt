@@ -21,15 +21,15 @@ class HttpLog(
         endTime: Long,
     ) {
         val message = """
-            |>> REQUEST: ${requestWrapper.method} ${requestWrapper.requestURI} (${(endTime - startTime) / 1000.0} s)
-            |>> CLIENT_IP: ${requestWrapper.remoteAddr}
-            |>> REQUEST_HEADER: ${extractHeaders(request = requestWrapper)}
-            |>> REQUEST_PARAMETER: ${extractParameters(request = requestWrapper)}
-            |>> REQUEST_BODY: ${readBody(content = requestWrapper.contentAsByteArray)}
-            |>> RESPONSE_BODY: ${readBody(content = responseWrapper.contentAsByteArray)}
-        """.trimIndent()
+            |[REQUEST] ${"\n ${requestWrapper.method} ${requestWrapper.requestURI} (${(endTime - startTime) / 1000.0} s)"}
+            |[CLIENT_IP] ${"\n ${requestWrapper.remoteAddr}"}
+            |[REQUEST_HEADER] ${extractHeaders(request = requestWrapper)}
+            |[REQUEST_PARAMETER] ${extractParameters(request = requestWrapper)}
+            |[REQUEST_BODY] ${readBody(content = requestWrapper.contentAsByteArray)}
+            |[RESPONSE_BODY] ${readBody(content = responseWrapper.contentAsByteArray)}
+        """.trimMargin()
 
-        logger.info(message)
+        logger.info("\n$message")
     }
 
     private fun extractHeaders(request: HttpServletRequest): String {
@@ -61,7 +61,7 @@ class HttpLog(
         return try {
             val json = objectMapper.readValue(body, Any::class.java)
             val writer = objectMapper.writerWithDefaultPrettyPrinter()
-            writer.writeValueAsString(json)
+            "\n ${writer.writeValueAsString(json)}"
         } catch (e: Exception) {
             body
         }
