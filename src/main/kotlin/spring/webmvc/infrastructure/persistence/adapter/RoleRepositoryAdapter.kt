@@ -3,7 +3,7 @@ package spring.webmvc.infrastructure.persistence.adapter
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Role
 import spring.webmvc.domain.repository.RoleRepository
-import spring.webmvc.infrastructure.persistence.RoleJpaRepository
+import spring.webmvc.infrastructure.persistence.jpa.RoleJpaRepository
 
 @Component
 class RoleRepositoryAdapter(

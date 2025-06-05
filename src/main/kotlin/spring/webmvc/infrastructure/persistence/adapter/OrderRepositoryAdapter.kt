@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.domain.repository.OrderRepository
-import spring.webmvc.infrastructure.persistence.OrderJpaRepository
 import spring.webmvc.infrastructure.persistence.OrderQuerydslRepository
+import spring.webmvc.infrastructure.persistence.jpa.OrderJpaRepository
 
 @Component
 class OrderRepositoryAdapter(

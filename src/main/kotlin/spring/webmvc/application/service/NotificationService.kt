@@ -21,7 +21,7 @@ class NotificationService(
             ?: throw EntityNotFoundException(kClass = Member::class, id = notificationEvent.memberId)
 
         notificationRepository.save(
-            Notification.of(
+            Notification.create(
                 member = member,
                 title = notificationEvent.title,
                 message = notificationEvent.message,

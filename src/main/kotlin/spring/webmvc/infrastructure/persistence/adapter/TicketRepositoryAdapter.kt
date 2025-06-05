@@ -4,7 +4,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.repository.TicketRepository
-import spring.webmvc.infrastructure.persistence.TicketJpaRepository
+import spring.webmvc.infrastructure.persistence.jpa.TicketJpaRepository
 
 @Component
 class TicketRepositoryAdapter(

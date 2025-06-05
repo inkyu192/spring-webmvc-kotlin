@@ -22,16 +22,16 @@ class DataInitializer(
 
 
         // 권한 생성
-        val productReader: Permission = permissionRepository.save(Permission.of("PRODUCT_READER"))
-        val productWriter: Permission = permissionRepository.save(Permission.of("PRODUCT_WRITER"))
-        val orderReader: Permission = permissionRepository.save(Permission.of("ORDER_READER"))
-        val orderWriter: Permission = permissionRepository.save(Permission.of("ORDER_WRITER"))
-        val permissionReader: Permission = permissionRepository.save(Permission.of("PERMISSION_READER"))
-        val permissionWriter: Permission = permissionRepository.save(Permission.of("PERMISSION_WRITER"))
-        val menuReader: Permission = permissionRepository.save(Permission.of("MENU_READER"))
-        val menuWriter: Permission = permissionRepository.save(Permission.of("MENU_WRITER"))
-        val roleReader: Permission = permissionRepository.save(Permission.of("ROLE_READER"))
-        val roleWriter: Permission = permissionRepository.save(Permission.of("ROLE_WRITER"))
+        val productReader: Permission = permissionRepository.save(Permission.create("PRODUCT_READER"))
+        val productWriter: Permission = permissionRepository.save(Permission.create("PRODUCT_WRITER"))
+        val orderReader: Permission = permissionRepository.save(Permission.create("ORDER_READER"))
+        val orderWriter: Permission = permissionRepository.save(Permission.create("ORDER_WRITER"))
+        val permissionReader: Permission = permissionRepository.save(Permission.create("PERMISSION_READER"))
+        val permissionWriter: Permission = permissionRepository.save(Permission.create("PERMISSION_WRITER"))
+        val menuReader: Permission = permissionRepository.save(Permission.create("MENU_READER"))
+        val menuWriter: Permission = permissionRepository.save(Permission.create("MENU_WRITER"))
+        val roleReader: Permission = permissionRepository.save(Permission.create("ROLE_READER"))
+        val roleWriter: Permission = permissionRepository.save(Permission.create("ROLE_WRITER"))
 
 
         // 역할 생성

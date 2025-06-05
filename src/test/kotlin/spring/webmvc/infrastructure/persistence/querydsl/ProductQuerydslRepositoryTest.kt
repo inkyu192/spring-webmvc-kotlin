@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.persistence
+package spring.webmvc.infrastructure.persistence.querydsl
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import io.kotest.core.spec.style.DescribeSpec
@@ -10,9 +10,12 @@ import org.springframework.data.domain.Pageable
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.DataJpaTestConfig
+import spring.webmvc.infrastructure.config.QuerydslTestConfig
+import spring.webmvc.infrastructure.persistence.ProductQuerydslRepository
+import spring.webmvc.infrastructure.persistence.jpa.ProductJpaRepository
 
 @DataJpaTest
-@Import(DataJpaTestConfig::class)
+@Import(DataJpaTestConfig::class, QuerydslTestConfig::class)
 class ProductQuerydslRepositoryTest(
     jpaQueryFactory: JPAQueryFactory,
     private val productJpaRepository: ProductJpaRepository,
@@ -22,35 +25,35 @@ class ProductQuerydslRepositoryTest(
     describe("findAll") {
         it("Product 조건 조회 후 반환한다") {
             val request = listOf(
-                Product.create(
+                Product.Companion.create(
                     name = "product1",
                     description = "description",
                     price = 1000,
                     quantity = 10,
                     category = Category.TICKET
                 ),
-                Product.create(
+                Product.Companion.create(
                     name = "product2",
                     description = "description",
                     price = 2000,
                     quantity = 20,
                     category = Category.FLIGHT
                 ),
-                Product.create(
+                Product.Companion.create(
                     name = "product3",
                     description = "description",
                     price = 3000,
                     quantity = 30,
                     category = Category.TICKET
                 ),
-                Product.create(
+                Product.Companion.create(
                     name = "product4",
                     description = "description",
                     price = 1500,
                     quantity = 30,
                     category = Category.FLIGHT
                 ),
-                Product.create(
+                Product.Companion.create(
                     name = "fake",
                     description = "description",
                     price = 2500,

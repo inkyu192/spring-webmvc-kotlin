@@ -14,6 +14,6 @@ class Permission protected constructor(
         protected set
 
     companion object {
-        fun of(name: String) = Permission(name)
+        fun create(name: String) = Permission(name)
     }
 }

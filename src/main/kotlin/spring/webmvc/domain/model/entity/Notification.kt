@@ -22,7 +22,7 @@ class Notification protected constructor(
         protected set
 
     companion object {
-        fun of(member: Member, title: String, message: String, url: String) =
+        fun create(member: Member, title: String, message: String, url: String) =
             Notification(
                 title = title,
                 message = message,
