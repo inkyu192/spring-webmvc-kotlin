@@ -1,13 +1,13 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
 import org.springframework.stereotype.Component
-import spring.webmvc.domain.model.entity.Notification
+import spring.webmvc.domain.model.document.Notification
 import spring.webmvc.domain.repository.NotificationRepository
-import spring.webmvc.infrastructure.persistence.jpa.NotificationJpaRepository
+import spring.webmvc.infrastructure.persistence.mongo.NotificationMongoRepository
 
 @Component
 class NotificationRepositoryAdapter(
-    private val jpaRepository: NotificationJpaRepository
+    private val mongoRepository: NotificationMongoRepository
 ) : NotificationRepository {
-    override fun save(notification: Notification) = jpaRepository.save(notification)
+    override fun save(notification: Notification) = mongoRepository.save(notification)
 }

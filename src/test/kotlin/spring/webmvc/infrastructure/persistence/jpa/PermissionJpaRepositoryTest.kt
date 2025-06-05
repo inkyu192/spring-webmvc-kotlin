@@ -1,9 +1,9 @@
 package spring.webmvc.infrastructure.persistence.jpa
 
-import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
 import spring.webmvc.domain.model.entity.Permission
@@ -11,51 +11,53 @@ import spring.webmvc.infrastructure.config.DataJpaTestConfig
 
 @DataJpaTest
 @Import(DataJpaTestConfig::class)
-class PermissionJpaRepositoryTest(
-    private val permissionJpaRepository: PermissionJpaRepository,
-) : DescribeSpec({
-    describe("save") {
-        it("Permission 저장 후 반환한다") {
-            val permission = Permission.create("name")
+class PermissionJpaRepositoryTest {
 
-            val saved = permissionJpaRepository.save(permission)
+    @Autowired
+    private lateinit var permissionJpaRepository: PermissionJpaRepository
 
-            saved.id shouldNotBe null
-            saved.name shouldBe permission.name
-        }
+    @Test
+    @DisplayName("save: Permission 저장 후 반환한다")
+    fun save() {
+        val permission = Permission.create("name")
+
+        val saved = permissionJpaRepository.save(permission)
+
+        Assertions.assertThat(saved.id).isNotNull()
+        Assertions.assertThat(saved.name).isEqualTo(permission.name)
     }
 
-    describe("findById") {
-        it("Permission 반환한다") {
-            val permission = permissionJpaRepository.save(Permission.create("name"))
+    @Test
+    @DisplayName("findById: Permission 반환한다")
+    fun findById() {
+        val permission = permissionJpaRepository.save(Permission.create("name"))
 
-            val result = permissionJpaRepository.findById(permission.id!!)
+        val result = permissionJpaRepository.findById(permission.id!!)
 
-            result.isPresent shouldBe true
-            result.get().name shouldBe permission.name
-        }
+        Assertions.assertThat(result).isPresent()
+        Assertions.assertThat(result.get().name).isEqualTo(permission.name)
     }
 
-    describe("findAll") {
-        it("Permission 목록 반환한다") {
-            permissionJpaRepository.save(Permission.create("name1"))
-            permissionJpaRepository.save(Permission.create("name2"))
+    @Test
+    @DisplayName("findAll: Permission 목록 반환한다")
+    fun findAll() {
+        permissionJpaRepository.save(Permission.create("name1"))
+        permissionJpaRepository.save(Permission.create("name2"))
 
-            val result = permissionJpaRepository.findAll()
+        val result = permissionJpaRepository.findAll()
 
-            result shouldHaveSize 2
-        }
+        Assertions.assertThat(result).hasSize(2)
     }
 
-    describe("deleteById") {
-        it("Permission 삭제한다") {
-            val permission = permissionJpaRepository.save(Permission.create("name"))
-            val id = permission.id!!
+    @Test
+    @DisplayName("deleteById: Permission 삭제한다")
+    fun deleteById() {
+        val permission = permissionJpaRepository.save(Permission.create("name"))
+        val id = permission.id!!
 
-            permissionJpaRepository.deleteById(id)
+        permissionJpaRepository.deleteById(id)
 
-            val deleted = permissionJpaRepository.findById(id)
-            deleted.isPresent shouldBe false
-        }
+        val deleted = permissionJpaRepository.findById(id)
+        Assertions.assertThat(deleted).isEmpty()
     }
-})
+}

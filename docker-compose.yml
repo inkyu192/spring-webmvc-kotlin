@@ -35,6 +35,14 @@ services:
     networks:
       - application-network
 
+  mongodb:
+    container_name: mongodb-container
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - application-network
+
   localstack:
     container_name: localstack-container
     image: localstack/localstack:latest

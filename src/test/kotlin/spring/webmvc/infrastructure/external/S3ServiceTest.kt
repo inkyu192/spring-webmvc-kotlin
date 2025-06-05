@@ -11,7 +11,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
-import spring.webmvc.infrastructure.config.LocalStackTestConfig
+import spring.webmvc.infrastructure.config.LocalStackTestContainerConfig
 
 class S3ServiceTest : DescribeSpec({
     val bucket = "my-bucket"
@@ -20,13 +20,13 @@ class S3ServiceTest : DescribeSpec({
 
     beforeSpec {
         s3Client = S3Client.builder()
-            .endpointOverride(LocalStackTestConfig.localStackContainer.getEndpointOverride(LocalStackContainer.Service.S3))
-            .region(Region.of(LocalStackTestConfig.localStackContainer.region))
+            .endpointOverride(LocalStackTestContainerConfig.localStackContainer.getEndpointOverride(LocalStackContainer.Service.S3))
+            .region(Region.of(LocalStackTestContainerConfig.localStackContainer.region))
             .credentialsProvider(
                 StaticCredentialsProvider.create(
                     AwsBasicCredentials.create(
-                        LocalStackTestConfig.localStackContainer.accessKey,
-                        LocalStackTestConfig.localStackContainer.secretKey
+                        LocalStackTestContainerConfig.localStackContainer.accessKey,
+                        LocalStackTestContainerConfig.localStackContainer.secretKey
                     )
                 )
             )
