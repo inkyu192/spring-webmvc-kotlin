@@ -144,10 +144,10 @@ class OrderControllerTest() {
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders")
                 .header("Authorization", "Bearer access-token")
-                .param("page", pageable.pageNumber.toString())
-                .param("size", pageable.pageSize.toString())
-                .param("memberId", memberId.toString())
-                .param("orderStatus", orderStatus.toString())
+                .queryParam("page", pageable.pageNumber.toString())
+                .queryParam("size", pageable.pageSize.toString())
+                .queryParam("memberId", memberId.toString())
+                .queryParam("orderStatus", orderStatus.toString())
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
