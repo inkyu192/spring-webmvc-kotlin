@@ -21,7 +21,7 @@ class FileController(
     fun uploadFile(@RequestPart file: MultipartFile, @RequestPart data: FileUploadRequest): FileResponse {
         FileUtil.validate(fileType = data.type, file = file)
 
-        val key = s3Service.putObject(bucket = "my-bucket", directory = data.type.directory, file = file)
+        val key = s3Service.putObject(fileType = data.type, file = file)
         return FileResponse(key = key)
     }
 }

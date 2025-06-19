@@ -11,6 +11,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import spring.webmvc.infrastructure.common.FileType
 import spring.webmvc.infrastructure.config.LocalStackTestContainerConfig
 
 class S3ServiceTest : DescribeSpec({
@@ -33,12 +34,11 @@ class S3ServiceTest : DescribeSpec({
             .build()
 
         s3Client.createBucket(CreateBucketRequest.builder().bucket(bucket).build())
-        s3Service = S3Service(s3Client)
+        s3Service = S3Service(s3Client, bucket)
     }
 
     describe("putObject") {
         it("MultipartFile S3 업로드 후 key 반환한다") {
-            val directory = "directory"
             val filename = "file.txt"
             val content = "content"
 
@@ -49,7 +49,7 @@ class S3ServiceTest : DescribeSpec({
                 content.toByteArray(Charsets.UTF_8)
             )
 
-            val key = s3Service.putObject(bucket = bucket, directory = directory, file = multipartFile)
+            val key = s3Service.putObject(fileType = FileType.TEMP, file = multipartFile)
 
             val response = s3Client.getObject(
                 GetObjectRequest.builder()
@@ -61,6 +61,33 @@ class S3ServiceTest : DescribeSpec({
             val result = response.readAllBytes().toString(Charsets.UTF_8)
 
             result shouldBe content
+        }
+    }
+
+    describe("copyObject") {
+        it("S3 객체를 복사한다") {
+            val filename = "file.txt"
+            val content = "content"
+
+            val multipartFile = MockMultipartFile(
+                filename,
+                filename,
+                MediaType.TEXT_PLAIN_VALUE,
+                content.toByteArray(Charsets.UTF_8)
+            )
+
+            val sourceKey = s3Service.putObject(fileType = FileType.TEMP, file = multipartFile)
+
+            s3Service.copyObject(sourceKey = sourceKey, destinationType = FileType.PROFILE)
+
+            val response = s3Client.getObject(
+                GetObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(sourceKey)
+                    .build()
+            )
+
+            String(response.readAllBytes(), Charsets.UTF_8) shouldBe content
         }
     }
 })

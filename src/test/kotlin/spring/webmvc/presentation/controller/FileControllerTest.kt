@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spring.webmvc.infrastructure.common.FileType
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.infrastructure.external.S3Service
 import java.nio.charset.StandardCharsets
@@ -59,17 +60,11 @@ class FileControllerTest {
             "data",
             "",
             "application/json",
-            "{\"type\": \"PROFILE\"}".toByteArray(StandardCharsets.UTF_8)
+            "{\"type\": \"TEMP\"}".toByteArray(StandardCharsets.UTF_8)
         )
 
         val key = "profile/20240610/uuid.jpg"
-        whenever(
-            methodCall = s3Service.putObject(
-                bucket = "my-bucket",
-                directory = "profile",
-                file = file,
-            )
-        ).thenReturn(key)
+        whenever(methodCall = s3Service.putObject(fileType = FileType.TEMP, file = file)).thenReturn(key)
 
         // When & Then
         mockMvc.perform(
