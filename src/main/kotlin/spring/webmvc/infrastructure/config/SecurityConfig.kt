@@ -49,6 +49,7 @@ class SecurityConfig {
     private fun createCorsConfig(corsProperties: CorsProperties): CorsConfigurationSource {
         val config = CorsConfiguration().apply {
             allowedOrigins = corsProperties.allowedOrigins
+            allowedOriginPatterns = corsProperties.allowedOriginPatterns
             allowedMethods = corsProperties.allowedMethods
             allowedHeaders = corsProperties.allowedHeaders
             allowCredentials = true
