@@ -15,6 +15,8 @@ import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.strategy.ProductStrategy
+import spring.webmvc.domain.cache.CacheKey
+import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
@@ -25,9 +27,11 @@ import java.time.Instant
 class ProductServiceTest : DescribeSpec({
     val productRepository = mockk<ProductRepository>()
     val productStrategy = mockk<ProductStrategy>()
+    val valueCache = mockk<ValueCache>()
     val productService = ProductService(
+        valueCache = valueCache,
         productRepository = productRepository,
-        productStrategies = listOf(productStrategy)
+        productStrategies = listOf(productStrategy),
     )
 
     describe("findProducts") {
@@ -108,6 +112,9 @@ class ProductServiceTest : DescribeSpec({
                 every { productStrategy.supports(category) } returns true
                 every { productStrategy.findByProductId(productId) } returns ticketResult
 
+                val key = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
+                every { valueCache.increment(key, 1) } returns 1
+
                 val result = productService.findProduct(id = productId, category = category)
 
                 result.name shouldBe ticketResult.name
@@ -148,6 +155,9 @@ class ProductServiceTest : DescribeSpec({
             every { productStrategy.supports(category) } returns true
             every { productStrategy.createProduct(productCreateCommand = ticketCreateCommand) } returns ticketResult
 
+            val key = CacheKey.PRODUCT_STOCK.generate(productId)
+            every { valueCache.set(key, ticketResult.quantity) } returns Unit
+
             val result = productService.createProduct(ticketCreateCommand)
 
             result.shouldBeInstanceOf<TicketResult>().apply {
@@ -164,104 +174,68 @@ class ProductServiceTest : DescribeSpec({
     }
 
     describe("updateProduct") {
-        context("Product 없을 경우") {
-            it("EntityNotFoundException 발생한다") {
-                val productId = 1L
-                val category = Category.TICKET
+        it("수정 후 반환한다") {
+            val productId = 1L
+            val category = Category.TICKET
 
-                val ticketUpdateCommand = mockk<TicketUpdateCommand>()
-                every { ticketUpdateCommand.category } returns category
+            val ticketUpdateCommand = mockk<TicketUpdateCommand>()
+            every { ticketUpdateCommand.category } returns category
 
-                every { productRepository.findByIdOrNull(productId) } returns null
+            val ticketResult = TicketResult(
+                id = productId,
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 10, createdAt = Instant.now(),
+                ticketId = 1L,
+                place = "place",
+                performanceTime = Instant.now(),
+                duration = "duration",
+                ageLimit = "ageLimit"
+            )
 
-                shouldThrow<EntityNotFoundException> {
-                    productService.updateProduct(id = productId, productUpdateCommand = ticketUpdateCommand)
-                }
-            }
-        }
-
-        context("Product 있을 경우") {
-            it("수정 후 반환한다") {
-                val productId = 1L
-                val category = Category.TICKET
-
-                val ticketUpdateCommand = mockk<TicketUpdateCommand>()
-                every { ticketUpdateCommand.category } returns category
-
-                val product = mockk<Product>()
-                val ticketResult = TicketResult(
-                    id = productId,
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 10, createdAt = Instant.now(),
-                    ticketId = 1L,
-                    place = "place",
-                    performanceTime = Instant.now(),
-                    duration = "duration",
-                    ageLimit = "ageLimit"
+            every { productStrategy.supports(category) } returns true
+            every {
+                productStrategy.updateProduct(
+                    productId = productId,
+                    productUpdateCommand = ticketUpdateCommand
                 )
+            } returns ticketResult
 
-                every { productRepository.findByIdOrNull(productId) } returns product
-                every { productStrategy.supports(category) } returns true
-                every {
-                    productStrategy.updateProduct(
-                        productId = productId,
-                        productUpdateCommand = ticketUpdateCommand
-                    )
-                } returns ticketResult
+            val key = CacheKey.PRODUCT_STOCK.generate(productId)
+            every { valueCache.set(key, ticketResult.quantity) } returns Unit
 
-                val result = productService.updateProduct(
-                    id = productId,
-                    productUpdateCommand = ticketUpdateCommand,
-                )
+            val result = productService.updateProduct(
+                id = productId,
+                productUpdateCommand = ticketUpdateCommand,
+            )
 
-                result.shouldBeInstanceOf<TicketResult>().apply {
-                    name shouldBe ticketResult.name
-                    description shouldBe ticketResult.description
-                    price shouldBe ticketResult.price
-                    quantity shouldBe ticketResult.quantity
-                    place shouldBe ticketResult.place
-                    performanceTime shouldBe ticketResult.performanceTime
-                    duration shouldBe ticketResult.duration
-                    ageLimit shouldBe ticketResult.ageLimit
-                }
+            result.shouldBeInstanceOf<TicketResult>().apply {
+                name shouldBe ticketResult.name
+                description shouldBe ticketResult.description
+                price shouldBe ticketResult.price
+                quantity shouldBe ticketResult.quantity
+                place shouldBe ticketResult.place
+                performanceTime shouldBe ticketResult.performanceTime
+                duration shouldBe ticketResult.duration
+                ageLimit shouldBe ticketResult.ageLimit
             }
         }
     }
 
     describe("deleteProduct") {
-        context("Product 없을 경우") {
-            it("EntityNotFoundException 발생한다") {
-                val category = Category.TICKET
-                val productId = 1L
+        it("Product 삭제한다") {
+            val category = Category.TICKET
+            val productId = 1L
+            val key = CacheKey.PRODUCT_STOCK.generate(productId)
 
-                every { productRepository.findByIdOrNull(productId) } returns null
+            every { productStrategy.supports(category) } returns true
+            every { productStrategy.deleteProduct(productId) } returns Unit
+            every { valueCache.delete(key) } returns true
 
-                shouldThrow<EntityNotFoundException> {
-                    productService.deleteProduct(
-                        category = category,
-                        id = productId
-                    )
-                }
-            }
-        }
+            productService.deleteProduct(category = category, id = productId)
 
-        context("Product 있을 경우") {
-            it("삭제한다") {
-                val category = Category.TICKET
-                val productId = 1L
-
-                val product = mockk<Product>()
-
-                every { productRepository.findByIdOrNull(productId) } returns product
-                every { productStrategy.supports(category) } returns true
-                every { productStrategy.deleteProduct(productId) } returns Unit
-
-                productService.deleteProduct(category = category, id = productId)
-
-                verify(exactly = 1) { productStrategy.deleteProduct(productId) }
-            }
+            verify(exactly = 1) { productStrategy.deleteProduct(productId) }
         }
     }
 })

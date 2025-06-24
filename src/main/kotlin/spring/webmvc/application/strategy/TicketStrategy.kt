@@ -22,11 +22,8 @@ class TicketStrategy(
     override fun supports(category: Category) = category == Category.TICKET
 
     override fun findByProductId(productId: Long): ProductResult {
-        val productKey = CacheKey.PRODUCT.generate(productId)
-        val cache = valueCache.get(key = productKey, clazz = TicketResult::class.java)
-
-        val viewCountKey = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
-        valueCache.increment(viewCountKey, 1)
+        val key = CacheKey.TICKET.generate(productId)
+        val cache = valueCache.get(key = key, clazz = TicketResult::class.java)
 
         if (cache != null) {
             return cache
@@ -36,7 +33,7 @@ class TicketStrategy(
             ?.let { TicketResult(ticket = it) }
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
-        valueCache.set(key = productKey, value = ticketResult, timeout = CacheKey.PRODUCT.timeOut)
+        valueCache.set(key = key, value = ticketResult, timeout = CacheKey.TICKET.timeOut)
 
         return ticketResult
     }
@@ -56,9 +53,6 @@ class TicketStrategy(
                 ageLimit = ticketCreateCommand.ageLimit,
             )
         )
-
-        val key = CacheKey.PRODUCT_STOCK.generate(checkNotNull(ticket.product.id))
-        valueCache.set(key = key, value = ticket.product.quantity)
 
         return TicketResult(ticket)
     }
@@ -80,9 +74,6 @@ class TicketStrategy(
             ageLimit = ticketUpdateCommand.ageLimit,
         )
 
-        val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        valueCache.set(key = key, value = ticket.product.quantity)
-
         return TicketResult(ticket)
     }
 
@@ -90,9 +81,9 @@ class TicketStrategy(
         val ticket = ticketRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
-        val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        valueCache.delete(key = key)
-
         ticketRepository.delete(ticket)
+
+        val key = CacheKey.TICKET.generate(productId)
+        valueCache.delete(key = key)
     }
 }

@@ -7,7 +7,9 @@ enum class CacheKey(
     private val key: String,
     val timeOut: Duration? = null,
 ) {
-    PRODUCT(key = "product:%d", timeOut = Duration.ofHours(1)),
+    FLIGHT(key = "flight:%d", timeOut = Duration.ofHours(1)),
+    ACCOMMODATION(key = "accommodation:%d", timeOut = Duration.ofHours(1)),
+    TICKET(key = "ticket:%d", timeOut = Duration.ofHours(1)),
     PRODUCT_STOCK(key = "product:%d:stock"),
     PRODUCT_VIEW_COUNT(key = "product:%d:view-count"),
     CURATION(key = "curation", timeOut = Duration.ofHours(1)),

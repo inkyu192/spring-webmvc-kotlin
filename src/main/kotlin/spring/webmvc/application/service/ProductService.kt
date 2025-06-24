@@ -7,15 +7,16 @@ import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.strategy.ProductStrategy
-import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.cache.CacheKey
+import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.ProductRepository
-import spring.webmvc.presentation.exception.EntityNotFoundException
 import spring.webmvc.presentation.exception.StrategyNotImplementedException
 
 @Service
 @Transactional(readOnly = true)
 class ProductService(
+    private val valueCache: ValueCache,
     private val productRepository: ProductRepository,
     private val productStrategies: List<ProductStrategy>,
 ) {
@@ -24,35 +25,43 @@ class ProductService(
 
     fun findProduct(category: Category, id: Long): ProductResult {
         val productStrategy = getProductStrategy(category)
+        val productResult = productStrategy.findByProductId(productId = id)
 
-        return productStrategy.findByProductId(productId = id)
+        val key = CacheKey.PRODUCT_VIEW_COUNT.generate(id)
+        valueCache.increment(key, 1)
+
+        return productResult
     }
 
     @Transactional
     fun createProduct(command: ProductCreateCommand): ProductResult {
         val productStrategy = getProductStrategy(category = command.category)
+        val productResult = productStrategy.createProduct(productCreateCommand = command)
 
-        return productStrategy.createProduct(productCreateCommand = command)
+        val key = CacheKey.PRODUCT_STOCK.generate(productResult.id)
+        valueCache.set(key = key, value = productResult.quantity)
+
+        return productResult
     }
 
     @Transactional
     fun updateProduct(id: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
-        productRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(kClass = Product::class, id = id)
-
         val productStrategy = getProductStrategy(category = productUpdateCommand.category)
+        val productResult = productStrategy.updateProduct(productId = id, productUpdateCommand = productUpdateCommand)
 
-        return productStrategy.updateProduct(productId = id, productUpdateCommand = productUpdateCommand)
+        val key = CacheKey.PRODUCT_STOCK.generate(id)
+        valueCache.set(key = key, value = productResult.quantity)
+
+        return productResult
     }
 
     @Transactional
     fun deleteProduct(category: Category, id: Long) {
-        productRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException(kClass = Product::class, id = id)
-
         val productStrategy = getProductStrategy(category = category)
-
         productStrategy.deleteProduct(productId = id)
+
+        val key = CacheKey.PRODUCT_STOCK.generate(id)
+        valueCache.delete(key = key)
     }
 
     private fun getProductStrategy(category: Category) =

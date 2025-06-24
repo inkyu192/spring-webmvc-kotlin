@@ -22,11 +22,8 @@ class FlightStrategy(
     override fun supports(category: Category) = category == Category.FLIGHT
 
     override fun findByProductId(productId: Long): ProductResult {
-        val productKey = CacheKey.PRODUCT.generate(productId)
-        val cache = valueCache.get(key = productKey, clazz = FlightResult::class.java)
-
-        val viewCountKey = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
-        valueCache.increment(viewCountKey, 1)
+        val key = CacheKey.FLIGHT.generate(productId)
+        val cache = valueCache.get(key = key, clazz = FlightResult::class.java)
 
         if (cache != null) {
             return cache
@@ -36,7 +33,7 @@ class FlightStrategy(
             ?.let { FlightResult(flight = it) }
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId))
 
-        valueCache.set(key = productKey, value = flightResult, timeout = CacheKey.PRODUCT.timeOut)
+        valueCache.set(key = key, value = flightResult, timeout = CacheKey.FLIGHT.timeOut)
 
         return flightResult
     }
@@ -58,9 +55,6 @@ class FlightStrategy(
                 arrivalTime = flightCreateCommand.arrivalTime,
             )
         )
-
-        val key = CacheKey.PRODUCT_STOCK.generate(checkNotNull(flight.product.id))
-        valueCache.set(key = key, value = flight.product.quantity)
 
         return FlightResult(flight)
     }
@@ -84,9 +78,6 @@ class FlightStrategy(
             arrivalTime = flightUpdateCommand.arrivalTime,
         )
 
-        val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        valueCache.set(key = key, value = flight.product.quantity)
-
         return FlightResult(flight)
     }
 
@@ -94,9 +85,9 @@ class FlightStrategy(
         val flight = flightRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
 
-        val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        valueCache.delete(key = key)
-
         flightRepository.delete(flight)
+
+        val key = CacheKey.FLIGHT.generate(productId)
+        valueCache.delete(key = key)
     }
 }

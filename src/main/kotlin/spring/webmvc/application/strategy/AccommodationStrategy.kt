@@ -22,11 +22,8 @@ class AccommodationStrategy(
     override fun supports(category: Category) = category == Category.ACCOMMODATION
 
     override fun findByProductId(productId: Long): ProductResult {
-        val productKey = CacheKey.PRODUCT.generate(productId)
-        val cache = valueCache.get(key = productKey, clazz = AccommodationResult::class.java)
-
-        val viewCountKey = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
-        valueCache.increment(viewCountKey, 1)
+        val key = CacheKey.ACCOMMODATION.generate(productId)
+        val cache = valueCache.get(key = key, clazz = AccommodationResult::class.java)
 
         if (cache != null) {
             return cache
@@ -36,7 +33,7 @@ class AccommodationStrategy(
             ?.let { AccommodationResult(accommodation = it) }
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
-        valueCache.set(key = productKey, value = accommodationResult, timeout = CacheKey.PRODUCT.timeOut)
+        valueCache.set(key = key, value = accommodationResult, timeout = CacheKey.ACCOMMODATION.timeOut)
 
         return accommodationResult
     }
@@ -55,9 +52,6 @@ class AccommodationStrategy(
                 checkOutTime = accommodationCreateCommand.checkOutTime
             )
         )
-
-        val key = CacheKey.PRODUCT_STOCK.generate(checkNotNull(accommodation.product.id))
-        valueCache.set(key = key, value = accommodation.product.quantity)
 
         return AccommodationResult(accommodation)
     }
@@ -78,9 +72,6 @@ class AccommodationStrategy(
             checkOutTime = accommodationUpdateCommand.checkOutTime,
         )
 
-        val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        valueCache.set(key = key, value = accommodation.product.quantity)
-
         return AccommodationResult(accommodation)
     }
 
@@ -88,9 +79,9 @@ class AccommodationStrategy(
         val accommodation = accommodationRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
-        val key = CacheKey.PRODUCT_STOCK.generate(productId)
-        valueCache.delete(key = key)
-
         accommodationRepository.delete(accommodation)
+
+        val key = CacheKey.ACCOMMODATION.generate(productId)
+        valueCache.delete(key = key)
     }
 }
