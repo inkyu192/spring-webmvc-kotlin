@@ -22,8 +22,11 @@ class FlightStrategy(
     override fun supports(category: Category) = category == Category.FLIGHT
 
     override fun findByProductId(productId: Long): ProductResult {
-        val key = CacheKey.PRODUCT.generate(productId)
-        val cache = valueCache.get(key = key, clazz = FlightResult::class.java)
+        val productKey = CacheKey.PRODUCT.generate(productId)
+        val cache = valueCache.get(key = productKey, clazz = FlightResult::class.java)
+
+        val viewCountKey = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
+        valueCache.increment(viewCountKey, 1)
 
         if (cache != null) {
             return cache
@@ -33,7 +36,7 @@ class FlightStrategy(
             ?.let { FlightResult(flight = it) }
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId))
 
-        valueCache.set(key = key, value = flightResult, timeout = CacheKey.PRODUCT.timeOut)
+        valueCache.set(key = productKey, value = flightResult, timeout = CacheKey.PRODUCT.timeOut)
 
         return flightResult
     }

@@ -9,6 +9,7 @@ enum class CacheKey(
 ) {
     PRODUCT(key = "product:%d", timeOut = Duration.ofHours(1)),
     PRODUCT_STOCK(key = "product:%d:stock"),
+    PRODUCT_VIEW_COUNT(key = "product:%d:view-count"),
     CURATION(key = "curation", timeOut = Duration.ofHours(1)),
     CURATION_PRODUCT(key = "curation:%d:product", timeOut = Duration.ofHours(1)),
     REFRESH_TOKEN(key = "member:%s:token:refresh", timeOut = Duration.ofDays(7)),

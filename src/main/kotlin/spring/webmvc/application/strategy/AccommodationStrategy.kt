@@ -22,8 +22,11 @@ class AccommodationStrategy(
     override fun supports(category: Category) = category == Category.ACCOMMODATION
 
     override fun findByProductId(productId: Long): ProductResult {
-        val key = CacheKey.PRODUCT.generate(productId)
-        val cache = valueCache.get(key = key, clazz = AccommodationResult::class.java)
+        val productKey = CacheKey.PRODUCT.generate(productId)
+        val cache = valueCache.get(key = productKey, clazz = AccommodationResult::class.java)
+
+        val viewCountKey = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
+        valueCache.increment(viewCountKey, 1)
 
         if (cache != null) {
             return cache
@@ -33,7 +36,7 @@ class AccommodationStrategy(
             ?.let { AccommodationResult(accommodation = it) }
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
-        valueCache.set(key = key, value = accommodationResult, timeout = CacheKey.PRODUCT.timeOut)
+        valueCache.set(key = productKey, value = accommodationResult, timeout = CacheKey.PRODUCT.timeOut)
 
         return accommodationResult
     }
