@@ -19,7 +19,7 @@ class TicketStrategy(
     private val valueCache: ValueCache,
     private val ticketRepository: TicketRepository,
 ) : ProductStrategy {
-    override fun supports(category: Category) = category == Category.TICKET
+    override fun category() = Category.TICKET
 
     override fun findByProductId(productId: Long): ProductResult {
         val key = CacheKey.TICKET.generate(productId)

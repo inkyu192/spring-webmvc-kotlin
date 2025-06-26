@@ -19,7 +19,7 @@ class AccommodationStrategy(
     private val valueCache: ValueCache,
     private val accommodationRepository: AccommodationRepository,
 ) : ProductStrategy {
-    override fun supports(category: Category) = category == Category.ACCOMMODATION
+    override fun category() = Category.ACCOMMODATION
 
     override fun findByProductId(productId: Long): ProductResult {
         val key = CacheKey.ACCOMMODATION.generate(productId)

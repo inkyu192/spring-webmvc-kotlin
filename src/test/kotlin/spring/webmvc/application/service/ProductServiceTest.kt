@@ -26,12 +26,13 @@ import java.time.Instant
 
 class ProductServiceTest : DescribeSpec({
     val productRepository = mockk<ProductRepository>()
+    val productStrategyMap = mockk<Map<Category, ProductStrategy>>()
     val productStrategy = mockk<ProductStrategy>()
     val valueCache = mockk<ValueCache>()
     val productService = ProductService(
         valueCache = valueCache,
         productRepository = productRepository,
-        productStrategies = listOf(productStrategy),
+        productStrategyMap = productStrategyMap,
     )
 
     describe("findProducts") {
@@ -83,7 +84,7 @@ class ProductServiceTest : DescribeSpec({
                 val productId = 1L
                 val category = Category.TICKET
 
-                every { productStrategy.supports(category) } returns true
+                every { productStrategyMap[category] } returns productStrategy
                 every { productStrategy.findByProductId(productId) } throws EntityNotFoundException(
                     kClass = Ticket::class,
                     id = productId
@@ -109,7 +110,7 @@ class ProductServiceTest : DescribeSpec({
                     ageLimit = "ageLimit"
                 )
 
-                every { productStrategy.supports(category) } returns true
+                every { productStrategyMap[category] } returns productStrategy
                 every { productStrategy.findByProductId(productId) } returns ticketResult
 
                 val key = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
@@ -152,7 +153,7 @@ class ProductServiceTest : DescribeSpec({
                 ageLimit = "ageLimit"
             )
 
-            every { productStrategy.supports(category) } returns true
+            every { productStrategyMap[category] } returns productStrategy
             every { productStrategy.createProduct(productCreateCommand = ticketCreateCommand) } returns ticketResult
 
             val key = CacheKey.PRODUCT_STOCK.generate(productId)
@@ -194,7 +195,7 @@ class ProductServiceTest : DescribeSpec({
                 ageLimit = "ageLimit"
             )
 
-            every { productStrategy.supports(category) } returns true
+            every { productStrategyMap[category] } returns productStrategy
             every {
                 productStrategy.updateProduct(
                     productId = productId,
@@ -229,7 +230,7 @@ class ProductServiceTest : DescribeSpec({
             val productId = 1L
             val key = CacheKey.PRODUCT_STOCK.generate(productId)
 
-            every { productStrategy.supports(category) } returns true
+            every { productStrategyMap[category] } returns productStrategy
             every { productStrategy.deleteProduct(productId) } returns Unit
             every { valueCache.delete(key) } returns true
 

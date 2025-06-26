@@ -18,13 +18,14 @@ import spring.webmvc.presentation.exception.StrategyNotImplementedException
 class ProductService(
     private val valueCache: ValueCache,
     private val productRepository: ProductRepository,
-    private val productStrategies: List<ProductStrategy>,
+    private val productStrategyMap: Map<Category, ProductStrategy>,
 ) {
     fun findProducts(pageable: Pageable, name: String?) =
         productRepository.findAll(pageable = pageable, name = name).map { ProductResult(product = it) }
 
     fun findProduct(category: Category, id: Long): ProductResult {
-        val productStrategy = getProductStrategy(category)
+        val productStrategy = productStrategyMap[category]
+            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
         val productResult = productStrategy.findByProductId(productId = id)
 
         val key = CacheKey.PRODUCT_VIEW_COUNT.generate(id)
@@ -35,7 +36,8 @@ class ProductService(
 
     @Transactional
     fun createProduct(command: ProductCreateCommand): ProductResult {
-        val productStrategy = getProductStrategy(category = command.category)
+        val productStrategy = productStrategyMap[command.category]
+            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = command.category)
         val productResult = productStrategy.createProduct(productCreateCommand = command)
 
         val key = CacheKey.PRODUCT_STOCK.generate(productResult.id)
@@ -46,7 +48,11 @@ class ProductService(
 
     @Transactional
     fun updateProduct(id: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
-        val productStrategy = getProductStrategy(category = productUpdateCommand.category)
+        val productStrategy = productStrategyMap[productUpdateCommand.category]
+            ?: throw StrategyNotImplementedException(
+                kClass = ProductStrategy::class,
+                category = productUpdateCommand.category
+            )
         val productResult = productStrategy.updateProduct(productId = id, productUpdateCommand = productUpdateCommand)
 
         val key = CacheKey.PRODUCT_STOCK.generate(id)
@@ -57,14 +63,11 @@ class ProductService(
 
     @Transactional
     fun deleteProduct(category: Category, id: Long) {
-        val productStrategy = getProductStrategy(category = category)
+        val productStrategy = productStrategyMap[category]
+            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
         productStrategy.deleteProduct(productId = id)
 
         val key = CacheKey.PRODUCT_STOCK.generate(id)
         valueCache.delete(key = key)
     }
-
-    private fun getProductStrategy(category: Category) =
-        productStrategies.firstOrNull { it.supports(category) }
-            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
 }

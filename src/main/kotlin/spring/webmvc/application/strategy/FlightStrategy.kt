@@ -19,7 +19,7 @@ class FlightStrategy(
     private val valueCache: ValueCache,
     private val flightRepository: FlightRepository,
 ) : ProductStrategy {
-    override fun supports(category: Category) = category == Category.FLIGHT
+    override fun category() = Category.FLIGHT
 
     override fun findByProductId(productId: Long): ProductResult {
         val key = CacheKey.FLIGHT.generate(productId)
