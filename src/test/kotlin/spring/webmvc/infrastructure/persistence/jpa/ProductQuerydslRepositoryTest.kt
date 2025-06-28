@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.persistence.querydsl
+package spring.webmvc.infrastructure.persistence.jpa
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import io.kotest.core.spec.style.DescribeSpec
@@ -10,12 +10,10 @@ import org.springframework.data.domain.Pageable
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.DataJpaTestConfig
-import spring.webmvc.infrastructure.config.QuerydslTestConfig
 import spring.webmvc.infrastructure.persistence.ProductQuerydslRepository
-import spring.webmvc.infrastructure.persistence.jpa.ProductJpaRepository
 
 @DataJpaTest
-@Import(DataJpaTestConfig::class, QuerydslTestConfig::class)
+@Import(DataJpaTestConfig::class)
 class ProductQuerydslRepositoryTest(
     jpaQueryFactory: JPAQueryFactory,
     private val productJpaRepository: ProductJpaRepository,

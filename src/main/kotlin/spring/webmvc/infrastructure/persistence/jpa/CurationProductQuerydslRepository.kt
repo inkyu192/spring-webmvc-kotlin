@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.persistence.querydsl
+package spring.webmvc.infrastructure.persistence.jpa
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
