@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.DataJpaTestConfig
-import spring.webmvc.infrastructure.persistence.ProductQuerydslRepository
 
 @DataJpaTest
 @Import(DataJpaTestConfig::class)

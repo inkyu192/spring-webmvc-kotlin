@@ -4,7 +4,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.repository.ProductRepository
-import spring.webmvc.infrastructure.persistence.ProductQuerydslRepository
+import spring.webmvc.infrastructure.persistence.jpa.ProductQuerydslRepository
 import spring.webmvc.infrastructure.persistence.jpa.ProductJpaRepository
 
 @Component
