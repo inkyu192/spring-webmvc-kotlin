@@ -100,3 +100,11 @@ tasks.register<Copy>("copyAsciidoc") {
 tasks.named("build") {
 	dependsOn("copyAsciidoc")
 }
+
+tasks.bootBuildImage {
+	val requiredProps = listOf("registry", "repositoryAlias", "repositoryName", "imageTag")
+	if (requiredProps.all { project.hasProperty(it) }) {
+		val (registry, repositoryAlias, repository, imageTag) = requiredProps.map { project.property(it) }
+		imageName.set("$registry/$repositoryAlias/$repository:$imageTag")
+	}
+}
