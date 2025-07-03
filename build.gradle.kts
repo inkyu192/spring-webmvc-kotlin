@@ -102,7 +102,7 @@ tasks.named("build") {
 }
 
 tasks.bootBuildImage {
-	val requiredProps = listOf("registry", "repositoryAlias", "repositoryName", "imageTag")
+	val requiredProps = listOf("registry", "repositoryAlias", "repository", "imageTag")
 	if (requiredProps.all { project.hasProperty(it) }) {
 		val (registry, repositoryAlias, repository, imageTag) = requiredProps.map { project.property(it) }
 		imageName.set("$registry/$repositoryAlias/$repository:$imageTag")
