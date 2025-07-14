@@ -39,5 +39,8 @@ out/
 ### Kotlin ###
 .kotlin
 
-### REST Docs ###
+### Spring REST Docs ###
 /src/main/resources/static/docs/
+
+### SDKMAN ###
+.sdkmanrc
