@@ -1,17 +1,21 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.presentation.dto.request.AccommodationCreateRequest
+import spring.webmvc.domain.model.enums.Category
+import java.time.Instant
 
 class AccommodationCreateCommand(
-    accommodationCreateRequest: AccommodationCreateRequest
+    category: Category,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+    val place: String,
+    val checkInTime: Instant,
+    val checkOutTime: Instant,
 ) : ProductCreateCommand(
-    category = accommodationCreateRequest.category,
-    name = accommodationCreateRequest.name,
-    description = accommodationCreateRequest.description,
-    price = accommodationCreateRequest.price,
-    quantity = accommodationCreateRequest.quantity
-) {
-    val place = accommodationCreateRequest.place
-    val checkInTime = accommodationCreateRequest.checkInTime
-    val checkOutTime = accommodationCreateRequest.checkOutTime
-}
+    category = category,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity
+)

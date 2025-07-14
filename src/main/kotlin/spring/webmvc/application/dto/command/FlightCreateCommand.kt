@@ -1,20 +1,24 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.presentation.dto.request.FlightCreateRequest
+import spring.webmvc.domain.model.enums.Category
+import java.time.Instant
 
 class FlightCreateCommand(
-    flightCreateRequest: FlightCreateRequest
+    category: Category,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+    val airline: String,
+    val flightNumber: String,
+    val departureAirport: String,
+    val arrivalAirport: String,
+    val departureTime: Instant,
+    val arrivalTime: Instant,
 ) : ProductCreateCommand(
-    category = flightCreateRequest.category,
-    name = flightCreateRequest.name,
-    description = flightCreateRequest.description,
-    price = flightCreateRequest.price,
-    quantity = flightCreateRequest.quantity
-) {
-    val airline = flightCreateRequest.airline
-    val flightNumber = flightCreateRequest.flightNumber
-    val departureAirport = flightCreateRequest.departureAirport
-    val arrivalAirport = flightCreateRequest.arrivalAirport
-    val departureTime = flightCreateRequest.departureTime
-    val arrivalTime = flightCreateRequest.arrivalTime
-}
+    category = category,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity
+)

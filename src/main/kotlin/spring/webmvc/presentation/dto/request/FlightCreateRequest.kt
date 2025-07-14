@@ -1,5 +1,7 @@
 package spring.webmvc.presentation.dto.request
 
+import spring.webmvc.application.dto.command.FlightCreateCommand
+import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
@@ -15,4 +17,25 @@ class FlightCreateRequest(
     val arrivalAirport: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
-) : ProductCreateRequest(category, name, description, price, quantity)
+) : ProductCreateRequest(
+    category = category,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity
+) {
+    override fun toCommand() =
+        FlightCreateCommand(
+            category = category,
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            airline = airline,
+            flightNumber = flightNumber,
+            departureAirport = departureAirport,
+            arrivalAirport = arrivalAirport,
+            departureTime = departureTime,
+            arrivalTime = arrivalTime,
+        )
+}

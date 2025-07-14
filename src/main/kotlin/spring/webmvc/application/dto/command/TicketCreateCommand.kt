@@ -1,18 +1,22 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.presentation.dto.request.TicketCreateRequest
+import spring.webmvc.domain.model.enums.Category
+import java.time.Instant
 
 class TicketCreateCommand(
-    ticketCreateRequest: TicketCreateRequest
+    category: Category,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+    val place: String,
+    val performanceTime: Instant,
+    val duration: String,
+    val ageLimit: String,
 ) : ProductCreateCommand(
-    category = ticketCreateRequest.category,
-    name = ticketCreateRequest.name,
-    description = ticketCreateRequest.description,
-    price = ticketCreateRequest.price,
-    quantity = ticketCreateRequest.quantity
-) {
-    val place = ticketCreateRequest.place
-    val performanceTime = ticketCreateRequest.performanceTime
-    val duration = ticketCreateRequest.duration
-    val ageLimit = ticketCreateRequest.ageLimit
-}
+    category = category,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity
+)
