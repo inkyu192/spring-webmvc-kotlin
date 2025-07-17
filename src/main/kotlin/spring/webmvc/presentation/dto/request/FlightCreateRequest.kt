@@ -22,7 +22,7 @@ class FlightCreateRequest(
     name = name,
     description = description,
     price = price,
-    quantity = quantity
+    quantity = quantity,
 ) {
     override fun toCommand() =
         FlightCreateCommand(
