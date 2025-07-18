@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.infrastructure.aspect.RequestLock
@@ -23,8 +22,8 @@ class OrderController(
     @RequestLock
     @ResponseStatus(HttpStatus.CREATED)
     fun createOrder(@RequestBody @Validated orderCreateRequest: OrderCreateRequest): OrderResponse {
-        val orderCreateCommand = OrderCreateCommand(orderCreateRequest = orderCreateRequest)
-        return OrderResponse(order = orderService.createOrder(orderCreateCommand = orderCreateCommand))
+        val command = orderCreateRequest.toCommand()
+        return OrderResponse(order = orderService.createOrder(orderCreateCommand = command))
     }
 
     @GetMapping
