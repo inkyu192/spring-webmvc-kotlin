@@ -21,7 +21,7 @@ class CurationController(
     @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     fun createCuration(@Valid @RequestBody request: CurationCreateRequest): CurationResponse {
-        val command = CurationCreateCommand(curationCreateRequest = request)
+        val command = request.toCommand()
         return CurationResponse(curationResult = curationService.createCuration(command))
     }
 
