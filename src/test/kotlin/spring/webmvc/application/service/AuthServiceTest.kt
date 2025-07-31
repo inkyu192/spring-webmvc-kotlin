@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.domain.cache.CacheKey
 import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.infrastructure.security.JwtProvider
 
@@ -32,44 +33,44 @@ class AuthServiceTest : DescribeSpec({
     describe("login") {
         context("Member 엔티티 없을 경우") {
             it("BadCredentialsException 발생한다") {
-                val account = "account"
+                val email = "test@gmail.com"
                 val password = "password"
 
-                every { memberRepository.findByAccount(account = account) } returns null
+                every { memberRepository.findByEmail(email = any<Email>()) } returns null
 
-                shouldThrow<BadCredentialsException> { authService.login(account = account, password = password) }
+                shouldThrow<BadCredentialsException> { authService.login(email = email, password = password) }
             }
         }
 
         context("비밀번호가 일치하지 않을 경우") {
             it("BadCredentialsException 발생한다") {
-                val account = "account"
+                val email = "test@gmail.com"
                 val password = "password"
                 val member = mockk<Member>(relaxed = true)
 
-                every { memberRepository.findByAccount(account = account) } returns member
+                every { memberRepository.findByEmail(email = any<Email>()) } returns member
                 every { passwordEncoder.matches(password, member.password) } returns false
 
-                shouldThrow<BadCredentialsException> { authService.login(account = account, password = password) }
+                shouldThrow<BadCredentialsException> { authService.login(email = email, password = password) }
             }
         }
 
         context("유효성 검사 성공할 경우") {
             it("Token 저장 후 반환한다") {
-                val account = "account"
+                val email = "test@gmail.com"
                 val password = "password"
                 val accessToken = "accessToken"
                 val refreshToken = "refreshToken"
 
                 val member = mockk<Member>(relaxed = true)
 
-                every { memberRepository.findByAccount(account = account) } returns member
+                every { memberRepository.findByEmail(email = any<Email>()) } returns member
                 every { passwordEncoder.matches(any(), any()) } returns true
                 every { jwtProvider.createAccessToken(memberId = any(), permissions = any()) } returns accessToken
                 every { jwtProvider.createRefreshToken() } returns refreshToken
                 every { valueCache.set(key = any(), value = any<String>(), timeout = any()) } returns Unit
 
-                val result = authService.login(account = account, password = password)
+                val result = authService.login(email = email, password = password)
 
                 verify(exactly = 1) { valueCache.set(key = any(), value = any<String>(), timeout = any()) }
                 result.accessToken shouldBe accessToken

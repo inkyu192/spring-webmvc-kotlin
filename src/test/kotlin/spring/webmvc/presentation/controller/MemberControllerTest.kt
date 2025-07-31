@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.MemberService
 import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import java.time.Instant
 import java.time.LocalDate
@@ -52,7 +54,7 @@ class MemberControllerTest() {
 
     @Test
     fun createMember() {
-        val account = "test@gmail.com"
+        val email = "test@gmail.com"
         val password = "password"
         val name = "name"
         val phone = "010-1234-1234"
@@ -62,15 +64,15 @@ class MemberControllerTest() {
 
         val member = mock<Member>()
         whenever(member.id).thenReturn(1L)
-        whenever(member.account).thenReturn(account)
+        whenever(member.email).thenReturn(Email.create(email))
         whenever(member.name).thenReturn(name)
-        whenever(member.phone).thenReturn(phone)
+        whenever(member.phone).thenReturn(Phone.create(phone))
         whenever(member.birthDate).thenReturn(birthDate)
         whenever(member.createdAt).thenReturn(Instant.now())
 
         whenever(
             memberService.createMember(
-                account = account,
+                email = email,
                 password = password,
                 name = name,
                 phone = phone,
@@ -86,7 +88,7 @@ class MemberControllerTest() {
                 .content(
                     """
                         {
-                          "account": "$account",
+                          "email": "$email",
                           "password": "$password",
                           "name": "$name",
                           "phone": "$phone",
@@ -102,7 +104,7 @@ class MemberControllerTest() {
                 MockMvcRestDocumentation.document(
                     "member-create",
                     PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("account").description("계정"),
+                        PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("password").description("패스워드"),
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("phone").description("번호"),
@@ -112,7 +114,7 @@ class MemberControllerTest() {
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("account").description("계정"),
+                        PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("phone").description("번호"),
                         PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
@@ -126,9 +128,9 @@ class MemberControllerTest() {
     fun findMember() {
         val member = mock<Member>()
         whenever(member.id).thenReturn(1L)
-        whenever(member.account).thenReturn("account")
+        whenever(member.email).thenReturn(Email.create("test@gmail.com"))
         whenever(member.name).thenReturn("name")
-        whenever(member.phone).thenReturn("010-1234-1234")
+        whenever(member.phone).thenReturn(Phone.create("010-1234-1234"))
         whenever(member.birthDate).thenReturn(LocalDate.now())
         whenever(member.createdAt).thenReturn(Instant.now())
 
@@ -147,7 +149,7 @@ class MemberControllerTest() {
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("account").description("계정"),
+                        PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("phone").description("번호"),
                         PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
@@ -166,9 +168,9 @@ class MemberControllerTest() {
 
         val member = mock<Member>()
         whenever(member.id).thenReturn(1L)
-        whenever(member.account).thenReturn("account")
+        whenever(member.email).thenReturn(Email.create("test@gmail.com"))
         whenever(member.name).thenReturn(name)
-        whenever(member.phone).thenReturn(phone)
+        whenever(member.phone).thenReturn(Phone.create(phone))
         whenever(member.birthDate).thenReturn(birthDate)
         whenever(member.createdAt).thenReturn(Instant.now())
 
@@ -211,7 +213,7 @@ class MemberControllerTest() {
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("account").description("계정"),
+                        PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("phone").description("번호"),
                         PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),

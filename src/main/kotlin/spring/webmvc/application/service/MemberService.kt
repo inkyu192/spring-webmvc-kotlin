@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.event.NotificationEvent
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.entity.Role
+import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.RoleRepository
 import spring.webmvc.infrastructure.security.SecurityContextUtil
@@ -25,7 +26,7 @@ class MemberService(
 ) {
     @Transactional
     fun createMember(
-        account: String,
+        email: String,
         password: String,
         name: String,
         phone: String,
@@ -33,12 +34,12 @@ class MemberService(
         roleIds: List<Long>,
         permissionIds: List<Long>,
     ): Member {
-        if (memberRepository.existsByAccount(account)) {
-            throw DuplicateEntityException(kClass = Member::class, name = account)
+        if (memberRepository.existsByEmail(Email.create(email))) {
+            throw DuplicateEntityException(kClass = Member::class, name = email)
         }
 
         val member = Member.create(
-            account = account,
+            email = email,
             password = passwordEncoder.encode(password),
             name = name,
             phone = phone,

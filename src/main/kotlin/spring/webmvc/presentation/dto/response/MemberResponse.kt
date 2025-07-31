@@ -6,7 +6,7 @@ import java.time.LocalDate
 
 data class MemberResponse(
     val id: Long,
-    val account: String,
+    val email: String,
     val name: String,
     val phone: String,
     val birthDate: LocalDate,
@@ -14,9 +14,9 @@ data class MemberResponse(
 ) {
     constructor(member: Member) : this(
         id = checkNotNull(member.id),
-        account = member.account,
+        email = member.email.value,
         name = member.name,
-        phone = member.phone,
+        phone = member.phone.value,
         birthDate = member.birthDate,
         createdAt = member.createdAt,
     )

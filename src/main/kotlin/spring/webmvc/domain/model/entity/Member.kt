@@ -2,15 +2,17 @@ package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
 import spring.webmvc.domain.converter.CryptoAttributeConverter
+import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.vo.Phone
 import java.time.LocalDate
 
 @Entity
 class Member protected constructor(
-    @Convert(converter = CryptoAttributeConverter::class)
-    val account: String,
+    @Embedded
+    val email: Email,
     password: String,
     name: String,
-    phone: String,
+    phone: Phone,
     birthDate: LocalDate,
 ) : BaseTime() {
     @Id
@@ -25,7 +27,7 @@ class Member protected constructor(
     var name = name
         protected set
 
-    @Convert(converter = CryptoAttributeConverter::class)
+    @Embedded
     var phone = phone
         protected set
 
@@ -48,16 +50,16 @@ class Member protected constructor(
 
     companion object {
         fun create(
-            account: String,
+            email: String,
             password: String,
             name: String,
             phone: String,
             birthDate: LocalDate,
         ) = Member(
-            account = account,
+            email = Email.create(email),
             password = password,
             name = name,
-            phone = phone,
+            phone = Phone.create(phone),
             birthDate = birthDate,
         )
     }
@@ -73,7 +75,7 @@ class Member protected constructor(
     fun update(password: String?, name: String?, phone: String?, birthDate: LocalDate?) {
         password?.let { this.password = password }
         name?.let { this.name = name }
-        phone?.let { this.phone = phone }
+        phone?.let { this.phone = Phone.create(phone) }
         birthDate?.let { this.birthDate = birthDate }
     }
 }

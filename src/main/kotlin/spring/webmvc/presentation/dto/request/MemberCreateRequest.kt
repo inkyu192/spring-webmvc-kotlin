@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 data class MemberCreateRequest(
     @field:Email
-    val account: String,
+    val email: String,
     val password: String,
     val name: String,
     @field:Pattern(regexp = "^010-\\d{3,4}-\\d{4}$")

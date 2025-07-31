@@ -19,7 +19,7 @@ class AuthController(
     fun login(@RequestBody @Validated memberLoginRequest: MemberLoginRequest) =
         TokenResponse(
             tokenResult = authService.login(
-                account = memberLoginRequest.account,
+                email = memberLoginRequest.email,
                 password = memberLoginRequest.password
             )
         )

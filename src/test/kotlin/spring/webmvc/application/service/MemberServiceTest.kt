@@ -11,6 +11,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.RoleRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
@@ -61,9 +63,9 @@ class MemberServiceTest : DescribeSpec({
                 val memberId = 1L
                 val member = mockk<Member> {
                     every { id } returns memberId
-                    every { account } returns "test@gmail.com"
+                    every { email } returns Email.create("test@gmail.com")
                     every { name } returns "name"
-                    every { phone } returns "010-1234-1234"
+                    every { phone } returns Phone.create("010-1234-1234")
                     every { birthDate } returns LocalDate.now()
                     every { createdAt } returns Instant.now()
                 }
@@ -73,7 +75,7 @@ class MemberServiceTest : DescribeSpec({
                 val result = memberService.findMember()
 
                 result.id shouldBe memberId
-                result.account shouldBe member.account
+                result.email shouldBe member.email
                 result.name shouldBe member.name
                 result.phone shouldBe member.phone
                 result.birthDate shouldBe member.birthDate
