@@ -1,17 +1,21 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.presentation.dto.request.AccommodationUpdateRequest
+import spring.webmvc.domain.model.enums.Category
+import java.time.Instant
 
 class AccommodationUpdateCommand(
-    accommodationUpdateRequest: AccommodationUpdateRequest
+    category: Category,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+    val place: String,
+    val checkInTime: Instant,
+    val checkOutTime: Instant,
 ) : ProductUpdateCommand(
-    category = accommodationUpdateRequest.category,
-    name = accommodationUpdateRequest.name,
-    description = accommodationUpdateRequest.description,
-    price = accommodationUpdateRequest.price,
-    quantity = accommodationUpdateRequest.quantity
-) {
-    val place = accommodationUpdateRequest.place
-    val checkInTime = accommodationUpdateRequest.checkInTime
-    val checkOutTime = accommodationUpdateRequest.checkOutTime
-}
+    category = category,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity,
+)

@@ -1,5 +1,6 @@
 package spring.webmvc.presentation.dto.request
 
+import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
@@ -13,4 +14,23 @@ class TicketUpdateRequest(
     val performanceTime: Instant,
     val duration: String,
     val ageLimit: String,
-) : ProductUpdateRequest(category, name, description, price, quantity)
+) : ProductUpdateRequest(
+    category = category,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity,
+) {
+    override fun toCommand() =
+        TicketUpdateCommand(
+            category = category,
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            place = place,
+            performanceTime = performanceTime,
+            duration = duration,
+            ageLimit = ageLimit,
+        )
+}

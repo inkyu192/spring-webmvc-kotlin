@@ -9,6 +9,7 @@ import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.domain.cache.CacheKey
 import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.infrastructure.security.JwtProvider
 import spring.webmvc.presentation.exception.EntityNotFoundException
@@ -22,8 +23,8 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
 ) {
     @Transactional
-    fun login(account: String, password: String): TokenResult {
-        val member = memberRepository.findByAccount(account)
+    fun login(email: String, password: String): TokenResult {
+        val member = memberRepository.findByEmail(Email.create(email))
             ?.takeIf { passwordEncoder.matches(password, it.password) }
             ?: throw BadCredentialsException("잘못된 아이디 또는 비밀번호입니다.")
 

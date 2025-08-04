@@ -24,7 +24,7 @@ class MemberController(
 
         return MemberResponse(
             member = memberService.createMember(
-                account = memberCreateRequest.account,
+                email = memberCreateRequest.email,
                 password = memberCreateRequest.password,
                 name = memberCreateRequest.name,
                 phone = memberCreateRequest.phone,

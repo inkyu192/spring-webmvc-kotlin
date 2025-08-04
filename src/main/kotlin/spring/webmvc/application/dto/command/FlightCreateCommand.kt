@@ -20,5 +20,5 @@ class FlightCreateCommand(
     name = name,
     description = description,
     price = price,
-    quantity = quantity
+    quantity = quantity,
 )

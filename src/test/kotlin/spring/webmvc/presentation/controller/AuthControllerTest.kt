@@ -48,12 +48,12 @@ class AuthControllerTest() {
     fun login() {
         val accessToken = "accessToken"
         val refreshToken = "refreshToken"
-        val account = "test@gmail.com"
+        val email = "test@gmail.com"
         val password = "password"
 
         val tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
 
-        whenever(authService.login(account = account, password = password)).thenReturn(tokenResult)
+        whenever(authService.login(email = email, password = password)).thenReturn(tokenResult)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/login")
@@ -61,7 +61,7 @@ class AuthControllerTest() {
                 .content(
                     """
                         {
-                          "account": "$account",
+                          "email": "$email",
                           "password": "$password"
                         }
                     """.trimIndent()
@@ -72,7 +72,7 @@ class AuthControllerTest() {
                 MockMvcRestDocumentation.document(
                     "login",
                     PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("account").description("계정"),
+                        PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("password").description("패스워드")
                     ),
                     PayloadDocumentation.responseFields(

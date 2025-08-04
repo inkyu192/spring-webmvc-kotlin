@@ -4,6 +4,6 @@ import jakarta.validation.constraints.Email
 
 data class MemberLoginRequest(
     @field:Email
-    val account: String,
+    val email: String,
     val password: String,
 )

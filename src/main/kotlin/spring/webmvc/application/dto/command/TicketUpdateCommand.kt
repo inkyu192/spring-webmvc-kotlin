@@ -1,18 +1,23 @@
 package spring.webmvc.application.dto.command
 
+import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.presentation.dto.request.TicketUpdateRequest
+import java.time.Instant
 
 class TicketUpdateCommand(
-    ticketUpdateRequest: TicketUpdateRequest
+    category: Category,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+    val place: String,
+    val performanceTime: Instant,
+    val duration: String,
+    val ageLimit: String,
 ) : ProductUpdateCommand(
-    category = ticketUpdateRequest.category,
-    name = ticketUpdateRequest.name,
-    description = ticketUpdateRequest.description,
-    price = ticketUpdateRequest.price,
-    quantity = ticketUpdateRequest.quantity
-) {
-    val place = ticketUpdateRequest.place
-    val performanceTime = ticketUpdateRequest.performanceTime
-    val duration = ticketUpdateRequest.duration
-    val ageLimit = ticketUpdateRequest.ageLimit
-}
+    category = category,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity,
+)
