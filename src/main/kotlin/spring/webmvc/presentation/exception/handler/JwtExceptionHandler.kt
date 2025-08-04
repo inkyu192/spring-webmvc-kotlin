@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import spring.webmvc.infrastructure.common.UriFactory
 import spring.webmvc.infrastructure.common.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
 
 @Component
 class JwtExceptionHandler(

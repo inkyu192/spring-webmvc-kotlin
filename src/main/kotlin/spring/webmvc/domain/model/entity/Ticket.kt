@@ -1,14 +1,6 @@
 package spring.webmvc.domain.model.entity
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.ConstraintMode
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.ForeignKey
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
+import jakarta.persistence.*
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 

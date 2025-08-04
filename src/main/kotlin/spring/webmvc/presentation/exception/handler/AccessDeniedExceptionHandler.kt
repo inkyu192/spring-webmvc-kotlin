@@ -7,8 +7,8 @@ import org.springframework.http.ProblemDetail
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
-import spring.webmvc.infrastructure.common.UriFactory
 import spring.webmvc.infrastructure.common.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
 
 @Component
 class AccessDeniedExceptionHandler(

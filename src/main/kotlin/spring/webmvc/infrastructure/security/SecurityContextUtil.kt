@@ -1,9 +1,7 @@
 package spring.webmvc.infrastructure.security
 
 import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import java.util.stream.Collectors
 
 object SecurityContextUtil {
     fun getMemberId(): Long {

@@ -7,8 +7,8 @@ import org.springframework.http.ProblemDetail
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
-import spring.webmvc.infrastructure.common.UriFactory
 import spring.webmvc.infrastructure.common.ResponseWriter
+import spring.webmvc.infrastructure.common.UriFactory
 
 @Component
 class AuthenticationExceptionHandler(

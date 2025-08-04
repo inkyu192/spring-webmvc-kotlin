@@ -1,7 +1,6 @@
 package spring.webmvc.presentation.dto.request
 
 import spring.webmvc.application.dto.command.FlightCreateCommand
-import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
