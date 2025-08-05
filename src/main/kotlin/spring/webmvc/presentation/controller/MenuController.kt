@@ -21,7 +21,6 @@ class MenuController(
                 parentId = menuCreateRequest.parentId,
                 name = menuCreateRequest.name,
                 path = menuCreateRequest.path,
-                permissionIds = menuCreateRequest.permissionIds
             )
         )
 

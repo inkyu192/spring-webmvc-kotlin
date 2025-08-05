@@ -12,36 +12,41 @@ import spring.webmvc.presentation.exception.EntityNotFoundException
 @Transactional(readOnly = true)
 class MenuService(
     private val menuRepository: MenuRepository,
-    private val permissionService: PermissionService,
 ) {
     @Transactional
-    fun createMenu(parentId: Long?, name: String, path: String?, permissionIds: List<Long>): MenuResult {
-        val menu = Menu.create(name, path)
-
-        val parent = if (parentId != null) {
-            menuRepository.findByIdOrNull(parentId)
-                ?: throw EntityNotFoundException(kClass = Menu::class, id = parentId)
+    fun createMenu(parentId: Long?, name: String, path: String?): MenuResult {
+        val menu = if (parentId == null) {
+            Menu.create(name, path)
         } else {
-            null
+            val parent = menuRepository.findByIdOrNull(parentId)
+                ?: throw EntityNotFoundException(kClass = Menu::class, id = parentId)
+
+            Menu.create(name, path, parent)
         }
 
-        if (parent != null) {
-            menu.updateParent(parent)
-        }
+        menuRepository.save(menu)
 
-        permissionService.addPermission(
-            permissionIds = permissionIds,
-            consumer = menu::addPermission,
-        )
-
-        return MenuResult(menu = menuRepository.save(menu))
+        return mapToResult(menu)
     }
 
     fun findMenus(): List<MenuResult> {
         val permissions = SecurityContextUtil.getAuthorities()
 
-        return menuRepository.findAllByPermissionNameIn(permissions)
-            .filter { it.parent == null }
-            .map { MenuResult(menu = it) }
+        return menuRepository.findRootMenus(permissions)
+            .map { mapToResult(menu = it) }
+    }
+
+    private fun mapToResult(menu: Menu): MenuResult {
+        val permissions = SecurityContextUtil.getAuthorities()
+        val childMenus = menuRepository.findChildMenus(
+            permissions = permissions,
+            parentId = checkNotNull(menu.id)
+        )
+
+        return MenuResult(
+            id = checkNotNull(menu.id),
+            name = menu.name,
+            path = menu.path,
+            children = childMenus.map { mapToResult(menu = it) })
     }
 }

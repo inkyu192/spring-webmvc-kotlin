@@ -12,8 +12,10 @@ class MenuRepositoryAdapter(
 ) : MenuRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 
-    override fun findAllByPermissionNameIn(permissions: Iterable<String>) =
-        jpaRepository.findAllByPermissionNameIn(permissions)
+    override fun findRootMenus(permissions: Iterable<String>) = jpaRepository.findRootMenus(permissions)
+
+    override fun findChildMenus(permissions: Iterable<String>, parentId: Long) =
+        jpaRepository.findChildMenus(permissions, parentId)
 
     override fun save(menu: Menu) = jpaRepository.save(menu)
 

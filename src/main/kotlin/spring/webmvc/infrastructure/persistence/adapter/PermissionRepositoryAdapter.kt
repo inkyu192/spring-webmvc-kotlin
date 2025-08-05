@@ -11,4 +11,5 @@ class PermissionRepositoryAdapter(
 ) : PermissionRepository {
     override fun findAllById(ids: Iterable<Long>): List<Permission> = jpaRepository.findAllById(ids)
     override fun save(permission: Permission) = jpaRepository.save(permission)
+    override fun saveAll(permissions: Iterable<Permission>) = jpaRepository.saveAll(permissions)
 }

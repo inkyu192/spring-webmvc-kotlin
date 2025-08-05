@@ -5,4 +5,5 @@ import spring.webmvc.domain.model.entity.Permission
 interface PermissionRepository {
     fun findAllById(ids: Iterable<Long>): List<Permission>
     fun save(permission: Permission): Permission
+    fun saveAll(permissions: Iterable<Permission>): List<Permission>
 }

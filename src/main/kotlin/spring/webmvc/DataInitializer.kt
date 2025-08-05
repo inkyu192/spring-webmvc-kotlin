@@ -19,20 +19,64 @@ class DataInitializer(
     private val permissionRepository: PermissionRepository,
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
+        // 메뉴 생성
+        val product = Menu.create("상품 관리", "/products")
+        val order = Menu.create("주문 관리", "/orders")
+        val settings = Menu.create("설정")
+        val permissionManage = Menu.create("권한 관리", "/permissions", settings)
+        val menuManage = Menu.create("메뉴 관리", "/menus", settings)
+        val roleManage = Menu.create("역할 관리", "/roles", settings)
 
+        menuRepository.saveAll(
+            listOf(
+                product,
+                order,
+                settings,
+                permissionManage,
+                menuManage,
+                roleManage
+            )
+        )
 
         // 권한 생성
-        val productReader: Permission = permissionRepository.save(Permission.create("PRODUCT_READER"))
-        val productWriter: Permission = permissionRepository.save(Permission.create("PRODUCT_WRITER"))
-        val orderReader: Permission = permissionRepository.save(Permission.create("ORDER_READER"))
-        val orderWriter: Permission = permissionRepository.save(Permission.create("ORDER_WRITER"))
-        val permissionReader: Permission = permissionRepository.save(Permission.create("PERMISSION_READER"))
-        val permissionWriter: Permission = permissionRepository.save(Permission.create("PERMISSION_WRITER"))
-        val menuReader: Permission = permissionRepository.save(Permission.create("MENU_READER"))
-        val menuWriter: Permission = permissionRepository.save(Permission.create("MENU_WRITER"))
-        val roleReader: Permission = permissionRepository.save(Permission.create("ROLE_READER"))
-        val roleWriter: Permission = permissionRepository.save(Permission.create("ROLE_WRITER"))
+        val productReader = Permission.create("PRODUCT_READER").apply {
+            addMenu(product)
+        }
+        val productWriter = Permission.create("PRODUCT_WRITER")
+        val orderReader = Permission.create("ORDER_READER").apply {
+            addMenu(order)
+        }
+        val orderWriter = Permission.create("ORDER_WRITER")
+        val permissionReader = Permission.create("PERMISSION_READER").apply {
+            addMenu(settings)
+            addMenu(permissionManage)
+        }
+        val permissionWriter = Permission.create("PERMISSION_WRITER")
+        val menuReader = Permission.create("MENU_READER").apply {
+            addMenu(settings)
+            addMenu(menuManage)
+        }
+        val menuWriter = Permission.create("MENU_WRITER")
+        val roleReader = Permission.create("ROLE_READER").apply {
+            addMenu(settings)
+            addMenu(roleManage)
+        }
+        val roleWriter = Permission.create("ROLE_WRITER")
 
+        permissionRepository.saveAll(
+            listOf(
+                productReader,
+                productWriter,
+                orderReader,
+                orderWriter,
+                permissionReader,
+                permissionWriter,
+                menuReader,
+                menuWriter,
+                roleReader,
+                roleWriter
+            )
+        )
 
         // 역할 생성
         val roleViewer = Role.create("ROLE_VIEWER")
@@ -59,41 +103,5 @@ class DataInitializer(
         roleAdmin.addPermission(roleWriter)
 
         roleRepository.saveAll(listOf(roleViewer, roleProductManager, roleAdmin))
-
-
-        // 메뉴 생성
-        val product = Menu.create("상품 관리", "/products")
-        product.addPermission(productReader)
-
-        val order = Menu.create("주문 관리", "/orders")
-        order.addPermission(orderReader)
-
-        val settings = Menu.create("설정")
-        settings.addPermission(permissionReader)
-        settings.addPermission(menuReader)
-        settings.addPermission(roleReader)
-
-        val permissionManage = Menu.create("권한 관리", "/permissions")
-        permissionManage.addPermission(permissionReader)
-        permissionManage.updateParent(settings)
-
-        val menuManage = Menu.create("메뉴 관리", "/menus")
-        menuManage.addPermission(menuReader)
-        menuManage.updateParent(settings)
-
-        val roleManage = Menu.create("역할 관리", "/roles")
-        roleManage.addPermission(roleReader)
-        roleManage.updateParent(settings)
-
-        menuRepository.saveAll(
-            listOf(
-                product,
-                order,
-                settings,
-                permissionManage,
-                menuManage,
-                roleManage
-            )
-        )
     }
 }

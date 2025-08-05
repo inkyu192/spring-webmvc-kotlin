@@ -10,10 +10,23 @@ interface MenuJpaRepository : JpaRepository<Menu, Long> {
         """
 		select m
 		from Menu m
-		left join m._menuPermissions mp
+		left join m._permissionMenus mp
 		left join mp.permission p
 		where p.name in (:permissions)
+        and m.parent is null
 	"""
     )
-    fun findAllByPermissionNameIn(permissions: Iterable<String>): List<Menu>
+    fun findRootMenus(permissions: Iterable<String>): List<Menu>
+
+    @Query(
+        """
+		select m
+		from Menu m
+		left join m._permissionMenus mp
+		left join mp.permission p
+		where p.name in (:permissions)
+        and m.parent.id = :parentId
+	"""
+    )
+    fun findChildMenus(permissions: Iterable<String>, parentId: Long): List<Menu>
 }
