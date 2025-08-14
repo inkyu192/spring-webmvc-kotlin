@@ -3,7 +3,18 @@ package spring.webmvc.presentation.dto.response
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import java.time.Instant
+
+data class ProductPageResponse(
+    val page: CursorPageResponse,
+    val products: List<ProductResponse>,
+) {
+    constructor(page: CursorPage<Product>) : this(
+        page = CursorPageResponse(page),
+        products = page.content.map { ProductResponse(product = it) }
+    )
+}
 
 open class ProductResponse(
     val id: Long,

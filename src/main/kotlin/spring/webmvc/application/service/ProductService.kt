@@ -1,6 +1,5 @@
 package spring.webmvc.application.service
 
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.command.ProductCreateCommand
@@ -20,8 +19,8 @@ class ProductService(
     private val productRepository: ProductRepository,
     private val productStrategyMap: Map<Category, ProductStrategy>,
 ) {
-    fun findProducts(pageable: Pageable, name: String?) =
-        productRepository.findAll(pageable = pageable, name = name).map { ProductResult(product = it) }
+    fun findProducts(nextCursorId: Long?, size: Int, name: String?) =
+        productRepository.findAll(nextCursorId = nextCursorId, size = size, name = name)
 
     fun findProduct(category: Category, id: Long): ProductResult {
         val productStrategy = productStrategyMap[category]

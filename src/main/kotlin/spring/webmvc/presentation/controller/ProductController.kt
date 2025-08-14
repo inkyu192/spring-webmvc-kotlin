@@ -1,7 +1,5 @@
 package spring.webmvc.presentation.controller
 
-import org.springframework.data.domain.Pageable
-import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -14,10 +12,7 @@ import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.presentation.dto.request.ProductCreateRequest
 import spring.webmvc.presentation.dto.request.ProductUpdateRequest
-import spring.webmvc.presentation.dto.response.AccommodationResponse
-import spring.webmvc.presentation.dto.response.FlightResponse
-import spring.webmvc.presentation.dto.response.ProductResponse
-import spring.webmvc.presentation.dto.response.TicketResponse
+import spring.webmvc.presentation.dto.response.*
 
 @RestController
 @RequestMapping("/products")
@@ -27,9 +22,16 @@ class ProductController(
     @GetMapping
     @PreAuthorize("hasAuthority('PRODUCT_READER')")
     fun findProducts(
-        @PageableDefault pageable: Pageable,
+        @RequestParam(required = false, defaultValue = "10") size: Int,
+        @RequestParam(required = false) nextCursorId: Long?,
         @RequestParam(required = false) name: String?,
-    ) = productService.findProducts(pageable = pageable, name = name).map { ProductResponse(productResult = it) }
+    ) = ProductPageResponse(
+        page = productService.findProducts(
+            nextCursorId = nextCursorId,
+            size = size,
+            name = name,
+        )
+    )
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_READER')")

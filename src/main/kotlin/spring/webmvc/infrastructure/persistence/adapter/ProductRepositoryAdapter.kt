@@ -1,6 +1,5 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
-import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.repository.ProductRepository
@@ -14,8 +13,8 @@ class ProductRepositoryAdapter(
 ) : ProductRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 
-    override fun findAll(pageable: Pageable, name: String?) =
-        querydslRepository.findAll(pageable = pageable, name = name)
-
     override fun findAllById(ids: Iterable<Long>) = jpaRepository.findAllById(ids)
+
+    override fun findAll(nextCursorId: Long?, size: Int, name: String?) =
+        querydslRepository.findAll(nextCursorId = nextCursorId, size = size, name = name)
 }

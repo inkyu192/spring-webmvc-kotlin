@@ -9,8 +9,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.TicketResult
@@ -21,6 +19,7 @@ import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import java.time.Instant
 
@@ -37,7 +36,8 @@ class ProductServiceTest : DescribeSpec({
 
     describe("findProducts") {
         it(" Product 조회 후 반환한다") {
-            val pageable = PageRequest.of(0, 10)
+            val nextCursorId: Long? = null
+            val size = 10
             val name = "name"
             val products = listOf(
                 spyk(
@@ -68,11 +68,16 @@ class ProductServiceTest : DescribeSpec({
                     )
                 ).apply { every { id } returns 3L },
             )
-            val page = PageImpl(products, pageable, products.size.toLong())
+            val cursorPage = CursorPage(
+                content = products,
+                size = size,
+                hasNext = false,
+                nextCursorId = null
+            )
 
-            every { productRepository.findAll(pageable = pageable, name = name) } returns page
+            every { productRepository.findAll(nextCursorId = nextCursorId, size = size, name = name) } returns cursorPage
 
-            val result = productService.findProducts(pageable = pageable, name = name)
+            val result = productService.findProducts(nextCursorId = nextCursorId, size = size, name = name)
 
             result.content shouldHaveSize products.size
         }
