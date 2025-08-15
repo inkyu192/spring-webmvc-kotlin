@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.aspect
+package spring.webmvc.application.aspect
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
