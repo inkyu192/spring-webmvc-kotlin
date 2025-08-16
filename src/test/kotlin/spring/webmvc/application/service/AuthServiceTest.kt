@@ -11,21 +11,20 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
-import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
+import spring.webmvc.domain.repository.TokenCacheRepository
 import spring.webmvc.infrastructure.security.JwtProvider
 
 class AuthServiceTest : DescribeSpec({
     val jwtProvider = mockk<JwtProvider>()
-    val valueCache = mockk<ValueCache>()
+    val tokenCacheRepository = mockk<TokenCacheRepository>()
     val memberRepository = mockk<MemberRepository>()
     val passwordEncoder = mockk<PasswordEncoder>()
     val authService = AuthService(
         jwtProvider = jwtProvider,
-        valueCache = valueCache,
+        tokenCacheRepository = tokenCacheRepository,
         memberRepository = memberRepository,
         passwordEncoder = passwordEncoder
     )
@@ -68,11 +67,11 @@ class AuthServiceTest : DescribeSpec({
                 every { passwordEncoder.matches(any(), any()) } returns true
                 every { jwtProvider.createAccessToken(memberId = any(), permissions = any()) } returns accessToken
                 every { jwtProvider.createRefreshToken() } returns refreshToken
-                every { valueCache.set(key = any(), value = any<String>(), timeout = any()) } returns Unit
+                every { tokenCacheRepository.setRefreshToken(memberId = any(), refreshToken = any<String>()) } returns Unit
 
                 val result = authService.login(email = email, password = password)
 
-                verify(exactly = 1) { valueCache.set(key = any(), value = any<String>(), timeout = any()) }
+                verify(exactly = 1) { tokenCacheRepository.setRefreshToken(memberId = any(), refreshToken = any<String>()) }
                 result.accessToken shouldBe accessToken
                 result.refreshToken shouldBe refreshToken
             }
@@ -123,7 +122,7 @@ class AuthServiceTest : DescribeSpec({
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every { claims["memberId"] } returns memberId
                 every { jwtProvider.parseRefreshToken(fakeRefreshToken) } returns claims
-                every { valueCache.get(CacheKey.REFRESH_TOKEN.generate(memberId)) } returns refreshToken
+                every { tokenCacheRepository.getRefreshToken(memberId) } returns refreshToken
 
                 shouldThrow<BadCredentialsException> {
                     authService.refreshToken(accessToken = accessToken, refreshToken = fakeRefreshToken)
@@ -145,7 +144,7 @@ class AuthServiceTest : DescribeSpec({
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every { claims["memberId"] } returns memberId
                 every { jwtProvider.parseRefreshToken(refreshToken) } returns claims
-                every { valueCache.get(CacheKey.REFRESH_TOKEN.generate(memberId)) } returns refreshToken
+                every { tokenCacheRepository.getRefreshToken(memberId) } returns refreshToken
                 every {
                     jwtProvider.createAccessToken(
                         memberId = any(),
