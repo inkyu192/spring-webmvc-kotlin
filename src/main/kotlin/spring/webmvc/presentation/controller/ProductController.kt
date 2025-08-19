@@ -23,11 +23,11 @@ class ProductController(
     @PreAuthorize("hasAuthority('PRODUCT_READER')")
     fun findProducts(
         @RequestParam(required = false, defaultValue = "10") size: Int,
-        @RequestParam(required = false) nextCursorId: Long?,
+        @RequestParam(required = false) cursorId: Long?,
         @RequestParam(required = false) name: String?,
     ) = ProductPageResponse(
         page = productService.findProducts(
-            nextCursorId = nextCursorId,
+            cursorId = cursorId,
             size = size,
             name = name,
         )

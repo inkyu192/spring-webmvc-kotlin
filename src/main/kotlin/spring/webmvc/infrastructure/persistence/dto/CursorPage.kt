@@ -16,4 +16,12 @@ data class CursorPage<T>(
         hasNext = content.size > size,
         nextCursorId = if (content.size > size) content.last().let(getCursorId) else null
     )
+
+    fun <U> map(transform: (T) -> U) =
+        CursorPage(
+            content = content.map(transform),
+            size = size,
+            hasNext = hasNext,
+            nextCursorId = nextCursorId
+        )
 }

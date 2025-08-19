@@ -97,7 +97,7 @@ class ProductControllerTest() {
             nextCursorId = null
         )
 
-        whenever(productService.findProducts(nextCursorId = nextCursorId, size = size, name = name)).thenReturn(cursorPage)
+        whenever(productService.findProducts(cursorId = nextCursorId, size = size, name = name)).thenReturn(cursorPage)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products")

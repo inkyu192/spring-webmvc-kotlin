@@ -32,7 +32,7 @@ class OrderService(
         val member = memberRepository.findByIdOrNull(id = memberId)
             ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
 
-        val productMap = productRepository.findAllById(ids = orderCreateCommand.products.map { it.id })
+        val productMap = productRepository.findByIds(ids = orderCreateCommand.products.map { it.id })
             .associateBy { it.id }
 
         val order = Order.create(member = member)

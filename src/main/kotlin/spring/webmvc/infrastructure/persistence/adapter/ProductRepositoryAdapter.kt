@@ -11,10 +11,10 @@ class ProductRepositoryAdapter(
     private val jpaRepository: ProductJpaRepository,
     private val querydslRepository: ProductQuerydslRepository,
 ) : ProductRepository {
-    override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
+    override fun findById(id: Long) = jpaRepository.findByIdOrNull(id)
 
-    override fun findAllById(ids: Iterable<Long>) = jpaRepository.findAllById(ids)
+    override fun findByIds(ids: Iterable<Long>) = jpaRepository.findAllById(ids)
 
-    override fun findAll(nextCursorId: Long?, size: Int, name: String?) =
-        querydslRepository.findAll(nextCursorId = nextCursorId, size = size, name = name)
+    override fun findWithCursorPage(cursorId: Long?, size: Int, name: String?) =
+        querydslRepository.findAll(cursorId = cursorId, size = size, name = name)
 }

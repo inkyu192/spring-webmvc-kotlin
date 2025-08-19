@@ -10,10 +10,10 @@ import spring.webmvc.infrastructure.persistence.dto.CursorPage
 class ProductQuerydslRepository(
     private val jpaQueryFactory: JPAQueryFactory,
 ) {
-    fun findAll(nextCursorId: Long?, size: Int, name: String?): CursorPage<Product> {
+    fun findAll(cursorId: Long?, size: Int, name: String?): CursorPage<Product> {
         val content = jpaQueryFactory
             .selectFrom(product)
-            .where(loeProductId(nextCursorId), likeName(name))
+            .where(loeProductId(cursorId), likeName(name))
             .orderBy(product.id.desc())
             .limit(size.toLong() + 1)
             .fetch()
@@ -21,7 +21,7 @@ class ProductQuerydslRepository(
         return CursorPage(content = content, size = size) { it.id }
     }
 
-    private fun loeProductId(nextCursorId: Long?) = if (nextCursorId == null) null else product.id.loe(nextCursorId)
+    private fun loeProductId(cursorId: Long?) = if (cursorId == null) null else product.id.loe(cursorId)
 
     private fun likeName(name: String?) = if (name.isNullOrBlank()) null else product.name.like("%$name%")
 }

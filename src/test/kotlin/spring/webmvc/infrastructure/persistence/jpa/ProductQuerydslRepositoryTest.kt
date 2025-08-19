@@ -73,7 +73,7 @@ class ProductQuerydslRepositoryTest(
         val size = 3
         val name = null
 
-        val result = productQuerydslRepository.findAll(nextCursorId = nextCursorId, size = size, name = name)
+        val result = productQuerydslRepository.findAll(cursorId = nextCursorId, size = size, name = name)
 
         assertThat(result.content.size).isEqualTo(size)
         assertThat(result.size).isEqualTo(size)

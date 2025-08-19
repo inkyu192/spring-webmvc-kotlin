@@ -3,14 +3,11 @@ package spring.webmvc.presentation.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
@@ -27,12 +24,14 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.dto.command.CurationCreateCommand
-import spring.webmvc.application.dto.result.CurationResult
-import spring.webmvc.application.dto.result.ProductResult
+import spring.webmvc.application.dto.result.CurationProductResult
 import spring.webmvc.application.service.CurationService
+import spring.webmvc.domain.model.entity.Curation
+import spring.webmvc.domain.model.entity.CurationProduct
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import java.time.Instant
+import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
 @WebMvcTest(CurationController::class)
 @Import(WebMvcTestConfig::class)
@@ -42,6 +41,16 @@ class CurationControllerTest() {
     private lateinit var curationService: CurationService
 
     private lateinit var mockMvc: MockMvc
+
+    // 공통 테스트 데이터
+    private lateinit var curation1: Curation
+    private lateinit var curation2: Curation
+    private lateinit var product1: Product
+    private lateinit var product2: Product
+    private lateinit var product3: Product
+    private lateinit var curationProduct1: CurationProduct
+    private lateinit var curationProduct2: CurationProduct
+    private lateinit var curationProduct3: CurationProduct
 
     @BeforeEach
     fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
@@ -53,18 +62,92 @@ class CurationControllerTest() {
                     .withResponseDefaults(Preprocessors.prettyPrint())
             )
             .build()
+
+        // 공통 테스트 데이터 초기화
+        setupTestData()
+    }
+
+    private fun setupTestData() {
+        // Curations
+        curation1 = spy(
+            Curation.create(
+                title = "여름 휴가 패키지",
+                isExposed = true,
+                sortOrder = 1L
+            )
+        ).apply { whenever(id).thenReturn(1L) }
+        curation2 = spy(
+            Curation.create(
+                title = "겨울 스키 패키지",
+                isExposed = true,
+                sortOrder = 2L
+            )
+        ).apply { whenever(id).thenReturn(2L) }
+
+        // Products
+        product1 = spy(
+            Product.create(
+                name = "제주도 호텔",
+                description = "제주도 3박4일",
+                price = 100000L,
+                quantity = 10L,
+                category = Category.ACCOMMODATION
+            )
+        ).apply {
+            whenever(id).thenReturn(1L)
+        }
+        product2 = spy(
+            Product.create(
+                name = "부산 항공권",
+                description = "부산 왕복 항공권",
+                price = 200000L,
+                quantity = 5L,
+                category = Category.FLIGHT
+            )
+        ).apply {
+            whenever(id).thenReturn(2L)
+        }
+        product3 = spy(
+            Product.create(
+                name = "부산 호텔",
+                description = "부산 2박3일",
+                price = 80000L,
+                quantity = 15L,
+                category = Category.ACCOMMODATION
+            )
+        ).apply {
+            whenever(id).thenReturn(3L)
+        }
+
+        // CurationProducts
+        curationProduct1 = spy(
+            CurationProduct.create(
+                curation = curation1,
+                product = product1,
+                sortOrder = 1L
+            )
+        ).apply { whenever(id).thenReturn(1L) }
+        curationProduct2 = spy(
+            CurationProduct.create(
+                curation = curation2,
+                product = product2,
+                sortOrder = 1L
+            )
+        ).apply { whenever(id).thenReturn(2L) }
+        curationProduct3 = spy(
+            CurationProduct.create(
+                curation = curation1,
+                product = product3,
+                sortOrder = 2L
+            )
+        ).apply { whenever(id).thenReturn(3L) }
     }
 
     @Test
     fun createCuration() {
         val id = 1L
-        val title = "Test Curation"
 
-        val curationResult = mock<CurationResult>()
-        whenever(curationResult.id).thenReturn(id)
-        whenever(curationResult.title).thenReturn(title)
-
-        whenever(curationService.createCuration(any<CurationCreateCommand>())).thenReturn(curationResult)
+        whenever(curationService.createCuration(any<CurationCreateCommand>())).thenReturn(id)
 
         // When & Then
         mockMvc.perform(
@@ -73,7 +156,7 @@ class CurationControllerTest() {
                 .content(
                     """
 						{
-						  "title": "$title",
+						  "title": "인기상품",
 						  "isExposed": true,
 						  "sortOrder": 1,
 						  "products": [
@@ -104,8 +187,7 @@ class CurationControllerTest() {
                         PayloadDocumentation.fieldWithPath("products[].sortOrder").description("상품 정렬 순서")
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
-                        PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목")
+                        PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID")
                     )
                 )
             )
@@ -113,17 +195,25 @@ class CurationControllerTest() {
 
     @Test
     fun findCurations() {
-        val curationResult1 = mock<CurationResult>()
-        whenever(curationResult1.id).thenReturn(1L)
-        whenever(curationResult1.title).thenReturn("Curation 1")
+        val cursorPage1 = CursorPage(
+            content = listOf(curationProduct1),
+            size = 10,
+            hasNext = false,
+            nextCursorId = null
+        )
+        val cursorPage2 = CursorPage(
+            content = listOf(curationProduct2),
+            size = 10,
+            hasNext = false,
+            nextCursorId = null
+        )
 
-        val curationResult2 = mock<CurationResult>()
-        whenever(curationResult2.id).thenReturn(2L)
-        whenever(curationResult2.title).thenReturn("Curation 2")
+        val curationProductResult1 = CurationProductResult(curation1, cursorPage1)
+        val curationProductResult2 = CurationProductResult(curation2, cursorPage2)
 
-        val curationResults = listOf(curationResult1, curationResult2)
+        val results = listOf(curationProductResult1, curationProductResult2)
 
-        whenever(curationService.findCurations()).thenReturn(curationResults)
+        whenever(curationService.findCurations()).thenReturn(results)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations")
@@ -133,8 +223,19 @@ class CurationControllerTest() {
                 MockMvcRestDocumentation.document(
                     "curation-list",
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("[].id").description("큐레이션 ID"),
-                        PayloadDocumentation.fieldWithPath("[].title").description("큐레이션 제목")
+                        PayloadDocumentation.fieldWithPath("count").description("큐레이션 수"),
+                        PayloadDocumentation.fieldWithPath("curations[].id").description("큐레이션 ID"),
+                        PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목"),
+                        PayloadDocumentation.fieldWithPath("curations[].page.size").description("페이지 크기"),
+                        PayloadDocumentation.fieldWithPath("curations[].page.hasNext").description("다음 페이지 존재 여부"),
+                        PayloadDocumentation.fieldWithPath("curations[].page.nextCursorId").description("다음 커서 ID"),
+                        PayloadDocumentation.fieldWithPath("curations[].products[].id").description("상품 ID"),
+                        PayloadDocumentation.fieldWithPath("curations[].products[].category").description("상품 카테고리"),
+                        PayloadDocumentation.fieldWithPath("curations[].products[].name").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("curations[].products[].description").description("상품 설명"),
+                        PayloadDocumentation.fieldWithPath("curations[].products[].price").description("상품 가격"),
+                        PayloadDocumentation.fieldWithPath("curations[].products[].quantity").description("상품 수량"),
+                        PayloadDocumentation.fieldWithPath("curations[].products[].createdAt").description("상품 생성일시")
                     )
                 )
             )
@@ -143,35 +244,17 @@ class CurationControllerTest() {
     @Test
     fun findCurationProduct() {
         val curationId = 1L
-        val pageable: Pageable = PageRequest.of(0, 10)
+        val size = 10
+        val cursorId: Long? = null
 
-        val productResult1 = mock<ProductResult>()
-        whenever(productResult1.id).thenReturn(1L)
-        whenever(productResult1.category).thenReturn(Category.ACCOMMODATION)
-        whenever(productResult1.name).thenReturn("Product 1")
-        whenever(productResult1.description).thenReturn("Description 1")
-        whenever(productResult1.price).thenReturn(1000L)
-        whenever(productResult1.quantity).thenReturn(10L)
-        whenever(productResult1.createdAt).thenReturn(Instant.now())
+        val cursorPage = CursorPage(listOf(curationProduct1, curationProduct3), size, false, null)
+        val curationProductResult = CurationProductResult(curation1, cursorPage)
 
-        val productResult2 = mock<ProductResult>()
-        whenever(productResult2.id).thenReturn(2L)
-        whenever(productResult2.category).thenReturn(Category.FLIGHT)
-        whenever(productResult2.name).thenReturn("Product 2")
-        whenever(productResult2.description).thenReturn("Description 2")
-        whenever(productResult2.price).thenReturn(2000L)
-        whenever(productResult2.quantity).thenReturn(20L)
-        whenever(productResult2.createdAt).thenReturn(Instant.now())
-
-        val products = listOf(productResult1, productResult2)
-        val productPage = PageImpl(products, pageable, products.size.toLong())
-
-        whenever(curationService.findCurationProduct(pageable, curationId)).thenReturn(productPage)
+        whenever(curationService.findCurationProduct(curationId, cursorId, size)).thenReturn(curationProductResult)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations/{id}", curationId)
-                .queryParam("page", pageable.getPageNumber().toString())
-                .queryParam("size", pageable.getPageSize().toString())
+                .queryParam("size", size.toString())
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
@@ -181,41 +264,24 @@ class CurationControllerTest() {
                         RequestDocumentation.parameterWithName("id").description("큐레이션 ID")
                     ),
                     RequestDocumentation.queryParameters(
-                        RequestDocumentation.parameterWithName("page").description("페이지 번호").optional(),
-                        RequestDocumentation.parameterWithName("size").description("페이지 크기").optional()
+                        RequestDocumentation.parameterWithName("size").description("페이지 크기").optional(),
+                        RequestDocumentation.parameterWithName("cursorId").description("커서 ID").optional()
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("content[].id").description("상품 ID"),
-                        PayloadDocumentation.fieldWithPath("content[].category").description("카테고리"),
-                        PayloadDocumentation.fieldWithPath("content[].name").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("content[].description").description("설명"),
-                        PayloadDocumentation.fieldWithPath("content[].price").description("가격"),
-                        PayloadDocumentation.fieldWithPath("content[].quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("content[].createdAt").description("생성일시"),
-
-                        PayloadDocumentation.fieldWithPath("pageable.pageNumber").description("현재 페이지 번호"),
-                        PayloadDocumentation.fieldWithPath("pageable.pageSize").description("페이지 크기"),
-                        PayloadDocumentation.fieldWithPath("pageable.offset").description("정렬 정보"),
-                        PayloadDocumentation.fieldWithPath("pageable.paged").description("정렬 정보"),
-                        PayloadDocumentation.fieldWithPath("pageable.unpaged").description("정렬 정보"),
-
-                        PayloadDocumentation.fieldWithPath("pageable.sort.empty").description("정렬이 비어있는지 여부"),
-                        PayloadDocumentation.fieldWithPath("pageable.sort.sorted").description("정렬되었는지 여부"),
-                        PayloadDocumentation.fieldWithPath("pageable.sort.unsorted").description("정렬되지 않았는지 여부"),
-
-                        PayloadDocumentation.fieldWithPath("last").description("마지막 페이지 여부"),
-                        PayloadDocumentation.fieldWithPath("totalPages").description("전체 페이지 수"),
-                        PayloadDocumentation.fieldWithPath("totalElements").description("전체 아이템 수"),
-                        PayloadDocumentation.fieldWithPath("first").description("첫 페이지 여부"),
-                        PayloadDocumentation.fieldWithPath("size").description("페이지 크기"),
-                        PayloadDocumentation.fieldWithPath("number").description("현재 페이지 번호"),
-
-                        PayloadDocumentation.fieldWithPath("sort.empty").description("정렬이 비어있는지 여부"),
-                        PayloadDocumentation.fieldWithPath("sort.sorted").description("정렬되었는지 여부"),
-                        PayloadDocumentation.fieldWithPath("sort.unsorted").description("정렬되지 않았는지 여부"),
-
-                        PayloadDocumentation.fieldWithPath("numberOfElements").description("현재 페이지의 아이템 수"),
-                        PayloadDocumentation.fieldWithPath("empty").description("빈 페이지 여부")
+                        PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
+                        PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
+                        PayloadDocumentation.fieldWithPath("page").description("페이지 정보"),
+                        PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
+                        PayloadDocumentation.fieldWithPath("page.hasNext").description("다음 페이지 존재 여부"),
+                        PayloadDocumentation.fieldWithPath("page.nextCursorId").description("다음 커서 ID"),
+                        PayloadDocumentation.fieldWithPath("products").description("상품 목록"),
+                        PayloadDocumentation.fieldWithPath("products[].id").description("상품 ID"),
+                        PayloadDocumentation.fieldWithPath("products[].category").description("상품 카테고리"),
+                        PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("products[].description").description("상품 설명"),
+                        PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격"),
+                        PayloadDocumentation.fieldWithPath("products[].quantity").description("상품 수량"),
+                        PayloadDocumentation.fieldWithPath("products[].createdAt").description("상품 생성일시")
                     )
                 )
             )

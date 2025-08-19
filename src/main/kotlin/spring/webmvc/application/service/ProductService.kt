@@ -19,8 +19,8 @@ class ProductService(
     private val productRepository: ProductRepository,
     private val productStrategyMap: Map<Category, ProductStrategy>,
 ) {
-    fun findProducts(nextCursorId: Long?, size: Int, name: String?) =
-        productRepository.findAll(nextCursorId = nextCursorId, size = size, name = name)
+    fun findProducts(cursorId: Long?, size: Int, name: String?) =
+        productRepository.findWithCursorPage(cursorId = cursorId, size = size, name = name)
 
     fun findProduct(category: Category, id: Long): ProductResult {
         val productStrategy = productStrategyMap[category]

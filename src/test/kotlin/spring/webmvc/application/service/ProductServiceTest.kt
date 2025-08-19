@@ -75,9 +75,9 @@ class ProductServiceTest : DescribeSpec({
                 nextCursorId = null
             )
 
-            every { productRepository.findAll(nextCursorId = nextCursorId, size = size, name = name) } returns cursorPage
+            every { productRepository.findWithCursorPage(cursorId = nextCursorId, size = size, name = name) } returns cursorPage
 
-            val result = productService.findProducts(nextCursorId = nextCursorId, size = size, name = name)
+            val result = productService.findProducts(cursorId = nextCursorId, size = size, name = name)
 
             result.content shouldHaveSize products.size
         }

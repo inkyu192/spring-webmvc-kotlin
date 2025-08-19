@@ -34,7 +34,7 @@ class Curation protected constructor(
             Curation(title = title, isExposed = isExposed, sortOrder = sortOrder)
     }
 
-    fun addProduct(product: Product, sortOrder: Long) {
-        _curationProducts.add(CurationProduct.create(curation = this, product = product, sortOrder = sortOrder))
+    fun addProduct(curationProduct: CurationProduct) {
+        _curationProducts.add(curationProduct)
     }
 }
