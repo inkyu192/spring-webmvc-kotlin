@@ -16,7 +16,7 @@ class Permission protected constructor(
     var id: Long? = null
         protected set
 
-    @OneToMany(mappedBy = "permission", cascade = [(CascadeType.ALL)])
+    @OneToMany(mappedBy = "permission", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _permissionMenus = mutableListOf<PermissionMenu>()
 
     @get:Transient

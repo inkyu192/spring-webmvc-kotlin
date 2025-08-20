@@ -9,11 +9,11 @@ data class CurationCreateResponse(
 
 data class CurationListResponse(
     val count: Long,
-    val content: List<CurationResponse>,
+    val curations: List<CurationResponse>,
 ) {
     constructor(resultList: List<CurationResult>) : this(
         count = resultList.size.toLong(),
-        content = resultList.map { CurationResponse(result = it) }
+        curations = resultList.map { CurationResponse(result = it) }
     )
 }
 

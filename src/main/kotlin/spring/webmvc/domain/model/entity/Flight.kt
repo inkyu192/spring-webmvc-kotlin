@@ -13,7 +13,7 @@ class Flight protected constructor(
     departureTime: Instant,
     arrivalTime: Instant,
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "product_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     val product: Product,
 ) {

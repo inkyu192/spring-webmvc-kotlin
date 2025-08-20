@@ -34,14 +34,14 @@ class Member protected constructor(
     var birthDate = birthDate
         protected set
 
-    @OneToMany(mappedBy = "member", cascade = [(CascadeType.ALL)])
+    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _memberRoles = mutableListOf<MemberRole>()
 
     @get:Transient
     val memberRoles: List<MemberRole>
         get() = _memberRoles.toList()
 
-    @OneToMany(mappedBy = "member", cascade = [(CascadeType.ALL)])
+    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _memberPermissions = mutableListOf<MemberPermission>()
 
     @get:Transient

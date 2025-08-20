@@ -27,7 +27,7 @@ class Menu protected constructor(
     @OneToMany(mappedBy = "parent")
     private val _children = mutableListOf<Menu>()
 
-    @OneToMany(mappedBy = "menu", cascade = [(CascadeType.ALL)])
+    @OneToMany(mappedBy = "menu", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _permissionMenus = mutableListOf<PermissionMenu>()
 
     @get:Transient

@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.result.CurationProductResult
+import spring.webmvc.application.dto.result.CurationResult
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.CurationProduct
@@ -42,7 +43,6 @@ class CurationControllerTest() {
 
     private lateinit var mockMvc: MockMvc
 
-    // 공통 테스트 데이터
     private lateinit var curation1: Curation
     private lateinit var curation2: Curation
     private lateinit var product1: Product
@@ -63,12 +63,10 @@ class CurationControllerTest() {
             )
             .build()
 
-        // 공통 테스트 데이터 초기화
         setupTestData()
     }
 
     private fun setupTestData() {
-        // Curations
         curation1 = spy(
             Curation.create(
                 title = "여름 휴가 패키지",
@@ -84,7 +82,6 @@ class CurationControllerTest() {
             )
         ).apply { whenever(id).thenReturn(2L) }
 
-        // Products
         product1 = spy(
             Product.create(
                 name = "제주도 호텔",
@@ -119,26 +116,22 @@ class CurationControllerTest() {
             whenever(id).thenReturn(3L)
         }
 
-        // CurationProducts
         curationProduct1 = spy(
             CurationProduct.create(
                 curation = curation1,
                 product = product1,
-                sortOrder = 1L
             )
         ).apply { whenever(id).thenReturn(1L) }
         curationProduct2 = spy(
             CurationProduct.create(
                 curation = curation2,
                 product = product2,
-                sortOrder = 1L
             )
         ).apply { whenever(id).thenReturn(2L) }
         curationProduct3 = spy(
             CurationProduct.create(
                 curation = curation1,
                 product = product3,
-                sortOrder = 2L
             )
         ).apply { whenever(id).thenReturn(3L) }
     }
@@ -149,7 +142,6 @@ class CurationControllerTest() {
 
         whenever(curationService.createCuration(any<CurationCreateCommand>())).thenReturn(id)
 
-        // When & Then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/curations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -195,23 +187,10 @@ class CurationControllerTest() {
 
     @Test
     fun findCurations() {
-        val cursorPage1 = CursorPage(
-            content = listOf(curationProduct1),
-            size = 10,
-            hasNext = false,
-            nextCursorId = null
-        )
-        val cursorPage2 = CursorPage(
-            content = listOf(curationProduct2),
-            size = 10,
-            hasNext = false,
-            nextCursorId = null
-        )
+        val curationResult1 = CurationResult(curation1)
+        val curationResult2 = CurationResult(curation2)
 
-        val curationProductResult1 = CurationProductResult(curation1, cursorPage1)
-        val curationProductResult2 = CurationProductResult(curation2, cursorPage2)
-
-        val results = listOf(curationProductResult1, curationProductResult2)
+        val results = listOf(curationResult1, curationResult2)
 
         whenever(curationService.findCurations()).thenReturn(results)
 
@@ -226,16 +205,6 @@ class CurationControllerTest() {
                         PayloadDocumentation.fieldWithPath("count").description("큐레이션 수"),
                         PayloadDocumentation.fieldWithPath("curations[].id").description("큐레이션 ID"),
                         PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목"),
-                        PayloadDocumentation.fieldWithPath("curations[].page.size").description("페이지 크기"),
-                        PayloadDocumentation.fieldWithPath("curations[].page.hasNext").description("다음 페이지 존재 여부"),
-                        PayloadDocumentation.fieldWithPath("curations[].page.nextCursorId").description("다음 커서 ID"),
-                        PayloadDocumentation.fieldWithPath("curations[].products[].id").description("상품 ID"),
-                        PayloadDocumentation.fieldWithPath("curations[].products[].category").description("상품 카테고리"),
-                        PayloadDocumentation.fieldWithPath("curations[].products[].name").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("curations[].products[].description").description("상품 설명"),
-                        PayloadDocumentation.fieldWithPath("curations[].products[].price").description("상품 가격"),
-                        PayloadDocumentation.fieldWithPath("curations[].products[].quantity").description("상품 수량"),
-                        PayloadDocumentation.fieldWithPath("curations[].products[].createdAt").description("상품 생성일시")
                     )
                 )
             )
@@ -247,7 +216,7 @@ class CurationControllerTest() {
         val size = 10
         val cursorId: Long? = null
 
-        val cursorPage = CursorPage(listOf(curationProduct1, curationProduct3), size, false, null)
+        val cursorPage = CursorPage(listOf(product1, product3), size, false, null)
         val curationProductResult = CurationProductResult(curation1, cursorPage)
 
         whenever(curationService.findCurationProduct(curationId, cursorId, size)).thenReturn(curationProductResult)

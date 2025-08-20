@@ -22,7 +22,7 @@ class Curation protected constructor(
     var sortOrder = sortOrder
         protected set
 
-    @OneToMany(mappedBy = "curation", cascade = [(CascadeType.ALL)])
+    @OneToMany(mappedBy = "curation", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _curationProducts = mutableListOf<CurationProduct>()
 
     @get:Transient

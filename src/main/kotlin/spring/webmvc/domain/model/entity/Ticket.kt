@@ -11,7 +11,7 @@ class Ticket protected constructor(
     duration: String,
     ageLimit: String,
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "product_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     val product: Product,
 ) {

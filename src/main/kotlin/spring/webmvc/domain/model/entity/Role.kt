@@ -14,7 +14,7 @@ class Role protected constructor(
     var name = name
         protected set
 
-    @OneToMany(mappedBy = "role", cascade = [(CascadeType.ALL)])
+    @OneToMany(mappedBy = "role", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _rolePermissions = mutableListOf<RolePermission>()
 
     @get:Transient

@@ -24,7 +24,7 @@ class Order protected constructor(
     var status = status
         protected set
 
-    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _orderProducts = mutableListOf<OrderProduct>()
 
     @get:Transient
