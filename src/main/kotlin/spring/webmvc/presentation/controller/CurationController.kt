@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.presentation.dto.request.CurationCreateRequest
 import spring.webmvc.presentation.dto.response.CurationCreateResponse
-import spring.webmvc.presentation.dto.response.CurationProductResponse
 import spring.webmvc.presentation.dto.response.CurationListResponse
+import spring.webmvc.presentation.dto.response.CurationProductResponse
 
 @RestController
 @RequestMapping("/curations")

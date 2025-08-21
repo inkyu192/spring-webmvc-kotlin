@@ -1,7 +1,6 @@
-package spring.webmvc.infrastructure.cache
+package spring.webmvc.infrastructure.cache.redis
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 import spring.webmvc.domain.model.cache.CurationCache
@@ -10,7 +9,7 @@ import spring.webmvc.domain.repository.CurationCacheRepository
 import java.time.Duration
 
 @Repository
-class CurationCacheRepositoryImpl(
+class CurationRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper,
 ) : CurationCacheRepository {
@@ -66,7 +65,7 @@ class CurationCacheRepositoryImpl(
         }
     }
 
-    override fun delete() {
+    override fun deleteAll() {
         val keys = redisTemplate.keys("$CURATIONS_KEY*")
 
         redisTemplate.delete(keys)

@@ -1,7 +1,6 @@
 package spring.webmvc.application.dto.command
 
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.presentation.dto.request.TicketUpdateRequest
 import java.time.Instant
 
 class TicketUpdateCommand(

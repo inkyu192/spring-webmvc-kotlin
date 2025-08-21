@@ -35,7 +35,7 @@ class CurationService(
                 requestProductIds = requestProductIds,
                 products = products,
             )
-        ).apply { curationCacheRepository.delete() }
+        ).apply { curationCacheRepository.deleteAll() }
 
         return checkNotNull(curation.id)
     }
@@ -58,7 +58,11 @@ class CurationService(
     }
 
     fun findCurationProduct(curationId: Long, cursorId: Long?, size: Int): CurationProductResult {
-        val cached = curationCacheRepository.getCurationProducts(curationId, cursorId, size)
+        val cached = curationCacheRepository.getCurationProducts(
+            curationId = curationId,
+            cursorId = cursorId,
+            size = size,
+        )
         if (cached != null) {
             return CurationProductResult(curationProduct = cached)
         }

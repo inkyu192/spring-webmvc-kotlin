@@ -8,5 +8,5 @@ interface CurationCacheRepository {
     fun getCurations(): List<CurationCache>
     fun setCurationProducts(curationId: Long, cursorId: Long?, size: Int, cache: CurationProductCache)
     fun getCurationProducts(curationId: Long, cursorId: Long?, size: Int): CurationProductCache?
-    fun delete()
+    fun deleteAll()
 }

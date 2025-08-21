@@ -1,11 +1,6 @@
 package spring.webmvc.domain.model.entity
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Transient
+import jakarta.persistence.*
 
 @Entity
 class Permission protected constructor(

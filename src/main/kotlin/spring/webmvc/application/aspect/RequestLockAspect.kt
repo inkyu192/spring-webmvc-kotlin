@@ -7,14 +7,14 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.springframework.stereotype.Component
-import spring.webmvc.domain.repository.LockCacheRepository
 import spring.webmvc.application.exception.DuplicateRequestException
+import spring.webmvc.domain.repository.RequestLockCacheRepository
 
 @Aspect
 @Component
 class RequestLockAspect(
     private val httpServletRequest: HttpServletRequest,
-    private val lockCacheRepository: LockCacheRepository,
+    private val requestLockCacheRepository: RequestLockCacheRepository,
     private val objectMapper: ObjectMapper,
 ) {
 
@@ -27,7 +27,7 @@ class RequestLockAspect(
         val uri = httpServletRequest.requestURI
         val method = httpServletRequest.method
 
-        val isSuccess = lockCacheRepository.tryLock(
+        val isSuccess = requestLockCacheRepository.tryLock(
             method = method,
             uri = uri,
             hash = objectMapper.writeValueAsString(joinPoint.args)

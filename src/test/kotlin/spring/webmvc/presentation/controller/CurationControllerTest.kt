@@ -28,7 +28,6 @@ import spring.webmvc.application.dto.result.CurationProductResult
 import spring.webmvc.application.dto.result.CurationResult
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.Curation
-import spring.webmvc.domain.model.entity.CurationProduct
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -47,10 +46,6 @@ class CurationControllerTest() {
     private lateinit var curation2: Curation
     private lateinit var product1: Product
     private lateinit var product2: Product
-    private lateinit var product3: Product
-    private lateinit var curationProduct1: CurationProduct
-    private lateinit var curationProduct2: CurationProduct
-    private lateinit var curationProduct3: CurationProduct
 
     @BeforeEach
     fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
@@ -63,10 +58,6 @@ class CurationControllerTest() {
             )
             .build()
 
-        setupTestData()
-    }
-
-    private fun setupTestData() {
         curation1 = spy(
             Curation.create(
                 title = "여름 휴가 패키지",
@@ -104,36 +95,6 @@ class CurationControllerTest() {
         ).apply {
             whenever(id).thenReturn(2L)
         }
-        product3 = spy(
-            Product.create(
-                name = "부산 호텔",
-                description = "부산 2박3일",
-                price = 80000L,
-                quantity = 15L,
-                category = Category.ACCOMMODATION
-            )
-        ).apply {
-            whenever(id).thenReturn(3L)
-        }
-
-        curationProduct1 = spy(
-            CurationProduct.create(
-                curation = curation1,
-                product = product1,
-            )
-        ).apply { whenever(id).thenReturn(1L) }
-        curationProduct2 = spy(
-            CurationProduct.create(
-                curation = curation2,
-                product = product2,
-            )
-        ).apply { whenever(id).thenReturn(2L) }
-        curationProduct3 = spy(
-            CurationProduct.create(
-                curation = curation1,
-                product = product3,
-            )
-        ).apply { whenever(id).thenReturn(3L) }
     }
 
     @Test
@@ -174,7 +135,6 @@ class CurationControllerTest() {
                         PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
                         PayloadDocumentation.fieldWithPath("isExposed").description("노출 여부"),
                         PayloadDocumentation.fieldWithPath("sortOrder").description("정렬 순서"),
-                        PayloadDocumentation.fieldWithPath("products").description("상품 목록"),
                         PayloadDocumentation.fieldWithPath("products[].id").description("상품 ID"),
                         PayloadDocumentation.fieldWithPath("products[].sortOrder").description("상품 정렬 순서")
                     ),
@@ -190,9 +150,9 @@ class CurationControllerTest() {
         val curationResult1 = CurationResult(curation1)
         val curationResult2 = CurationResult(curation2)
 
-        val results = listOf(curationResult1, curationResult2)
+        val result = listOf(curationResult1, curationResult2)
 
-        whenever(curationService.findCurations()).thenReturn(results)
+        whenever(curationService.findCurations()).thenReturn(result)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations")
@@ -214,9 +174,9 @@ class CurationControllerTest() {
     fun findCurationProduct() {
         val curationId = 1L
         val size = 10
-        val cursorId: Long? = null
+        val cursorId = null
 
-        val cursorPage = CursorPage(listOf(product1, product3), size, false, null)
+        val cursorPage = CursorPage(listOf(product1, product2), size, false, null)
         val curationProductResult = CurationProductResult(curation1, cursorPage)
 
         whenever(curationService.findCurationProduct(curationId, cursorId, size)).thenReturn(curationProductResult)
@@ -239,11 +199,9 @@ class CurationControllerTest() {
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
                         PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
-                        PayloadDocumentation.fieldWithPath("page").description("페이지 정보"),
                         PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
                         PayloadDocumentation.fieldWithPath("page.hasNext").description("다음 페이지 존재 여부"),
                         PayloadDocumentation.fieldWithPath("page.nextCursorId").description("다음 커서 ID"),
-                        PayloadDocumentation.fieldWithPath("products").description("상품 목록"),
                         PayloadDocumentation.fieldWithPath("products[].id").description("상품 ID"),
                         PayloadDocumentation.fieldWithPath("products[].category").description("상품 카테고리"),
                         PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),

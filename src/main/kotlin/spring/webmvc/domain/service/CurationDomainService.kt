@@ -1,6 +1,6 @@
 package spring.webmvc.domain.service
 
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import spring.webmvc.domain.model.cache.CurationCache
 import spring.webmvc.domain.model.cache.CurationProductCache
 import spring.webmvc.domain.model.cache.ProductCache
@@ -10,7 +10,7 @@ import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
-@Component
+@Service
 class CurationDomainService {
     fun createCuration(
         title: String,
@@ -47,10 +47,16 @@ class CurationDomainService {
         requestProductIds: List<Long>,
     ) {
         requestProductIds.forEach { requestProductId ->
-            val product = products.first { it.id == requestProductId }
-            val curationProduct = CurationProduct.create(curation = curation, product = product)
+            val product = products.firstOrNull { it.id == requestProductId }
 
-            curation.addProduct(curationProduct)
+            if (product != null) {
+                curation.addProduct(
+                    curationProduct = CurationProduct.create(
+                        curation = curation,
+                        product = product
+                    )
+                )
+            }
         }
     }
 

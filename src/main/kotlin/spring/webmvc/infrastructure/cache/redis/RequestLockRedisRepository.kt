@@ -1,14 +1,14 @@
 package spring.webmvc.infrastructure.cache.redis
 
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.stereotype.Component
-import spring.webmvc.domain.repository.LockCacheRepository
+import org.springframework.stereotype.Repository
+import spring.webmvc.domain.repository.RequestLockCacheRepository
 import java.time.Duration
 
-@Component
-class LockCacheRedisRepository(
+@Repository
+class RequestLockRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
-) : LockCacheRepository {
+) : RequestLockCacheRepository {
     override fun tryLock(method: String, uri: String, hash: String) =
         redisTemplate.opsForValue()
             .setIfAbsent(
