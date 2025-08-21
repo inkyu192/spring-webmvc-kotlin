@@ -14,8 +14,6 @@ class RedisValueCache(
 ) : ValueCache {
     private val logger = LoggerFactory.getLogger(RedisValueCache::class.java)
 
-    override fun get(key: String) = redisTemplate.opsForValue().get(key)
-
     override fun <T> get(key: String, clazz: Class<T>): T? {
         val value = redisTemplate.opsForValue().get(key)
         return if (value != null) deserialize(key = key, value = value, clazz = clazz) else null
@@ -29,16 +27,6 @@ class RedisValueCache(
                 redisTemplate.opsForValue().set(key, it, timeout)
             }
         }
-    }
-
-    override fun setIfAbsent(key: String, value: String, timeout: Duration?): Boolean {
-        val result = if (timeout == null) {
-            redisTemplate.opsForValue().setIfAbsent(key, value)
-        } else {
-            redisTemplate.opsForValue().setIfAbsent(key, value, timeout)
-        }
-
-        return result ?: false
     }
 
     override fun delete(key: String) = redisTemplate.delete(key)
