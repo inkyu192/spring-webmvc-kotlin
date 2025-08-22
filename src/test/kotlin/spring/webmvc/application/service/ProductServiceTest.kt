@@ -13,11 +13,10 @@ import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.strategy.ProductStrategy
-import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import spring.webmvc.presentation.exception.EntityNotFoundException
@@ -27,9 +26,9 @@ class ProductServiceTest : DescribeSpec({
     val productRepository = mockk<ProductRepository>()
     val productStrategyMap = mockk<Map<Category, ProductStrategy>>()
     val productStrategy = mockk<ProductStrategy>()
-    val valueCache = mockk<ValueCache>()
+    val productCacheRepository = mockk<ProductCacheRepository>()
     val productService = ProductService(
-        valueCache = valueCache,
+        productCacheRepository = productCacheRepository,
         productRepository = productRepository,
         productStrategyMap = productStrategyMap,
     )
@@ -75,7 +74,13 @@ class ProductServiceTest : DescribeSpec({
                 nextCursorId = null
             )
 
-            every { productRepository.findWithCursorPage(cursorId = nextCursorId, size = size, name = name) } returns cursorPage
+            every {
+                productRepository.findWithCursorPage(
+                    cursorId = nextCursorId,
+                    size = size,
+                    name = name
+                )
+            } returns cursorPage
 
             val result = productService.findProducts(cursorId = nextCursorId, size = size, name = name)
 
@@ -118,8 +123,7 @@ class ProductServiceTest : DescribeSpec({
                 every { productStrategyMap[category] } returns productStrategy
                 every { productStrategy.findByProductId(productId) } returns ticketResult
 
-                val key = CacheKey.PRODUCT_VIEW_COUNT.generate(productId)
-                every { valueCache.increment(key, 1) } returns 1
+                every { productCacheRepository.incrementProductViewCount(productId, 1) } returns 1
 
                 val result = productService.findProduct(id = productId, category = category)
 
@@ -161,8 +165,7 @@ class ProductServiceTest : DescribeSpec({
             every { productStrategyMap[category] } returns productStrategy
             every { productStrategy.createProduct(productCreateCommand = ticketCreateCommand) } returns ticketResult
 
-            val key = CacheKey.PRODUCT_STOCK.generate(productId)
-            every { valueCache.set(key, ticketResult.quantity) } returns Unit
+            every { productCacheRepository.deleteProductStock(productId) } returns true
 
             val result = productService.createProduct(ticketCreateCommand)
 
@@ -208,8 +211,7 @@ class ProductServiceTest : DescribeSpec({
                 )
             } returns ticketResult
 
-            val key = CacheKey.PRODUCT_STOCK.generate(productId)
-            every { valueCache.set(key, ticketResult.quantity) } returns Unit
+            every { productCacheRepository.deleteProductStock(productId) } returns true
 
             val result = productService.updateProduct(
                 id = productId,
@@ -233,11 +235,9 @@ class ProductServiceTest : DescribeSpec({
         it("Product 삭제한다") {
             val category = Category.TICKET
             val productId = 1L
-            val key = CacheKey.PRODUCT_STOCK.generate(productId)
-
             every { productStrategyMap[category] } returns productStrategy
             every { productStrategy.deleteProduct(productId) } returns Unit
-            every { valueCache.delete(key) } returns true
+            every { productCacheRepository.deleteProductStock(productId) } returns true
 
             productService.deleteProduct(category = category, id = productId)
 

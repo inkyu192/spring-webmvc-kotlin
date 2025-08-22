@@ -7,23 +7,21 @@ import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.application.dto.result.ProductResult
-import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.repository.cache.FlightCacheRepository
 import spring.webmvc.domain.repository.FlightRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class FlightStrategy(
-    private val valueCache: ValueCache,
+    private val flightCacheRepository: FlightCacheRepository,
     private val flightRepository: FlightRepository,
 ) : ProductStrategy {
     override fun category() = Category.FLIGHT
 
     override fun findByProductId(productId: Long): ProductResult {
-        val key = CacheKey.FLIGHT.generate(productId)
-        val cache = valueCache.get(key = key, clazz = FlightResult::class.java)
+        val cache = flightCacheRepository.getFlight(productId)
 
         if (cache != null) {
             return cache
@@ -33,7 +31,7 @@ class FlightStrategy(
             ?.let { FlightResult(flight = it) }
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId))
 
-        valueCache.set(key = key, value = flightResult, timeout = CacheKey.FLIGHT.timeOut)
+        flightCacheRepository.setFlight(productId, flightResult)
 
         return flightResult
     }
@@ -87,7 +85,6 @@ class FlightStrategy(
 
         flightRepository.delete(flight)
 
-        val key = CacheKey.FLIGHT.generate(productId)
-        valueCache.delete(key = key)
+        flightCacheRepository.deleteFlight(productId)
     }
 }

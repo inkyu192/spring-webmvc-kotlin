@@ -1,4 +1,4 @@
-package spring.webmvc.domain.repository
+package spring.webmvc.domain.repository.cache
 
 import spring.webmvc.domain.model.cache.CurationCache
 import spring.webmvc.domain.model.cache.CurationProductCache

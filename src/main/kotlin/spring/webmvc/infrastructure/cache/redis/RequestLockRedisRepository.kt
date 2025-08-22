@@ -2,7 +2,7 @@ package spring.webmvc.infrastructure.cache.redis
 
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
-import spring.webmvc.domain.repository.RequestLockCacheRepository
+import spring.webmvc.domain.repository.cache.RequestLockCacheRepository
 import java.time.Duration
 
 @Repository

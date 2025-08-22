@@ -2,7 +2,7 @@ package spring.webmvc.infrastructure.cache.redis
 
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
-import spring.webmvc.domain.repository.TokenCacheRepository
+import spring.webmvc.domain.repository.cache.TokenCacheRepository
 
 @Repository
 class TokenRedisRepository(

@@ -7,23 +7,21 @@ import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.ProductResult
-import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.repository.cache.AccommodationCacheRepository
 import spring.webmvc.domain.repository.AccommodationRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class AccommodationStrategy(
-    private val valueCache: ValueCache,
+    private val accommodationCacheRepository: AccommodationCacheRepository,
     private val accommodationRepository: AccommodationRepository,
 ) : ProductStrategy {
     override fun category() = Category.ACCOMMODATION
 
     override fun findByProductId(productId: Long): ProductResult {
-        val key = CacheKey.ACCOMMODATION.generate(productId)
-        val cache = valueCache.get(key = key, clazz = AccommodationResult::class.java)
+        val cache = accommodationCacheRepository.getAccommodation(productId)
 
         if (cache != null) {
             return cache
@@ -33,7 +31,7 @@ class AccommodationStrategy(
             ?.let { AccommodationResult(accommodation = it) }
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
-        valueCache.set(key = key, value = accommodationResult, timeout = CacheKey.ACCOMMODATION.timeOut)
+        accommodationCacheRepository.setAccommodation(productId, accommodationResult)
 
         return accommodationResult
     }
@@ -81,7 +79,6 @@ class AccommodationStrategy(
 
         accommodationRepository.delete(accommodation)
 
-        val key = CacheKey.ACCOMMODATION.generate(productId)
-        valueCache.delete(key = key)
+        accommodationCacheRepository.deleteAccommodation(productId)
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
-import spring.webmvc.domain.repository.TokenCacheRepository
+import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.security.JwtProvider
 
 class AuthServiceTest : DescribeSpec({

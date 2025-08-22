@@ -6,16 +6,15 @@ import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.strategy.ProductStrategy
-import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.presentation.exception.StrategyNotImplementedException
 
 @Service
 @Transactional(readOnly = true)
 class ProductService(
-    private val valueCache: ValueCache,
+    private val productCacheRepository: ProductCacheRepository,
     private val productRepository: ProductRepository,
     private val productStrategyMap: Map<Category, ProductStrategy>,
 ) {
@@ -27,8 +26,7 @@ class ProductService(
             ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
         val productResult = productStrategy.findByProductId(productId = id)
 
-        val key = CacheKey.PRODUCT_VIEW_COUNT.generate(id)
-        valueCache.increment(key, 1)
+        productCacheRepository.incrementProductViewCount(productId = id, delta = 1)
 
         return productResult
     }
@@ -39,8 +37,7 @@ class ProductService(
             ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = command.category)
         val productResult = productStrategy.createProduct(productCreateCommand = command)
 
-        val key = CacheKey.PRODUCT_STOCK.generate(productResult.id)
-        valueCache.set(key = key, value = productResult.quantity)
+        productCacheRepository.deleteProductStock(productId = productResult.id)
 
         return productResult
     }
@@ -54,8 +51,7 @@ class ProductService(
             )
         val productResult = productStrategy.updateProduct(productId = id, productUpdateCommand = productUpdateCommand)
 
-        val key = CacheKey.PRODUCT_STOCK.generate(id)
-        valueCache.set(key = key, value = productResult.quantity)
+        productCacheRepository.deleteProductStock(productId = id)
 
         return productResult
     }
@@ -66,7 +62,6 @@ class ProductService(
             ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
         productStrategy.deleteProduct(productId = id)
 
-        val key = CacheKey.PRODUCT_STOCK.generate(id)
-        valueCache.delete(key = key)
+        productCacheRepository.deleteProductStock(productId = id)
     }
 }

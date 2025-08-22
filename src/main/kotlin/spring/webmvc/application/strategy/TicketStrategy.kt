@@ -7,23 +7,21 @@ import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.dto.result.TicketResult
-import spring.webmvc.domain.cache.CacheKey
-import spring.webmvc.domain.cache.ValueCache
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.repository.cache.TicketCacheRepository
 import spring.webmvc.domain.repository.TicketRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class TicketStrategy(
-    private val valueCache: ValueCache,
+    private val ticketCacheRepository: TicketCacheRepository,
     private val ticketRepository: TicketRepository,
 ) : ProductStrategy {
     override fun category() = Category.TICKET
 
     override fun findByProductId(productId: Long): ProductResult {
-        val key = CacheKey.TICKET.generate(productId)
-        val cache = valueCache.get(key = key, clazz = TicketResult::class.java)
+        val cache = ticketCacheRepository.getTicket(productId)
 
         if (cache != null) {
             return cache
@@ -33,7 +31,7 @@ class TicketStrategy(
             ?.let { TicketResult(ticket = it) }
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
-        valueCache.set(key = key, value = ticketResult, timeout = CacheKey.TICKET.timeOut)
+        ticketCacheRepository.setTicket(productId, ticketResult)
 
         return ticketResult
     }
@@ -83,7 +81,6 @@ class TicketStrategy(
 
         ticketRepository.delete(ticket)
 
-        val key = CacheKey.TICKET.generate(productId)
-        valueCache.delete(key = key)
+        ticketCacheRepository.deleteTicket(productId)
     }
 }

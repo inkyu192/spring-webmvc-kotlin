@@ -1,4 +1,4 @@
-package spring.webmvc.domain.repository
+package spring.webmvc.domain.repository.cache
 
 interface TokenCacheRepository {
     fun setRefreshToken(memberId: Long, refreshToken: String)
