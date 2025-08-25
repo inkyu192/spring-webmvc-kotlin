@@ -12,8 +12,6 @@ class TicketRepositoryAdapter(
 ) : TicketRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 
-    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
-
     override fun save(ticket: Ticket) = jpaRepository.save(ticket)
 
     override fun delete(ticket: Ticket) {

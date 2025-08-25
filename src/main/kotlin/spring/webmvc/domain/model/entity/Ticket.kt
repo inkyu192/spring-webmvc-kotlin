@@ -1,6 +1,6 @@
 package spring.webmvc.domain.model.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
@@ -10,16 +10,17 @@ class Ticket protected constructor(
     performanceTime: Instant,
     duration: String,
     ageLimit: String,
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "product_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    val product: Product,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+) : Product(
+    category = Category.TICKET,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity
 ) {
-    @Id
-    @GeneratedValue
-    var id: Long? = null
-        protected set
-
     var place = place
         protected set
 
@@ -47,13 +48,10 @@ class Ticket protected constructor(
             performanceTime = performanceTime,
             duration = duration,
             ageLimit = ageLimit,
-            product = Product.create(
-                category = Category.TICKET,
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity
-            ),
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity
         )
     }
 
@@ -67,7 +65,7 @@ class Ticket protected constructor(
         duration: String,
         ageLimit: String,
     ) {
-        this.product.update(name, description, price, quantity)
+        super.update(name, description, price, quantity)
         this.place = place
         this.performanceTime = performanceTime
         this.duration = duration

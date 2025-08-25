@@ -28,18 +28,18 @@ class AccommodationStrategy(
             return AccommodationResult(accommodationCache = cached)
         }
 
-        val accommodation = accommodationRepository.findByProductId(productId)
-            ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
+        val accommodation = accommodationRepository.findByIdOrNull(productId)
+            ?: throw EntityNotFoundException(kClass = Accommodation::class, id = productId)
 
         accommodationCacheRepository.setAccommodation(
             productId = productId,
             accommodationCache = AccommodationCache.create(
                 id = productId,
-                name = accommodation.product.name,
-                description = accommodation.product.description,
-                price = accommodation.product.price,
-                quantity = accommodation.product.quantity,
-                createdAt = accommodation.product.createdAt,
+                name = accommodation.name,
+                description = accommodation.description,
+                price = accommodation.price,
+                quantity = accommodation.quantity,
+                createdAt = accommodation.createdAt,
                 accommodationId = checkNotNull(accommodation.id),
                 place = accommodation.place,
                 checkInTime = accommodation.checkInTime,
@@ -71,8 +71,8 @@ class AccommodationStrategy(
     override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
         val accommodationUpdateCommand = productUpdateCommand as AccommodationUpdateCommand
 
-        val accommodation = accommodationRepository.findByProductId(productId)
-            ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
+        val accommodation = accommodationRepository.findByIdOrNull(productId)
+            ?: throw EntityNotFoundException(kClass = Accommodation::class, id = productId)
 
         accommodation.update(
             name = accommodationUpdateCommand.name,
@@ -88,8 +88,8 @@ class AccommodationStrategy(
     }
 
     override fun deleteProduct(productId: Long) {
-        val accommodation = accommodationRepository.findByProductId(productId)
-            ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
+        val accommodation = accommodationRepository.findByIdOrNull(productId)
+            ?: throw EntityNotFoundException(kClass = Accommodation::class, id = productId)
 
         accommodationRepository.delete(accommodation)
 

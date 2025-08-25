@@ -12,7 +12,7 @@ open class ProductResult(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val createdAt: Instant
+    val createdAt: Instant,
 ) {
     constructor(product: Product) : this(
         id = checkNotNull(product.id),
@@ -21,7 +21,7 @@ open class ProductResult(
         description = product.description,
         price = product.price,
         quantity = product.quantity,
-        createdAt = product.createdAt
+        createdAt = product.createdAt,
     )
 
     constructor(product: ProductCache) : this(
@@ -31,6 +31,6 @@ open class ProductResult(
         description = product.description,
         price = product.price,
         quantity = product.quantity,
-        createdAt = product.createdAt
+        createdAt = product.createdAt,
     )
 }

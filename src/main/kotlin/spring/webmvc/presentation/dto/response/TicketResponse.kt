@@ -1,7 +1,6 @@
 package spring.webmvc.presentation.dto.response
 
 import spring.webmvc.application.dto.result.TicketResult
-import spring.webmvc.domain.model.entity.Ticket
 import java.time.Instant
 
 class TicketResponse : ProductResponse {
@@ -17,13 +16,5 @@ class TicketResponse : ProductResponse {
         performanceTime = ticketResult.performanceTime
         duration = ticketResult.duration
         ageLimit = ticketResult.ageLimit
-    }
-
-    constructor(ticket: Ticket) : super(product = ticket.product) {
-        ticketId = checkNotNull(ticket.id)
-        place = ticket.place
-        performanceTime = ticket.performanceTime
-        duration = ticket.duration
-        ageLimit = ticket.ageLimit
     }
 }

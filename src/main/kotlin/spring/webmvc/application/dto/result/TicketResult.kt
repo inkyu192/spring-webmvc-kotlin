@@ -12,7 +12,7 @@ class TicketResult : ProductResult {
     val duration: String
     val ageLimit: String
 
-    constructor(ticket: Ticket) : super(product = ticket.product) {
+    constructor(ticket: Ticket) : super(product = ticket) {
         this.ticketId = checkNotNull(ticket.id)
         this.place = ticket.place
         this.performanceTime = ticket.performanceTime

@@ -12,8 +12,6 @@ class FlightRepositoryAdapter(
 ) : FlightRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 
-    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
-
     override fun save(flight: Flight) = jpaRepository.save(flight)
 
     override fun delete(flight: Flight) {

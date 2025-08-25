@@ -28,7 +28,8 @@ import spring.webmvc.application.dto.result.CurationProductResult
 import spring.webmvc.application.dto.result.CurationResult
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.Curation
-import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.model.entity.Accommodation
+import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
@@ -44,8 +45,8 @@ class CurationControllerTest() {
 
     private lateinit var curation1: Curation
     private lateinit var curation2: Curation
-    private lateinit var product1: Product
-    private lateinit var product2: Product
+    private lateinit var product1: Accommodation
+    private lateinit var product2: Flight
 
     @BeforeEach
     fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
@@ -74,23 +75,30 @@ class CurationControllerTest() {
         ).apply { whenever(id).thenReturn(2L) }
 
         product1 = spy(
-            Product.create(
+            Accommodation.create(
                 name = "제주도 호텔",
                 description = "제주도 3박4일",
                 price = 100000L,
                 quantity = 10L,
-                category = Category.ACCOMMODATION
+                place = "제주도",
+                checkInTime = java.time.Instant.now(),
+                checkOutTime = java.time.Instant.now().plusSeconds(3600 * 24 * 4)
             )
         ).apply {
             whenever(id).thenReturn(1L)
         }
         product2 = spy(
-            Product.create(
+            Flight.create(
                 name = "부산 항공권",
                 description = "부산 왕복 항공권",
                 price = 200000L,
                 quantity = 5L,
-                category = Category.FLIGHT
+                airline = "Korean Air",
+                flightNumber = "KE1234",
+                departureAirport = "ICN",
+                arrivalAirport = "PUS",
+                departureTime = java.time.Instant.now(),
+                arrivalTime = java.time.Instant.now().plusSeconds(3600 * 2)
             )
         ).apply {
             whenever(id).thenReturn(2L)

@@ -1,6 +1,6 @@
 package spring.webmvc.domain.model.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
@@ -9,16 +9,17 @@ class Accommodation protected constructor(
     place: String,
     checkInTime: Instant,
     checkOutTime: Instant,
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "product_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    val product: Product,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+) : Product(
+    category = Category.ACCOMMODATION,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity
 ) {
-    @Id
-    @GeneratedValue
-    var id: Long? = null
-        protected set
-
     var place = place
         protected set
 
@@ -41,13 +42,10 @@ class Accommodation protected constructor(
             place = place,
             checkInTime = checkInTime,
             checkOutTime = checkOutTime,
-            product = Product.create(
-                category = Category.ACCOMMODATION,
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity
-            ),
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity
         )
     }
 
@@ -60,7 +58,7 @@ class Accommodation protected constructor(
         checkInTime: Instant,
         checkOutTime: Instant,
     ) {
-        this.product.update(name, description, price, quantity)
+        super.update(name, description, price, quantity)
         this.place = place
         this.checkInTime = checkInTime
         this.checkOutTime = checkOutTime

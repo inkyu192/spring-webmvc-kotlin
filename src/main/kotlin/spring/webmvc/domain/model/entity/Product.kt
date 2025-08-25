@@ -4,7 +4,8 @@ import jakarta.persistence.*
 import spring.webmvc.domain.model.enums.Category
 
 @Entity
-class Product protected constructor(
+@Inheritance(strategy = InheritanceType.JOINED)
+abstract class Product protected constructor(
     @Enumerated(EnumType.STRING)
     val category: Category,
     name: String,
@@ -28,11 +29,6 @@ class Product protected constructor(
 
     var quantity = quantity
         protected set
-
-    companion object {
-        fun create(name: String, description: String, price: Long, quantity: Long, category: Category) =
-            Product(name = name, description = description, price = price, quantity = quantity, category = category)
-    }
 
     fun update(name: String, description: String, price: Long, quantity: Long) {
         this.name = name

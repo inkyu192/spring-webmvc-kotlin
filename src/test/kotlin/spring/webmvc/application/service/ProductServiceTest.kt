@@ -14,7 +14,8 @@ import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.strategy.ProductStrategy
 import spring.webmvc.domain.model.cache.TicketCache
-import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.model.entity.Accommodation
+import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.ProductRepository
@@ -41,30 +42,40 @@ class ProductServiceTest : DescribeSpec({
             val name = "name"
             val products = listOf(
                 spyk(
-                    Product.create(
+                    Accommodation.create(
                         name = "name1",
                         description = "description",
                         price = 1000,
                         quantity = 10,
-                        category = Category.ACCOMMODATION
+                        place = "place1",
+                        checkInTime = Instant.now(),
+                        checkOutTime = Instant.now().plusSeconds(3600)
                     )
                 ).apply { every { id } returns 1L },
                 spyk(
-                    Product.create(
+                    Flight.create(
                         name = "name2",
                         description = "description",
                         price = 2000,
                         quantity = 20,
-                        category = Category.FLIGHT
+                        airline = "airline",
+                        flightNumber = "FL123",
+                        departureAirport = "ICN",
+                        arrivalAirport = "NRT",
+                        departureTime = Instant.now(),
+                        arrivalTime = Instant.now().plusSeconds(7200)
                     )
                 ).apply { every { id } returns 2L },
                 spyk(
-                    Product.create(
+                    Ticket.create(
                         name = "name3",
                         description = "description",
                         price = 3000,
                         quantity = 30,
-                        category = Category.TICKET
+                        place = "place3",
+                        performanceTime = Instant.now(),
+                        duration = "2h",
+                        ageLimit = "All"
                     )
                 ).apply { every { id } returns 3L },
             )

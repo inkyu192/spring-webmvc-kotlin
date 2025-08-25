@@ -28,18 +28,18 @@ class FlightStrategy(
             return FlightResult(flightCache = cached)
         }
 
-        val flight = flightRepository.findByProductId(productId)
+        val flight = flightRepository.findByIdOrNull(productId)
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
 
         flightCacheRepository.setFlight(
             productId = productId,
             flightCache = FlightCache.create(
                 id = productId,
-                name = flight.product.name,
-                description = flight.product.description,
-                price = flight.product.price,
-                quantity = flight.product.quantity,
-                createdAt = flight.product.createdAt,
+                name = flight.name,
+                description = flight.description,
+                price = flight.price,
+                quantity = flight.quantity,
+                createdAt = flight.createdAt,
                 flightId = checkNotNull(flight.id),
                 airline = flight.airline,
                 flightNumber = flight.flightNumber,
@@ -77,7 +77,7 @@ class FlightStrategy(
     override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
         val flightUpdateCommand = productUpdateCommand as FlightUpdateCommand
 
-        val flight = flightRepository.findByProductId(productId)
+        val flight = flightRepository.findByIdOrNull(productId)
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
 
         flight.update(
@@ -97,7 +97,7 @@ class FlightStrategy(
     }
 
     override fun deleteProduct(productId: Long) {
-        val flight = flightRepository.findByProductId(productId)
+        val flight = flightRepository.findByIdOrNull(productId)
             ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
 
         flightRepository.delete(flight)

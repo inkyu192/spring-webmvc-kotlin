@@ -1,6 +1,6 @@
 package spring.webmvc.domain.model.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
@@ -12,16 +12,17 @@ class Flight protected constructor(
     arrivalAirport: String,
     departureTime: Instant,
     arrivalTime: Instant,
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "product_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    val product: Product,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+) : Product(
+    category = Category.FLIGHT,
+    name = name,
+    description = description,
+    price = price,
+    quantity = quantity
 ) {
-    @Id
-    @GeneratedValue
-    var id: Long? = null
-        protected set
-
     var airline = airline
         protected set
 
@@ -59,13 +60,10 @@ class Flight protected constructor(
             arrivalAirport = arrivalAirport,
             departureTime = departureTime,
             arrivalTime = arrivalTime,
-            product = Product.create(
-                category = Category.FLIGHT,
-                name = name,
-                description = description,
-                price = price,
-                quantity = quantity
-            ),
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
         )
     }
 
@@ -81,7 +79,7 @@ class Flight protected constructor(
         departureTime: Instant,
         arrivalTime: Instant,
     ) {
-        this.product.update(name, description, price, quantity)
+        super.update(name, description, price, quantity)
         this.airline = airline
         this.flightNumber = flightNumber
         this.departureAirport = departureAirport

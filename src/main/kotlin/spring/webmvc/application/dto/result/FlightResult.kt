@@ -14,7 +14,7 @@ class FlightResult : ProductResult {
     val departureTime: Instant
     val arrivalTime: Instant
 
-    constructor(flight: Flight) : super(product = flight.product) {
+    constructor(flight: Flight) : super(product = flight) {
         this.flightId = checkNotNull(flight.id)
         this.airline = flight.airline
         this.flightNumber = flight.flightNumber

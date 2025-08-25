@@ -10,7 +10,7 @@ import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.crypto.CryptoService
 
@@ -22,40 +22,52 @@ class ProductQuerydslRepositoryTest(
     private val cryptoService = mock<CryptoService>()
     private val productQuerydslRepository = ProductQuerydslRepository(JPAQueryFactory(entityManager))
 
-    private lateinit var product1: Product
-    private lateinit var product2: Product
-    private lateinit var product3: Product
-    private lateinit var product4: Product
+    private lateinit var product1: Ticket
+    private lateinit var product2: Ticket
+    private lateinit var product3: Ticket
+    private lateinit var product4: Ticket
 
     @BeforeEach
     fun setUp() {
-        product1 = Product.create(
+        product1 = Ticket.create(
             name = "product1",
             description = "description",
             price = 1000,
             quantity = 10,
-            category = Category.TICKET
+            place = "place1",
+            performanceTime = java.time.Instant.now(),
+            duration = "2h",
+            ageLimit = "12+"
         )
-        product2 = Product.create(
+        product2 = Ticket.create(
             name = "product2",
             description = "description",
             price = 2000,
             quantity = 20,
-            category = Category.FLIGHT
+            place = "place2",
+            performanceTime = java.time.Instant.now(),
+            duration = "3h",
+            ageLimit = "15+"
         )
-        product3 = Product.create(
+        product3 = Ticket.create(
             name = "product3",
             price = 3000,
             quantity = 30,
-            category = Category.TICKET,
             description = "description",
+            place = "place3",
+            performanceTime = java.time.Instant.now(),
+            duration = "1h",
+            ageLimit = "All"
         )
-        product4 = Product.create(
+        product4 = Ticket.create(
             name = "product4",
             description = "description",
             price = 1500,
             quantity = 30,
-            category = Category.FLIGHT
+            place = "place4",
+            performanceTime = java.time.Instant.now(),
+            duration = "2h",
+            ageLimit = "18+"
         )
         entityManager.persist(product1)
         entityManager.persist(product2)

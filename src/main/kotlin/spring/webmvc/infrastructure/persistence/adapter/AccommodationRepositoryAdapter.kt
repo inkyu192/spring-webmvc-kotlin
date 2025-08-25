@@ -12,8 +12,6 @@ class AccommodationRepositoryAdapter(
 ) : AccommodationRepository {
     override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id)
 
-    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
-
     override fun save(accommodation: Accommodation) = jpaRepository.save(accommodation)
 
     override fun delete(accommodation: Accommodation) {

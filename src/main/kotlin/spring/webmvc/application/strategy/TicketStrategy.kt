@@ -28,18 +28,18 @@ class TicketStrategy(
             return TicketResult(ticketCache = cached)
         }
 
-        val ticket = ticketRepository.findByProductId(productId)
+        val ticket = ticketRepository.findByIdOrNull(productId)
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
         ticketCacheRepository.setTicket(
             productId = productId,
             ticketCache = TicketCache.create(
                 id = productId,
-                name = ticket.product.name,
-                description = ticket.product.description,
-                price = ticket.product.price,
-                quantity = ticket.product.quantity,
-                createdAt = ticket.product.createdAt,
+                name = ticket.name,
+                description = ticket.description,
+                price = ticket.price,
+                quantity = ticket.quantity,
+                createdAt = ticket.createdAt,
                 ticketId = checkNotNull(ticket.id),
                 place = ticket.place,
                 performanceTime = ticket.performanceTime,
@@ -73,7 +73,7 @@ class TicketStrategy(
     override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
         val ticketUpdateCommand = productUpdateCommand as TicketUpdateCommand
 
-        val ticket = ticketRepository.findByProductId(productId)
+        val ticket = ticketRepository.findByIdOrNull(productId)
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
         ticket.update(
@@ -91,7 +91,7 @@ class TicketStrategy(
     }
 
     override fun deleteProduct(productId: Long) {
-        val ticket = ticketRepository.findByProductId(productId)
+        val ticket = ticketRepository.findByIdOrNull(productId)
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
         ticketRepository.delete(ticket)

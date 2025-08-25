@@ -1,7 +1,6 @@
 package spring.webmvc.presentation.dto.response
 
 import spring.webmvc.application.dto.result.AccommodationResult
-import spring.webmvc.domain.model.entity.Accommodation
 import java.time.Instant
 
 class AccommodationResponse : ProductResponse {
@@ -15,12 +14,5 @@ class AccommodationResponse : ProductResponse {
         place = accommodationResult.place
         checkInTime = accommodationResult.checkInTime
         checkOutTime = accommodationResult.checkOutTime
-    }
-
-    constructor(accommodation: Accommodation) : super(product = accommodation.product) {
-        accommodationId = checkNotNull(accommodation.id)
-        place = accommodation.place
-        checkInTime = accommodation.checkInTime
-        checkOutTime = accommodation.checkOutTime
     }
 }
