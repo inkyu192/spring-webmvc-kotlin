@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
-import spring.webmvc.application.dto.result.FlightResult
-
+import spring.webmvc.domain.model.cache.FlightCache
 import spring.webmvc.domain.repository.cache.FlightCacheRepository
 import java.time.Duration
 
@@ -15,41 +14,38 @@ class FlightRedisRepository(
     private val objectMapper: ObjectMapper,
 ) : FlightCacheRepository {
     private val logger = LoggerFactory.getLogger(FlightRedisRepository::class.java)
-    
+
     companion object {
-        private const val KEY_PREFIX = "flight:%d"
-        private val DEFAULT_TIMEOUT = Duration.ofHours(1)
+        private const val FLIGHT_KEY = "flight"
     }
 
-    override fun getFlight(productId: Long): FlightResult? {
-        return try {
-            val key = KEY_PREFIX.format(productId)
+    override fun getFlight(productId: Long): FlightCache? {
+        val key = "$FLIGHT_KEY:$productId"
+        return runCatching {
             val value = redisTemplate.opsForValue().get(key)
-            value?.let { objectMapper.readValue(it, FlightResult::class.java) }
-        } catch (e: Exception) {
-            logger.error("Redis get 연산 중 오류 발생. productId: $productId", e)
-            null
-        }
+            value?.let { objectMapper.readValue(it, FlightCache::class.java) }
+        }.onFailure {
+            logger.warn("Failed to get flight cache for key={}: {}", key, it.message)
+        }.getOrElse { null }
     }
 
-    override fun setFlight(productId: Long, flightResult: FlightResult, timeout: Duration?) {
-        try {
-            val key = KEY_PREFIX.format(productId)
-            val valueAsString = objectMapper.writeValueAsString(flightResult)
-            val actualTimeout = timeout ?: DEFAULT_TIMEOUT
+    override fun setFlight(productId: Long, flightCache: FlightCache) {
+        val key = "$FLIGHT_KEY:$productId"
+        runCatching {
+            val valueAsString = objectMapper.writeValueAsString(flightCache)
+            val actualTimeout = Duration.ofHours(1)
             redisTemplate.opsForValue().set(key, valueAsString, actualTimeout)
-        } catch (e: Exception) {
-            logger.error("Redis set 연산 중 오류 발생. productId: $productId", e)
+        }.onFailure {
+            logger.error("Failed to set flight cache for key={}: {}", key, it.message, it)
         }
     }
 
     override fun deleteFlight(productId: Long): Boolean {
-        return try {
-            val key = KEY_PREFIX.format(productId)
+        val key = "$FLIGHT_KEY:$productId"
+        return runCatching {
             redisTemplate.delete(key)
-        } catch (e: Exception) {
-            logger.error("Redis delete 연산 중 오류 발생. productId: $productId", e)
-            false
-        }
+        }.onFailure {
+            logger.error("Failed to delete flight cache for key={}: {}", key, it.message, it)
+        }.getOrElse { false }
     }
 }

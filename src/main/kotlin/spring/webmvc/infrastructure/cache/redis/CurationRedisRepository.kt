@@ -14,22 +14,22 @@ class CurationRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper,
 ) : CurationCacheRepository {
-    private val logger = LoggerFactory.getLogger(CurationCacheRepository::class.java)
+    private val logger = LoggerFactory.getLogger(CurationRedisRepository::class.java)
 
     companion object {
-        private const val CURATIONS_KEY = "curations"
+        private const val CURATION_KEY = "curations"
     }
 
     override fun setCurations(curations: List<CurationCache>) {
         runCatching {
             val jsonValue = objectMapper.writeValueAsString(curations)
-            redisTemplate.opsForValue().set(CURATIONS_KEY, jsonValue, Duration.ofHours(1))
-        }.onFailure { logger.error("Failed to set curations cache for key={}: {}", CURATIONS_KEY, it.message, it) }
+            redisTemplate.opsForValue().set(CURATION_KEY, jsonValue, Duration.ofHours(1))
+        }.onFailure { logger.error("Failed to set curations cache for key={}: {}", CURATION_KEY, it.message, it) }
     }
 
     override fun getCurations(): List<CurationCache> {
         return runCatching {
-            val jsonValue = redisTemplate.opsForValue().get(CURATIONS_KEY)
+            val jsonValue = redisTemplate.opsForValue().get(CURATION_KEY)
             jsonValue?.let {
                 objectMapper.readValue(
                     it,
@@ -40,7 +40,7 @@ class CurationRedisRepository(
                 )
             } ?: emptyList<CurationCache>()
         }.onFailure {
-            logger.warn("Failed to get curations cache for key={}: {}", CURATIONS_KEY, it.message)
+            logger.warn("Failed to get curations cache for key={}: {}", CURATION_KEY, it.message)
         }.getOrElse { emptyList() }
     }
 
@@ -50,7 +50,7 @@ class CurationRedisRepository(
         size: Int,
         cache: CurationProductCache,
     ) {
-        val key = "$CURATIONS_KEY:$curationId:cursor:${cursorId ?: "null"}:size:$size"
+        val key = "$CURATION_KEY:$curationId:cursor:${cursorId ?: "null"}:size:$size"
 
         runCatching {
             val jsonValue = objectMapper.writeValueAsString(cache)
@@ -61,7 +61,7 @@ class CurationRedisRepository(
     }
 
     override fun getCurationProducts(curationId: Long, cursorId: Long?, size: Int): CurationProductCache? {
-        val key = "$CURATIONS_KEY:$curationId:cursor:${cursorId ?: "null"}:size:$size"
+        val key = "$CURATION_KEY:$curationId:cursor:${cursorId ?: "null"}:size:$size"
 
         return runCatching {
             val jsonValue = redisTemplate.opsForValue().get(key)
@@ -75,7 +75,7 @@ class CurationRedisRepository(
 
     override fun deleteAll() {
         runCatching {
-            val keys = redisTemplate.keys("$CURATIONS_KEY*")
+            val keys = redisTemplate.keys("$CURATION_KEY*")
             redisTemplate.delete(keys)
         }.onFailure {
             logger.error("Failed to delete all curations cache: {}", it.message, it)

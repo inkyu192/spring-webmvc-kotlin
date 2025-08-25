@@ -7,10 +7,11 @@ import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.application.dto.result.ProductResult
+import spring.webmvc.domain.model.cache.FlightCache
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.domain.repository.cache.FlightCacheRepository
 import spring.webmvc.domain.repository.FlightRepository
+import spring.webmvc.domain.repository.cache.FlightCacheRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
@@ -21,19 +22,35 @@ class FlightStrategy(
     override fun category() = Category.FLIGHT
 
     override fun findByProductId(productId: Long): ProductResult {
-        val cache = flightCacheRepository.getFlight(productId)
+        val cached = flightCacheRepository.getFlight(productId)
 
-        if (cache != null) {
-            return cache
+        if (cached != null) {
+            return FlightResult(flightCache = cached)
         }
 
-        val flightResult = (flightRepository.findByProductId(productId)
-            ?.let { FlightResult(flight = it) }
-            ?: throw EntityNotFoundException(kClass = Flight::class, id = productId))
+        val flight = flightRepository.findByProductId(productId)
+            ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
 
-        flightCacheRepository.setFlight(productId, flightResult)
+        flightCacheRepository.setFlight(
+            productId = productId,
+            flightCache = FlightCache.create(
+                id = productId,
+                name = flight.product.name,
+                description = flight.product.description,
+                price = flight.product.price,
+                quantity = flight.product.quantity,
+                createdAt = flight.product.createdAt,
+                flightId = checkNotNull(flight.id),
+                airline = flight.airline,
+                flightNumber = flight.flightNumber,
+                departureAirport = flight.departureAirport,
+                arrivalAirport = flight.arrivalAirport,
+                departureTime = flight.departureTime,
+                arrivalTime = flight.arrivalTime
+            )
+        )
 
-        return flightResult
+        return FlightResult(flight)
     }
 
     override fun createProduct(productCreateCommand: ProductCreateCommand): ProductResult {

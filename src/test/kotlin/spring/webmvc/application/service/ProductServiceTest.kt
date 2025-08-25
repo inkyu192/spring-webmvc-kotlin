@@ -13,11 +13,12 @@ import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.strategy.ProductStrategy
+import spring.webmvc.domain.model.cache.TicketCache
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import java.time.Instant
@@ -108,16 +109,19 @@ class ProductServiceTest : DescribeSpec({
                 val productId = 1L
                 val category = Category.TICKET
                 val ticketResult = TicketResult(
-                    id = productId,
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 10, createdAt = Instant.now(),
-                    ticketId = 1L,
-                    place = "place",
-                    performanceTime = Instant.now(),
-                    duration = "duration",
-                    ageLimit = "ageLimit"
+                    TicketCache(
+                        id = productId,
+                        name = "name",
+                        description = "description",
+                        price = 1000,
+                        quantity = 10,
+                        createdAt = Instant.now(),
+                        ticketId = 1L,
+                        place = "place",
+                        performanceTime = Instant.now(),
+                        duration = "duration",
+                        ageLimit = "ageLimit"
+                    )
                 )
 
                 every { productStrategyMap[category] } returns productStrategy
@@ -150,16 +154,19 @@ class ProductServiceTest : DescribeSpec({
             every { ticketCreateCommand.category } returns category
 
             val ticketResult = TicketResult(
-                id = productId,
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 10, createdAt = Instant.now(),
-                ticketId = 1L,
-                place = "place",
-                performanceTime = Instant.now(),
-                duration = "duration",
-                ageLimit = "ageLimit"
+                TicketCache(
+                    id = productId,
+                    name = "name",
+                    description = "description",
+                    price = 1000,
+                    quantity = 10,
+                    createdAt = Instant.now(),
+                    ticketId = 1L,
+                    place = "place",
+                    performanceTime = Instant.now(),
+                    duration = "duration",
+                    ageLimit = "ageLimit"
+                )
             )
 
             every { productStrategyMap[category] } returns productStrategy
@@ -191,16 +198,19 @@ class ProductServiceTest : DescribeSpec({
             every { ticketUpdateCommand.category } returns category
 
             val ticketResult = TicketResult(
-                id = productId,
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 10, createdAt = Instant.now(),
-                ticketId = 1L,
-                place = "place",
-                performanceTime = Instant.now(),
-                duration = "duration",
-                ageLimit = "ageLimit"
+                TicketCache(
+                    id = productId,
+                    name = "name",
+                    description = "description",
+                    price = 1000,
+                    quantity = 10,
+                    createdAt = Instant.now(),
+                    ticketId = 1L,
+                    place = "place",
+                    performanceTime = Instant.now(),
+                    duration = "duration",
+                    ageLimit = "ageLimit"
+                )
             )
 
             every { productStrategyMap[category] } returns productStrategy

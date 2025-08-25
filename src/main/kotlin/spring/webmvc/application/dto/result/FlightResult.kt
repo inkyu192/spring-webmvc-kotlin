@@ -1,6 +1,6 @@
 package spring.webmvc.application.dto.result
 
-import com.fasterxml.jackson.annotation.JsonCreator
+import spring.webmvc.domain.model.cache.FlightCache
 import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
@@ -14,39 +14,6 @@ class FlightResult : ProductResult {
     val departureTime: Instant
     val arrivalTime: Instant
 
-    @JsonCreator
-    constructor(
-        id: Long,
-        name: String,
-        description: String,
-        price: Long,
-        quantity: Long,
-        createdAt: Instant,
-        flightId: Long,
-        airline: String,
-        flightNumber: String,
-        departureAirport: String,
-        arrivalAirport: String,
-        departureTime: Instant,
-        arrivalTime: Instant
-    ) : super(
-        id = id,
-        category = Category.FLIGHT,
-        name = name,
-        description = description,
-        price = price,
-        quantity = quantity,
-        createdAt = createdAt
-    ) {
-        this.flightId = flightId
-        this.airline = airline
-        this.flightNumber = flightNumber
-        this.departureAirport = departureAirport
-        this.arrivalAirport = arrivalAirport
-        this.departureTime = departureTime
-        this.arrivalTime = arrivalTime
-    }
-
     constructor(flight: Flight) : super(product = flight.product) {
         this.flightId = checkNotNull(flight.id)
         this.airline = flight.airline
@@ -55,5 +22,23 @@ class FlightResult : ProductResult {
         this.arrivalAirport = flight.arrivalAirport
         this.departureTime = flight.departureTime
         this.arrivalTime = flight.arrivalTime
+    }
+
+    constructor(flightCache: FlightCache) : super(
+        id = flightCache.id,
+        category = Category.FLIGHT,
+        name = flightCache.name,
+        description = flightCache.description,
+        price = flightCache.price,
+        quantity = flightCache.quantity,
+        createdAt = flightCache.createdAt
+    ) {
+        this.flightId = flightCache.flightId
+        this.airline = flightCache.airline
+        this.flightNumber = flightCache.flightNumber
+        this.departureAirport = flightCache.departureAirport
+        this.arrivalAirport = flightCache.arrivalAirport
+        this.departureTime = flightCache.departureTime
+        this.arrivalTime = flightCache.arrivalTime
     }
 }

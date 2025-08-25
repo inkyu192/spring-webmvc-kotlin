@@ -7,8 +7,8 @@ import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.strategy.ProductStrategy
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.presentation.exception.StrategyNotImplementedException
 
 @Service

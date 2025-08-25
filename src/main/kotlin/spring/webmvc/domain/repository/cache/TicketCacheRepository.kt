@@ -1,10 +1,9 @@
 package spring.webmvc.domain.repository.cache
 
-import spring.webmvc.application.dto.result.TicketResult
-import java.time.Duration
+import spring.webmvc.domain.model.cache.TicketCache
 
 interface TicketCacheRepository {
-    fun getTicket(productId: Long): TicketResult?
-    fun setTicket(productId: Long, ticketResult: TicketResult, timeout: Duration? = null)
+    fun getTicket(productId: Long): TicketCache?
+    fun setTicket(productId: Long, ticketCache: TicketCache)
     fun deleteTicket(productId: Long): Boolean
 }

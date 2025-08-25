@@ -28,6 +28,9 @@ import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.application.dto.result.TicketResult
 import spring.webmvc.application.service.ProductService
+import spring.webmvc.domain.model.cache.AccommodationCache
+import spring.webmvc.domain.model.cache.FlightCache
+import spring.webmvc.domain.model.cache.TicketCache
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -140,16 +143,19 @@ class ProductControllerTest() {
         val productId = 1L
         val category = Category.TICKET
         val ticketResult = TicketResult(
-            id = productId,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 10, createdAt = Instant.now(),
-            ticketId = 1L,
-            place = "place",
-            performanceTime = Instant.now(),
-            duration = "duration",
-            ageLimit = "ageLimit"
+            TicketCache(
+                id = productId,
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 10,
+                createdAt = Instant.now(),
+                ticketId = 1L,
+                place = "place",
+                performanceTime = Instant.now(),
+                duration = "duration",
+                ageLimit = "ageLimit"
+            )
         )
 
         whenever(productService.findProduct(id = productId, category = category)).thenReturn(ticketResult)
@@ -195,19 +201,21 @@ class ProductControllerTest() {
         val productId = 1L
         val category = Category.FLIGHT
         val flightResult = FlightResult(
-            id = productId,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 10,
-            createdAt = Instant.now(),
-            flightId = 1L,
-            airline = "airline",
-            flightNumber = "flightNumber",
-            departureAirport = "departureAirport",
-            arrivalAirport = "arrivalAirport",
-            departureTime = Instant.now(),
-            arrivalTime = Instant.now().plus(1, ChronoUnit.DAYS)
+            FlightCache(
+                id = productId,
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 10,
+                createdAt = Instant.now(),
+                flightId = 1L,
+                airline = "airline",
+                flightNumber = "flightNumber",
+                departureAirport = "departureAirport",
+                arrivalAirport = "arrivalAirport",
+                departureTime = Instant.now(),
+                arrivalTime = Instant.now().plus(1, ChronoUnit.DAYS)
+            )
         )
 
         whenever(productService.findProduct(id = productId, category = category)).thenReturn(flightResult)
@@ -255,16 +263,18 @@ class ProductControllerTest() {
         val productId = 1L
         val category = Category.ACCOMMODATION
         val accommodationResult = AccommodationResult(
-            id = productId,
-            name = "name",
-            description = "description",
-            price = 1000,
-            quantity = 10,
-            createdAt = Instant.now(),
-            accommodationId = 1L,
-            place = "place",
-            checkInTime = Instant.now(),
-            checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+            AccommodationCache(
+                id = productId,
+                name = "name",
+                description = "description",
+                price = 1000,
+                quantity = 10,
+                createdAt = Instant.now(),
+                accommodationId = 1L,
+                place = "place",
+                checkInTime = Instant.now(),
+                checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
+            )
         )
 
         whenever(productService.findProduct(id = productId, category = category)).thenReturn(accommodationResult)

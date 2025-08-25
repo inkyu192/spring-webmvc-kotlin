@@ -7,10 +7,11 @@ import spring.webmvc.application.dto.command.TicketCreateCommand
 import spring.webmvc.application.dto.command.TicketUpdateCommand
 import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.dto.result.TicketResult
+import spring.webmvc.domain.model.cache.TicketCache
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.domain.repository.cache.TicketCacheRepository
 import spring.webmvc.domain.repository.TicketRepository
+import spring.webmvc.domain.repository.cache.TicketCacheRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
@@ -21,19 +22,33 @@ class TicketStrategy(
     override fun category() = Category.TICKET
 
     override fun findByProductId(productId: Long): ProductResult {
-        val cache = ticketCacheRepository.getTicket(productId)
+        val cached = ticketCacheRepository.getTicket(productId)
 
-        if (cache != null) {
-            return cache
+        if (cached != null) {
+            return TicketResult(ticketCache = cached)
         }
 
-        val ticketResult = ticketRepository.findByProductId(productId)
-            ?.let { TicketResult(ticket = it) }
+        val ticket = ticketRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
 
-        ticketCacheRepository.setTicket(productId, ticketResult)
+        ticketCacheRepository.setTicket(
+            productId = productId,
+            ticketCache = TicketCache.create(
+                id = productId,
+                name = ticket.product.name,
+                description = ticket.product.description,
+                price = ticket.product.price,
+                quantity = ticket.product.quantity,
+                createdAt = ticket.product.createdAt,
+                ticketId = checkNotNull(ticket.id),
+                place = ticket.place,
+                performanceTime = ticket.performanceTime,
+                duration = ticket.duration,
+                ageLimit = ticket.ageLimit
+            )
+        )
 
-        return ticketResult
+        return TicketResult(ticket)
     }
 
     override fun createProduct(productCreateCommand: ProductCreateCommand): ProductResult {

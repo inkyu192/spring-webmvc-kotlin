@@ -1,7 +1,5 @@
 package spring.webmvc.domain.model.cache
 
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
-
 data class CurationCache(
     val id: Long,
     val title: String,
@@ -14,8 +12,3 @@ data class CurationCache(
             )
     }
 }
-
-data class CurationProductCache(
-    val curation: CurationCache,
-    val productPage: CursorPage<ProductCache>,
-)

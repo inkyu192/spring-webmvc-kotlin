@@ -6,10 +6,10 @@ import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.result.CurationProductResult
 import spring.webmvc.application.dto.result.CurationResult
 import spring.webmvc.domain.model.entity.Curation
-import spring.webmvc.domain.repository.cache.CurationCacheRepository
 import spring.webmvc.domain.repository.CurationProductRepository
 import spring.webmvc.domain.repository.CurationRepository
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.cache.CurationCacheRepository
 import spring.webmvc.domain.service.CurationDomainService
 import spring.webmvc.presentation.exception.EntityNotFoundException
 

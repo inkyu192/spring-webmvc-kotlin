@@ -12,8 +12,8 @@ import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.OrderRepository
-import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.infrastructure.security.SecurityContextUtil
 import spring.webmvc.presentation.exception.EntityNotFoundException
 import spring.webmvc.presentation.exception.InsufficientQuantityException

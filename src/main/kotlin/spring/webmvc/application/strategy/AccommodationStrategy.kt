@@ -7,10 +7,11 @@ import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.ProductResult
+import spring.webmvc.domain.model.cache.AccommodationCache
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.domain.repository.cache.AccommodationCacheRepository
 import spring.webmvc.domain.repository.AccommodationRepository
+import spring.webmvc.domain.repository.cache.AccommodationCacheRepository
 import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
@@ -21,19 +22,32 @@ class AccommodationStrategy(
     override fun category() = Category.ACCOMMODATION
 
     override fun findByProductId(productId: Long): ProductResult {
-        val cache = accommodationCacheRepository.getAccommodation(productId)
+        val cached = accommodationCacheRepository.getAccommodation(productId)
 
-        if (cache != null) {
-            return cache
+        if (cached != null) {
+            return AccommodationResult(accommodationCache = cached)
         }
 
-        val accommodationResult = accommodationRepository.findByProductId(productId)
-            ?.let { AccommodationResult(accommodation = it) }
+        val accommodation = accommodationRepository.findByProductId(productId)
             ?: throw EntityNotFoundException(kClass = AccommodationRepository::class, id = productId)
 
-        accommodationCacheRepository.setAccommodation(productId, accommodationResult)
+        accommodationCacheRepository.setAccommodation(
+            productId = productId,
+            accommodationCache = AccommodationCache.create(
+                id = productId,
+                name = accommodation.product.name,
+                description = accommodation.product.description,
+                price = accommodation.product.price,
+                quantity = accommodation.product.quantity,
+                createdAt = accommodation.product.createdAt,
+                accommodationId = checkNotNull(accommodation.id),
+                place = accommodation.place,
+                checkInTime = accommodation.checkInTime,
+                checkOutTime = accommodation.checkOutTime
+            )
+        )
 
-        return accommodationResult
+        return AccommodationResult(accommodation)
     }
 
     override fun createProduct(productCreateCommand: ProductCreateCommand): ProductResult {
