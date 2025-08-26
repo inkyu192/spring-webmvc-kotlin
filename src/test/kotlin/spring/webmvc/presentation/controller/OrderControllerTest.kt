@@ -2,7 +2,6 @@ package spring.webmvc.presentation.controller
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -11,20 +10,13 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.dto.command.OrderProductCreateCommand
 import spring.webmvc.application.service.OrderService
@@ -33,42 +25,37 @@ import spring.webmvc.domain.model.entity.OrderProduct
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 import java.time.Instant
 
 @WebMvcTest(OrderController::class)
 @Import(WebMvcTestConfig::class)
-@ExtendWith(RestDocumentationExtension::class)
-class OrderControllerTest() {
+class OrderControllerTest() : MockMvcRestDocsSetup() {
     @MockitoBean
     private lateinit var orderService: OrderService
-
-    private lateinit var mockMvc: MockMvc
+    private lateinit var order: Order
+    private lateinit var product: Product
+    private lateinit var orderProduct: OrderProduct
+    private lateinit var orderProductCreateCommand: OrderProductCreateCommand
+    private lateinit var orderCreateCommand: OrderCreateCommand
+    private lateinit var pageable: Pageable
+    private lateinit var page: PageImpl<Order>
+    private val productId = 1L
+    private val quantity = 3L
+    private val memberId = 1L
+    private val orderId = 1L
+    private val orderStatus = OrderStatus.ORDER
 
     @BeforeEach
-    fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply<DefaultMockMvcBuilder>(
-                MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(Preprocessors.prettyPrint())
-                    .withResponseDefaults(Preprocessors.prettyPrint())
-            )
-            .build()
-    }
+    fun setUp() {
+        orderProductCreateCommand = OrderProductCreateCommand(id = productId, quantity = quantity)
+        orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))
 
-    @Test
-    fun createOrder() {
-        val productId = 1L
-        val quantity = 3L
+        order = mock<Order>()
+        product = mock<Product>()
+        orderProduct = mock<OrderProduct>()
 
-        val orderProductCreateCommand = OrderProductCreateCommand(id = productId, quantity = quantity)
-        val orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))
-
-        val order = mock<Order>()
-        val product = mock<Product>()
-        val orderProduct = mock<OrderProduct>()
-
-        whenever(order.id).thenReturn(1L)
+        whenever(order.id).thenReturn(orderId)
         whenever(order.orderedAt).thenReturn(Instant.now())
         whenever(order.status).thenReturn(OrderStatus.ORDER)
         whenever(order.orderProducts).thenReturn(listOf(orderProduct))
@@ -76,6 +63,13 @@ class OrderControllerTest() {
         whenever(orderProduct.quantity).thenReturn(3)
         whenever(orderProduct.orderPrice).thenReturn(5000)
         whenever(orderProduct.product).thenReturn(product)
+
+        pageable = PageRequest.of(0, 10)
+        page = PageImpl(listOf(order), pageable, 1)
+    }
+
+    @Test
+    fun createOrder() {
         whenever(orderService.createOrder(orderCreateCommand)).thenReturn(order)
 
         mockMvc.perform(
@@ -120,25 +114,6 @@ class OrderControllerTest() {
 
     @Test
     fun findOrders() {
-        val pageable: Pageable = PageRequest.of(0, 10)
-        val memberId = 1L
-        val orderStatus = OrderStatus.ORDER
-
-        val order = mock<Order>()
-        val product = mock<Product>()
-        val orderProduct = mock<OrderProduct>()
-
-        val response = listOf(order)
-        val page = PageImpl(response, pageable, response.size.toLong())
-
-        whenever(order.id).thenReturn(1L)
-        whenever(order.orderedAt).thenReturn(Instant.now())
-        whenever(order.status).thenReturn(OrderStatus.ORDER)
-        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
-        whenever(product.name).thenReturn("name")
-        whenever(orderProduct.quantity).thenReturn(3)
-        whenever(orderProduct.orderPrice).thenReturn(5000)
-        whenever(orderProduct.product).thenReturn(product)
         whenever(orderService.findOrders(pageable = pageable, orderStatus = orderStatus)).thenReturn(page)
 
         mockMvc.perform(
@@ -200,20 +175,6 @@ class OrderControllerTest() {
 
     @Test
     fun findOrder() {
-        val orderId = 1L
-
-        val order = mock<Order>()
-        val product = mock<Product>()
-        val orderProduct = mock<OrderProduct>()
-
-        whenever(order.id).thenReturn(1L)
-        whenever(order.orderedAt).thenReturn(Instant.now())
-        whenever(order.status).thenReturn(OrderStatus.ORDER)
-        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
-        whenever(product.name).thenReturn("name")
-        whenever(orderProduct.quantity).thenReturn(3)
-        whenever(orderProduct.orderPrice).thenReturn(5000)
-        whenever(orderProduct.product).thenReturn(product)
         whenever(orderService.findOrder(id = orderId)).thenReturn(order)
 
         mockMvc.perform(
@@ -244,20 +205,6 @@ class OrderControllerTest() {
 
     @Test
     fun cancelOder() {
-        val orderId = 1L
-
-        val order = mock<Order>()
-        whenever(order.orderedAt).thenReturn(Instant.now())
-        whenever(order.status).thenReturn(OrderStatus.ORDER)
-
-        val product = mock<Product>()
-        whenever(product.name).thenReturn("name")
-
-        val orderProduct = mock<OrderProduct>()
-
-        whenever(orderProduct.product).thenReturn(product)
-        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
-
         whenever(orderService.cancelOrder(id = orderId)).thenReturn(order)
 
         mockMvc.perform(

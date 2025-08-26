@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import spring.webmvc.domain.model.entity.Ticket
-import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.crypto.CryptoService
 
 @DataJpaTest

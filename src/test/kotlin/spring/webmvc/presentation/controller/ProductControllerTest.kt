@@ -4,25 +4,17 @@ import io.mockk.every
 import io.mockk.spyk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.*
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.dto.command.*
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.FlightResult
@@ -33,85 +25,139 @@ import spring.webmvc.domain.model.cache.FlightCache
 import spring.webmvc.domain.model.cache.TicketCache
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Flight
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
+import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 @WebMvcTest(ProductController::class)
 @Import(WebMvcTestConfig::class)
-@ExtendWith(RestDocumentationExtension::class)
-class ProductControllerTest() {
+class ProductControllerTest() : MockMvcRestDocsSetup() {
     @MockitoBean
     private lateinit var productService: ProductService
-
-    private lateinit var mockMvc: MockMvc
+    private lateinit var accommodation: Accommodation
+    private lateinit var flight: Flight
+    private lateinit var ticket: Ticket
+    private lateinit var cursorPage: CursorPage<Product>
+    private lateinit var ticketResult: TicketResult
+    private lateinit var flightResult: FlightResult
+    private lateinit var accommodationResult: AccommodationResult
+    private lateinit var ticketCache: TicketCache
+    private lateinit var flightCache: FlightCache
+    private lateinit var accommodationCache: AccommodationCache
+    private val productId = 1L
+    private val name = "name"
+    private val description = "description"
+    private val price = 1000L
+    private val quantity = 5L
+    private val size = 10
+    private val nextCursorId: Long? = null
 
     @BeforeEach
-    fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply<DefaultMockMvcBuilder>(
-                MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(Preprocessors.prettyPrint())
-                    .withResponseDefaults(Preprocessors.prettyPrint())
-            )
-            .build()
-    }
+    fun setUp() {
+        val now = Instant.now()
 
-    @Test
-    fun findProducts() {
-        val nextCursorId: Long? = null
-        val size = 10
-        val name = "name"
-        val response = listOf(
-            spyk(
-                Accommodation.create(
-                    name = "name1",
-                    description = "description",
-                    price = 1000,
-                    quantity = 10,
-                    place = "place1",
-                    checkInTime = Instant.now(),
-                    checkOutTime = Instant.now().plusSeconds(3600)
-                )
-            ).apply { every { id } returns 1L },
-            spyk(
-                Flight.create(
-                    name = "name2",
-                    description = "description",
-                    price = 2000,
-                    quantity = 20,
-                    airline = "airline",
-                    flightNumber = "FL123",
-                    departureAirport = "ICN",
-                    arrivalAirport = "NRT",
-                    departureTime = Instant.now(),
-                    arrivalTime = Instant.now().plusSeconds(7200)
-                )
-            ).apply { every { id } returns 2L },
-            spyk(
-                Ticket.create(
-                    name = "name3",
-                    description = "description",
-                    price = 3000,
-                    quantity = 30,
-                    place = "place3",
-                    performanceTime = Instant.now(),
-                    duration = "2h",
-                    ageLimit = "All"
-                )
-            ).apply { every { id } returns 3L },
-        )
-        val cursorPage = CursorPage(
-            content = response,
+        accommodation = spyk(
+            Accommodation.create(
+                name = "name1",
+                description = "description",
+                price = 1000,
+                quantity = 10,
+                place = "place1",
+                checkInTime = now,
+                checkOutTime = now.plusSeconds(3600)
+            )
+        ).apply { every { id } returns 1L }
+
+        flight = spyk(
+            Flight.create(
+                name = "name2",
+                description = "description",
+                price = 2000,
+                quantity = 20,
+                airline = "airline",
+                flightNumber = "FL123",
+                departureAirport = "ICN",
+                arrivalAirport = "NRT",
+                departureTime = now,
+                arrivalTime = now.plusSeconds(7200)
+            )
+        ).apply { every { id } returns 2L }
+
+        ticket = spyk(
+            Ticket.create(
+                name = "name3",
+                description = "description",
+                price = 3000,
+                quantity = 30,
+                place = "place3",
+                performanceTime = now,
+                duration = "2h",
+                ageLimit = "All"
+            )
+        ).apply { every { id } returns 3L }
+
+        cursorPage = CursorPage(
+            content = listOf(accommodation, flight, ticket),
             size = size,
             hasNext = false,
             nextCursorId = null
         )
 
+        ticketCache = TicketCache(
+            id = productId,
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            createdAt = now,
+            ticketId = 1L,
+            place = "place",
+            performanceTime = now,
+            duration = "duration",
+            ageLimit = "ageLimit"
+        )
+
+        flightCache = FlightCache(
+            id = productId,
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            createdAt = now,
+            flightId = 1L,
+            airline = "airline",
+            flightNumber = "flightNumber",
+            departureAirport = "departureAirport",
+            arrivalAirport = "arrivalAirport",
+            departureTime = now,
+            arrivalTime = now.plus(1, ChronoUnit.DAYS)
+        )
+
+        accommodationCache = AccommodationCache(
+            id = productId,
+            name = name,
+            description = description,
+            price = price,
+            quantity = quantity,
+            createdAt = now,
+            accommodationId = 1L,
+            place = "place",
+            checkInTime = now,
+            checkOutTime = now.plus(1, ChronoUnit.DAYS)
+        )
+
+        ticketResult = TicketResult(ticketCache)
+        flightResult = FlightResult(flightCache)
+        accommodationResult = AccommodationResult(accommodationCache)
+    }
+
+    @Test
+    fun findProducts() {
         whenever(productService.findProducts(cursorId = nextCursorId, size = size, name = name)).thenReturn(cursorPage)
 
         mockMvc.perform(
@@ -152,23 +198,7 @@ class ProductControllerTest() {
 
     @Test
     fun findTicket() {
-        val productId = 1L
         val category = Category.TICKET
-        val ticketResult = TicketResult(
-            TicketCache(
-                id = productId,
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 10,
-                createdAt = Instant.now(),
-                ticketId = 1L,
-                place = "place",
-                performanceTime = Instant.now(),
-                duration = "duration",
-                ageLimit = "ageLimit"
-            )
-        )
 
         whenever(productService.findProduct(id = productId, category = category)).thenReturn(ticketResult)
 
@@ -210,25 +240,7 @@ class ProductControllerTest() {
 
     @Test
     fun findFlight() {
-        val productId = 1L
         val category = Category.FLIGHT
-        val flightResult = FlightResult(
-            FlightCache(
-                id = productId,
-                name = "name",
-                description = "description",
-                price = 1000,
-                quantity = 10,
-                createdAt = Instant.now(),
-                flightId = 1L,
-                airline = "airline",
-                flightNumber = "flightNumber",
-                departureAirport = "departureAirport",
-                arrivalAirport = "arrivalAirport",
-                departureTime = Instant.now(),
-                arrivalTime = Instant.now().plus(1, ChronoUnit.DAYS)
-            )
-        )
 
         whenever(productService.findProduct(id = productId, category = category)).thenReturn(flightResult)
 
@@ -672,7 +684,7 @@ class ProductControllerTest() {
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("ticketId").description("티켓아이디"),
                         PayloadDocumentation.fieldWithPath("place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
+                        PayloadDocumentation.fieldWithPath("performanceTime").description(  "공연 시간"),
                         PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
                         PayloadDocumentation.fieldWithPath("ageLimit").description("관람 연령")
                     )

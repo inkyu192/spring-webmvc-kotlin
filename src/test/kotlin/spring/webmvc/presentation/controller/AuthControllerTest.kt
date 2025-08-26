@@ -2,57 +2,42 @@ package spring.webmvc.presentation.controller
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.application.service.AuthService
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 
 @WebMvcTest(AuthController::class)
 @Import(WebMvcTestConfig::class)
-@ExtendWith(RestDocumentationExtension::class)
-class AuthControllerTest() {
+class AuthControllerTest : MockMvcRestDocsSetup() {
     @MockitoBean
     private lateinit var authService: AuthService
-
-    private lateinit var mockMvc: MockMvc
+    private lateinit var accessToken: String
+    private lateinit var refreshToken: String
+    private lateinit var email: String
+    private lateinit var password: String
+    private lateinit var tokenResult: TokenResult
 
     @BeforeEach
-    fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply<DefaultMockMvcBuilder>(
-                MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(Preprocessors.prettyPrint())
-                    .withResponseDefaults(Preprocessors.prettyPrint())
-            )
-            .build()
+    fun setUp() {
+        accessToken = "accessToken"
+        refreshToken = "refreshToken"
+        email = "test@gmail.com"
+        password = "password"
+        tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
     }
 
     @Test
     fun login() {
-        val accessToken = "accessToken"
-        val refreshToken = "refreshToken"
-        val email = "test@gmail.com"
-        val password = "password"
-
-        val tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
-
         whenever(authService.login(email = email, password = password)).thenReturn(tokenResult)
 
         mockMvc.perform(
@@ -85,11 +70,6 @@ class AuthControllerTest() {
 
     @Test
     fun refreshToken() {
-        val accessToken = "accessToken"
-        val refreshToken = "refreshToken"
-
-        val tokenResult = TokenResult(accessToken = accessToken, refreshToken = refreshToken)
-
         whenever(authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken))
             .thenReturn(tokenResult)
 

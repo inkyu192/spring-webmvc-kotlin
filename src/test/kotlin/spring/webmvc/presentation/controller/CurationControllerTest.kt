@@ -2,63 +2,42 @@ package spring.webmvc.presentation.controller
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.result.CurationProductResult
 import spring.webmvc.application.dto.result.CurationResult
 import spring.webmvc.application.service.CurationService
-import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.Accommodation
+import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.Flight
-import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
+import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 
 @WebMvcTest(CurationController::class)
 @Import(WebMvcTestConfig::class)
-@ExtendWith(RestDocumentationExtension::class)
-class CurationControllerTest() {
+class CurationControllerTest() : MockMvcRestDocsSetup() {
     @MockitoBean
     private lateinit var curationService: CurationService
-
-    private lateinit var mockMvc: MockMvc
-
     private lateinit var curation1: Curation
     private lateinit var curation2: Curation
     private lateinit var product1: Accommodation
     private lateinit var product2: Flight
 
     @BeforeEach
-    fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply<DefaultMockMvcBuilder>(
-                MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(Preprocessors.prettyPrint())
-                    .withResponseDefaults(Preprocessors.prettyPrint())
-            )
-            .build()
-
+    fun setUp() {
         curation1 = spy(
             Curation.create(
                 title = "여름 휴가 패키지",
@@ -66,6 +45,7 @@ class CurationControllerTest() {
                 sortOrder = 1L
             )
         ).apply { whenever(id).thenReturn(1L) }
+
         curation2 = spy(
             Curation.create(
                 title = "겨울 스키 패키지",
@@ -84,9 +64,8 @@ class CurationControllerTest() {
                 checkInTime = java.time.Instant.now(),
                 checkOutTime = java.time.Instant.now().plusSeconds(3600 * 24 * 4)
             )
-        ).apply {
-            whenever(id).thenReturn(1L)
-        }
+        ).apply { whenever(id).thenReturn(1L) }
+
         product2 = spy(
             Flight.create(
                 name = "부산 항공권",
@@ -100,9 +79,7 @@ class CurationControllerTest() {
                 departureTime = java.time.Instant.now(),
                 arrivalTime = java.time.Instant.now().plusSeconds(3600 * 2)
             )
-        ).apply {
-            whenever(id).thenReturn(2L)
-        }
+        ).apply { whenever(id).thenReturn(2L) }
     }
 
     @Test

@@ -16,6 +16,7 @@ import spring.webmvc.application.strategy.ProductStrategy
 import spring.webmvc.domain.model.cache.TicketCache
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Flight
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.ProductRepository
@@ -35,56 +36,94 @@ class ProductServiceTest : DescribeSpec({
         productStrategyMap = productStrategyMap,
     )
 
+    lateinit var accommodation: Accommodation
+    lateinit var flight: Flight
+    lateinit var ticket: Ticket
+    lateinit var products: List<Product>
+    lateinit var cursorPage: CursorPage<Product>
+    lateinit var ticketCache: TicketCache
+    lateinit var ticketResult: TicketResult
+    lateinit var ticketCreateCommand: TicketCreateCommand
+    lateinit var ticketUpdateCommand: TicketUpdateCommand
+
+    beforeEach {
+        accommodation = spyk(
+            Accommodation.create(
+                name = "name1",
+                description = "description",
+                price = 1000,
+                quantity = 10,
+                place = "place1",
+                checkInTime = Instant.now(),
+                checkOutTime = Instant.now().plusSeconds(3600)
+            )
+        ).apply { every { id } returns 1L }
+
+        flight = spyk(
+            Flight.create(
+                name = "name2",
+                description = "description",
+                price = 2000,
+                quantity = 20,
+                airline = "airline",
+                flightNumber = "FL123",
+                departureAirport = "ICN",
+                arrivalAirport = "NRT",
+                departureTime = Instant.now(),
+                arrivalTime = Instant.now().plusSeconds(7200)
+            )
+        ).apply { every { id } returns 2L }
+
+        ticket = spyk(
+            Ticket.create(
+                name = "name3",
+                description = "description",
+                price = 3000,
+                quantity = 30,
+                place = "place3",
+                performanceTime = Instant.now(),
+                duration = "2h",
+                ageLimit = "All"
+            )
+        ).apply { every { id } returns 3L }
+
+        products = listOf(accommodation, flight, ticket)
+
+        cursorPage = CursorPage(
+            content = products,
+            size = 10,
+            hasNext = false,
+            nextCursorId = null
+        )
+
+        ticketCache = TicketCache(
+            id = 1L,
+            name = "name",
+            description = "description",
+            price = 1000,
+            quantity = 10,
+            createdAt = Instant.now(),
+            ticketId = 1L,
+            place = "place",
+            performanceTime = Instant.now(),
+            duration = "duration",
+            ageLimit = "ageLimit"
+        )
+
+        ticketResult = TicketResult(ticketCache)
+
+        ticketCreateCommand = mockk<TicketCreateCommand>()
+        every { ticketCreateCommand.category } returns Category.TICKET
+
+        ticketUpdateCommand = mockk<TicketUpdateCommand>()
+        every { ticketUpdateCommand.category } returns Category.TICKET
+    }
+
     describe("findProducts") {
         it(" Product 조회 후 반환한다") {
             val nextCursorId: Long? = null
             val size = 10
             val name = "name"
-            val products = listOf(
-                spyk(
-                    Accommodation.create(
-                        name = "name1",
-                        description = "description",
-                        price = 1000,
-                        quantity = 10,
-                        place = "place1",
-                        checkInTime = Instant.now(),
-                        checkOutTime = Instant.now().plusSeconds(3600)
-                    )
-                ).apply { every { id } returns 1L },
-                spyk(
-                    Flight.create(
-                        name = "name2",
-                        description = "description",
-                        price = 2000,
-                        quantity = 20,
-                        airline = "airline",
-                        flightNumber = "FL123",
-                        departureAirport = "ICN",
-                        arrivalAirport = "NRT",
-                        departureTime = Instant.now(),
-                        arrivalTime = Instant.now().plusSeconds(7200)
-                    )
-                ).apply { every { id } returns 2L },
-                spyk(
-                    Ticket.create(
-                        name = "name3",
-                        description = "description",
-                        price = 3000,
-                        quantity = 30,
-                        place = "place3",
-                        performanceTime = Instant.now(),
-                        duration = "2h",
-                        ageLimit = "All"
-                    )
-                ).apply { every { id } returns 3L },
-            )
-            val cursorPage = CursorPage(
-                content = products,
-                size = size,
-                hasNext = false,
-                nextCursorId = null
-            )
 
             every {
                 productRepository.findWithCursorPage(
@@ -119,21 +158,6 @@ class ProductServiceTest : DescribeSpec({
             it("조회 후 반환한다") {
                 val productId = 1L
                 val category = Category.TICKET
-                val ticketResult = TicketResult(
-                    TicketCache(
-                        id = productId,
-                        name = "name",
-                        description = "description",
-                        price = 1000,
-                        quantity = 10,
-                        createdAt = Instant.now(),
-                        ticketId = 1L,
-                        place = "place",
-                        performanceTime = Instant.now(),
-                        duration = "duration",
-                        ageLimit = "ageLimit"
-                    )
-                )
 
                 every { productStrategyMap[category] } returns productStrategy
                 every { productStrategy.findByProductId(productId) } returns ticketResult
@@ -161,25 +185,6 @@ class ProductServiceTest : DescribeSpec({
             val productId = 1L
             val category = Category.TICKET
 
-            val ticketCreateCommand = mockk<TicketCreateCommand>()
-            every { ticketCreateCommand.category } returns category
-
-            val ticketResult = TicketResult(
-                TicketCache(
-                    id = productId,
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 10,
-                    createdAt = Instant.now(),
-                    ticketId = 1L,
-                    place = "place",
-                    performanceTime = Instant.now(),
-                    duration = "duration",
-                    ageLimit = "ageLimit"
-                )
-            )
-
             every { productStrategyMap[category] } returns productStrategy
             every { productStrategy.createProduct(productCreateCommand = ticketCreateCommand) } returns ticketResult
 
@@ -204,25 +209,6 @@ class ProductServiceTest : DescribeSpec({
         it("수정 후 반환한다") {
             val productId = 1L
             val category = Category.TICKET
-
-            val ticketUpdateCommand = mockk<TicketUpdateCommand>()
-            every { ticketUpdateCommand.category } returns category
-
-            val ticketResult = TicketResult(
-                TicketCache(
-                    id = productId,
-                    name = "name",
-                    description = "description",
-                    price = 1000,
-                    quantity = 10,
-                    createdAt = Instant.now(),
-                    ticketId = 1L,
-                    place = "place",
-                    performanceTime = Instant.now(),
-                    duration = "duration",
-                    ageLimit = "ageLimit"
-                )
-            )
 
             every { productStrategyMap[category] } returns productStrategy
             every {

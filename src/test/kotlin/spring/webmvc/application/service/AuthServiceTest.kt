@@ -29,12 +29,30 @@ class AuthServiceTest : DescribeSpec({
         passwordEncoder = passwordEncoder
     )
 
+    lateinit var email: String
+    lateinit var password: String
+    lateinit var member: Member
+    lateinit var accessToken: String
+    lateinit var refreshToken: String
+    lateinit var newAccessToken: String
+    lateinit var fakeRefreshToken: String
+    lateinit var claims: Claims
+    val memberId = 1L
+
+    beforeEach {
+        email = "test@gmail.com"
+        password = "password"
+        member = mockk<Member>(relaxed = true)
+        accessToken = "accessToken"
+        refreshToken = "refreshToken"
+        newAccessToken = "newAccessToken"
+        fakeRefreshToken = "fakeRefreshToken"
+        claims = mockk<Claims>()
+    }
+
     describe("login") {
         context("Member 엔티티 없을 경우") {
             it("BadCredentialsException 발생한다") {
-                val email = "test@gmail.com"
-                val password = "password"
-
                 every { memberRepository.findByEmail(email = any<Email>()) } returns null
 
                 shouldThrow<BadCredentialsException> { authService.login(email = email, password = password) }
@@ -43,10 +61,6 @@ class AuthServiceTest : DescribeSpec({
 
         context("비밀번호가 일치하지 않을 경우") {
             it("BadCredentialsException 발생한다") {
-                val email = "test@gmail.com"
-                val password = "password"
-                val member = mockk<Member>(relaxed = true)
-
                 every { memberRepository.findByEmail(email = any<Email>()) } returns member
                 every { passwordEncoder.matches(password, member.password) } returns false
 
@@ -56,13 +70,6 @@ class AuthServiceTest : DescribeSpec({
 
         context("유효성 검사 성공할 경우") {
             it("Token 저장 후 반환한다") {
-                val email = "test@gmail.com"
-                val password = "password"
-                val accessToken = "accessToken"
-                val refreshToken = "refreshToken"
-
-                val member = mockk<Member>(relaxed = true)
-
                 every { memberRepository.findByEmail(email = any<Email>()) } returns member
                 every { passwordEncoder.matches(any(), any()) } returns true
                 every { jwtProvider.createAccessToken(memberId = any(), permissions = any()) } returns accessToken
@@ -81,9 +88,6 @@ class AuthServiceTest : DescribeSpec({
     describe("refreshToken") {
         context("accessToken 유효하지 않을 경우") {
             it("JwtException 발생한다") {
-                val accessToken = "accessToken"
-                val refreshToken = "refreshToken"
-
                 every { jwtProvider.parseAccessToken(accessToken) } throws JwtException("invalid access token")
 
                 shouldThrow<JwtException> {
@@ -94,11 +98,6 @@ class AuthServiceTest : DescribeSpec({
 
         context("refreshToken 유효하지 않을 경우") {
             it("JwtException 발생한다") {
-                val memberId = 1L
-                val accessToken = "accessToken"
-                val refreshToken = "refreshToken"
-                val claims = mockk<Claims>()
-
                 every { jwtProvider.parseAccessToken(accessToken) } returns claims
                 every { jwtProvider.parseRefreshToken(refreshToken) } throws JwtException("invalid refresh token")
                 every { claims["memberId"] } returns memberId
@@ -111,13 +110,6 @@ class AuthServiceTest : DescribeSpec({
 
         context("refreshToken 일치하지 않을 경우") {
             it("BadCredentialsException 발생한다") {
-                val memberId = 1L
-                val accessToken = "accessToken"
-                val fakeRefreshToken = "fakeRefreshToken"
-                val refreshToken = "refreshToken"
-                val claims = mockk<Claims>()
-                val member = mockk<Member>()
-
                 every { jwtProvider.parseAccessToken(accessToken) } returns claims
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every { claims["memberId"] } returns memberId
@@ -132,14 +124,6 @@ class AuthServiceTest : DescribeSpec({
 
         context("유효성 검사 성공할 경우") {
             it("AccessToken 갱신된다") {
-                val memberId = 1L
-                val accessToken = "accessToken"
-                val newAccessToken = "newAccessToken"
-                val refreshToken = "refreshToken"
-
-                val claims = mockk<Claims>()
-                val member = mockk<Member>(relaxed = true)
-
                 every { jwtProvider.parseAccessToken(accessToken) } returns claims
                 every { memberRepository.findByIdOrNull(memberId) } returns member
                 every { claims["memberId"] } returns memberId

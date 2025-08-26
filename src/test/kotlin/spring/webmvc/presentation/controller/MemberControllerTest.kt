@@ -2,74 +2,62 @@ package spring.webmvc.presentation.controller
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
 import spring.webmvc.application.service.MemberService
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 import java.time.Instant
 import java.time.LocalDate
 
 
 @WebMvcTest(MemberController::class)
 @Import(WebMvcTestConfig::class)
-@ExtendWith(RestDocumentationExtension::class)
-class MemberControllerTest() {
+class MemberControllerTest() : MockMvcRestDocsSetup() {
     @MockitoBean
     private lateinit var memberService: MemberService
-
-    private lateinit var mockMvc: MockMvc
+    private lateinit var member: Member
+    private lateinit var email: String
+    private lateinit var password: String
+    private lateinit var name: String
+    private lateinit var phone: String
+    private lateinit var birthDate: LocalDate
+    private lateinit var roleIds: MutableList<Long>
+    private lateinit var permissionIds: MutableList<Long>
 
     @BeforeEach
-    fun setUp(webApplicationContext: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply<DefaultMockMvcBuilder>(
-                MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(Preprocessors.prettyPrint())
-                    .withResponseDefaults(Preprocessors.prettyPrint())
-            )
-            .build()
-    }
-
-    @Test
-    fun createMember() {
-        val email = "test@gmail.com"
-        val password = "password"
-        val name = "name"
-        val phone = "010-1234-1234"
-        val birthDate = LocalDate.now()
-        val roleIds = mutableListOf<Long>()
-        val permissionIds = mutableListOf(1L)
-
-        val member = mock<Member>()
+    fun setUp() {
+        email = "test@gmail.com"
+        password = "password"
+        name = "name"
+        phone = "010-1234-1234"
+        birthDate = LocalDate.now()
+        roleIds = mutableListOf()
+        permissionIds = mutableListOf(1L)
+        member = mock<Member>()
         whenever(member.id).thenReturn(1L)
         whenever(member.email).thenReturn(Email.create(email))
         whenever(member.name).thenReturn(name)
         whenever(member.phone).thenReturn(Phone.create(phone))
         whenever(member.birthDate).thenReturn(birthDate)
         whenever(member.createdAt).thenReturn(Instant.now())
+    }
 
+    @Test
+    fun createMember() {
         whenever(
             memberService.createMember(
                 email = email,
@@ -126,14 +114,6 @@ class MemberControllerTest() {
 
     @Test
     fun findMember() {
-        val member = mock<Member>()
-        whenever(member.id).thenReturn(1L)
-        whenever(member.email).thenReturn(Email.create("test@gmail.com"))
-        whenever(member.name).thenReturn("name")
-        whenever(member.phone).thenReturn(Phone.create("010-1234-1234"))
-        whenever(member.birthDate).thenReturn(LocalDate.now())
-        whenever(member.createdAt).thenReturn(Instant.now())
-
         whenever(memberService.findMember()).thenReturn(member)
 
         mockMvc.perform(
@@ -161,19 +141,6 @@ class MemberControllerTest() {
 
     @Test
     fun updateMember() {
-        val password = "password"
-        val name = "name"
-        val phone = "010-1234-1234"
-        val birthDate = LocalDate.now()
-
-        val member = mock<Member>()
-        whenever(member.id).thenReturn(1L)
-        whenever(member.email).thenReturn(Email.create("test@gmail.com"))
-        whenever(member.name).thenReturn(name)
-        whenever(member.phone).thenReturn(Phone.create(phone))
-        whenever(member.birthDate).thenReturn(birthDate)
-        whenever(member.createdAt).thenReturn(Instant.now())
-
         whenever(
             memberService.updateMember(
                 password = password,
