@@ -5,11 +5,11 @@ import jakarta.persistence.*
 @Entity
 class PermissionMenu protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "permission_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "permission_id")
     val permission: Permission,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "menu_id")
     val menu: Menu,
 ) {
     @Id

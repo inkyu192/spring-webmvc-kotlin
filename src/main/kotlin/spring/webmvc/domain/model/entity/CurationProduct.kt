@@ -5,11 +5,11 @@ import jakarta.persistence.*
 @Entity
 class CurationProduct protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "curation_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "curation_id")
     val curation: Curation,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "product_id")
     val product: Product,
 ) {
     @Id

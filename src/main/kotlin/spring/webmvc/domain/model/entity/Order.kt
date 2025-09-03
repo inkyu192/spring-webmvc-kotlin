@@ -12,7 +12,7 @@ class Order protected constructor(
     status: OrderStatus,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "member_id")
     val member: Member,
 ) : BaseTime() {
     @Id
