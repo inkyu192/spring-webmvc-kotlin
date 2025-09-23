@@ -15,6 +15,10 @@ class MenuService(
     fun findMenus(): List<MenuResult> {
         val permissions = SecurityContextUtil.getAuthorities()
 
+        if (permissions.isEmpty()) {
+            return listOf()
+        }
+
         val allMenus = getParentMenus(menuRepository.findByPermissions(permissions))
         val rootMenus = allMenus.filter { it.parent == null }
 
@@ -37,7 +41,9 @@ class MenuService(
             id = checkNotNull(menu.id),
             name = menu.name,
             path = menu.path,
-            children = childMenus.map { mapToResult(menu = it, allMenus = allMenus) }
+            children = childMenus
+                .sortedBy { it.sortOrder }
+                .map { mapToResult(menu = it, allMenus = allMenus) }
         )
     }
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.*
 class Menu protected constructor(
     name: String,
     path: String?,
+    sortOrder: Long?,
     parent: Menu?,
 ) : BaseTime() {
     @Id
@@ -17,6 +18,9 @@ class Menu protected constructor(
         protected set
 
     var path = path
+        protected set
+
+    var sortOrder = sortOrder
         protected set
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,8 +43,8 @@ class Menu protected constructor(
         get() = _permissionMenus.toList()
 
     companion object {
-        fun create(name: String, path: String? = null, parent: Menu? = null) =
-            Menu(name = name, path = path, parent = parent)
+        fun create(name: String, path: String? = null, parent: Menu? = null, sortOrder: Long? = null) =
+            Menu(name = name, path = path, sortOrder = sortOrder, parent = parent)
     }
 
     fun addPermission(permission: Permission) {
