@@ -6,19 +6,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import spring.webmvc.domain.model.entity.Ticket
-import spring.webmvc.infrastructure.crypto.CryptoService
+import spring.webmvc.infrastructure.config.RepositoryTest
 
-@DataJpaTest
+@RepositoryTest
 class ProductQuerydslRepositoryTest(
     @Autowired private val entityManager: EntityManager,
 ) {
-    @MockitoBean
-    private val cryptoService = mock<CryptoService>()
     private val productQuerydslRepository = ProductQuerydslRepository(JPAQueryFactory(entityManager))
 
     private lateinit var product1: Ticket
