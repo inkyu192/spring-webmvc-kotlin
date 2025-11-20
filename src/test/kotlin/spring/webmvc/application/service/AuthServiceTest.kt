@@ -111,7 +111,7 @@ class AuthServiceTest : DescribeSpec({
         context("refreshToken 일치하지 않을 경우") {
             it("BadCredentialsException 발생한다") {
                 every { jwtProvider.parseAccessToken(accessToken) } returns claims
-                every { memberRepository.findByIdOrNull(memberId) } returns member
+                every { memberRepository.findById(memberId) } returns member
                 every { claims["memberId"] } returns memberId
                 every { jwtProvider.parseRefreshToken(fakeRefreshToken) } returns claims
                 every { tokenCacheRepository.getRefreshToken(memberId) } returns refreshToken
@@ -125,7 +125,7 @@ class AuthServiceTest : DescribeSpec({
         context("유효성 검사 성공할 경우") {
             it("AccessToken 갱신된다") {
                 every { jwtProvider.parseAccessToken(accessToken) } returns claims
-                every { memberRepository.findByIdOrNull(memberId) } returns member
+                every { memberRepository.findById(memberId) } returns member
                 every { claims["memberId"] } returns memberId
                 every { jwtProvider.parseRefreshToken(refreshToken) } returns claims
                 every { tokenCacheRepository.getRefreshToken(memberId) } returns refreshToken

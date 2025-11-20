@@ -52,7 +52,7 @@ class MemberServiceTest : DescribeSpec({
             it("EntityNotFoundException 발생한다") {
                 val memberId = 1L
 
-                every { memberRepository.findByIdOrNull(memberId) } returns null
+                every { memberRepository.findById(memberId) } throws EntityNotFoundException(Member::class, memberId)
 
                 shouldThrow<EntityNotFoundException> { memberService.findMember() }
             }
@@ -70,7 +70,7 @@ class MemberServiceTest : DescribeSpec({
                     every { createdAt } returns Instant.now()
                 }
 
-                every { memberRepository.findByIdOrNull(any()) } returns member
+                every { memberRepository.findById(any()) } returns member
 
                 val result = memberService.findMember()
 

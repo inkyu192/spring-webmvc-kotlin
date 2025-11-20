@@ -11,7 +11,6 @@ import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.security.JwtProvider
-import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Service
 @Transactional(readOnly = true)
@@ -44,9 +43,7 @@ class AuthService(
         val memberId = extractMemberId(accessToken)
         jwtProvider.parseRefreshToken(refreshToken)
 
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
-
+        val member = memberRepository.findById(memberId)
 
         if (!tokenCacheRepository.getRefreshToken(memberId).equals(refreshToken)) {
             throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")

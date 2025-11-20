@@ -12,7 +12,6 @@ import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.FlightRepository
 import spring.webmvc.domain.repository.cache.FlightCacheRepository
-import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class FlightStrategy(
@@ -28,8 +27,7 @@ class FlightStrategy(
             return FlightResult(flightCache = cached)
         }
 
-        val flight = flightRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
+        val flight = flightRepository.findById(productId)
 
         flightCacheRepository.setFlight(
             productId = productId,
@@ -77,8 +75,7 @@ class FlightStrategy(
     override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
         val flightUpdateCommand = productUpdateCommand as FlightUpdateCommand
 
-        val flight = flightRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
+        val flight = flightRepository.findById(productId)
 
         flight.update(
             name = flightUpdateCommand.name,
@@ -97,8 +94,7 @@ class FlightStrategy(
     }
 
     override fun deleteProduct(productId: Long) {
-        val flight = flightRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Flight::class, id = productId)
+        val flight = flightRepository.findById(productId)
 
         flightRepository.delete(flight)
 

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.dto.command.OrderProductCreateCommand
-import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
@@ -29,10 +28,9 @@ class OrderService(
     @Transactional
     fun createOrder(orderCreateCommand: OrderCreateCommand): Order {
         val memberId = SecurityContextUtil.getMemberId()
-        val member = memberRepository.findByIdOrNull(id = memberId)
-            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
+        val member = memberRepository.findById(id = memberId)
 
-        val productMap = productRepository.findByIds(ids = orderCreateCommand.products.map { it.id })
+        val productMap = productRepository.findAllById(ids = orderCreateCommand.products.map { it.id })
             .associateBy { it.id }
 
         val order = Order.create(member = member)
@@ -68,7 +66,8 @@ class OrderService(
                     throw InsufficientQuantityException(
                         productName = product.name,
                         requestedQuantity = orderProductCreateCommand.quantity,
-                        availableStock = productCacheRepository.getProductStock(productId = orderProductCreateCommand.id) ?: 0L
+                        availableStock = productCacheRepository.getProductStock(productId = orderProductCreateCommand.id)
+                            ?: 0L
                     )
                 }
 

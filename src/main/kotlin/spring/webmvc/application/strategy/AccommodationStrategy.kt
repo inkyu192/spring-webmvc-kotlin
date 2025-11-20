@@ -12,7 +12,6 @@ import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.AccommodationRepository
 import spring.webmvc.domain.repository.cache.AccommodationCacheRepository
-import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class AccommodationStrategy(
@@ -28,8 +27,7 @@ class AccommodationStrategy(
             return AccommodationResult(accommodationCache = cached)
         }
 
-        val accommodation = accommodationRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Accommodation::class, id = productId)
+        val accommodation = accommodationRepository.findById(productId)
 
         accommodationCacheRepository.setAccommodation(
             productId = productId,
@@ -71,8 +69,7 @@ class AccommodationStrategy(
     override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
         val accommodationUpdateCommand = productUpdateCommand as AccommodationUpdateCommand
 
-        val accommodation = accommodationRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Accommodation::class, id = productId)
+        val accommodation = accommodationRepository.findById(productId)
 
         accommodation.update(
             name = accommodationUpdateCommand.name,
@@ -88,8 +85,7 @@ class AccommodationStrategy(
     }
 
     override fun deleteProduct(productId: Long) {
-        val accommodation = accommodationRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Accommodation::class, id = productId)
+        val accommodation = accommodationRepository.findById(productId)
 
         accommodationRepository.delete(accommodation)
 

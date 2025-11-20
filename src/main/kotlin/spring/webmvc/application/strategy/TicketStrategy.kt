@@ -12,7 +12,6 @@ import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.TicketRepository
 import spring.webmvc.domain.repository.cache.TicketCacheRepository
-import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Component
 class TicketStrategy(
@@ -28,8 +27,7 @@ class TicketStrategy(
             return TicketResult(ticketCache = cached)
         }
 
-        val ticket = ticketRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
+        val ticket = ticketRepository.findById(productId)
 
         ticketCacheRepository.setTicket(
             productId = productId,
@@ -73,8 +71,7 @@ class TicketStrategy(
     override fun updateProduct(productId: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
         val ticketUpdateCommand = productUpdateCommand as TicketUpdateCommand
 
-        val ticket = ticketRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
+        val ticket = ticketRepository.findById(productId)
 
         ticket.update(
             name = ticketUpdateCommand.name,
@@ -91,8 +88,7 @@ class TicketStrategy(
     }
 
     override fun deleteProduct(productId: Long) {
-        val ticket = ticketRepository.findByIdOrNull(productId)
-            ?: throw EntityNotFoundException(kClass = Ticket::class, id = productId)
+        val ticket = ticketRepository.findById(productId)
 
         ticketRepository.delete(ticket)
 

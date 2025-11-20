@@ -1,11 +1,11 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
 import org.springframework.data.domain.Pageable
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.domain.repository.OrderRepository
+import spring.webmvc.infrastructure.extensions.findByIdOrThrow
 import spring.webmvc.infrastructure.persistence.jpa.OrderJpaRepository
 import spring.webmvc.infrastructure.persistence.jpa.OrderQuerydslRepository
 
@@ -17,7 +17,7 @@ class OrderRepositoryAdapter(
     override fun findAll(pageable: Pageable, memberId: Long?, orderStatus: OrderStatus?) =
         querydslRepository.findAll(pageable = pageable, memberId = memberId, orderStatus = orderStatus)
 
-    override fun findByIdOrNull(id: Long) = jpaRepository.findByIdOrNull(id = id)
+    override fun findById(id: Long): Order = jpaRepository.findByIdOrThrow(id = id)
 
     override fun findByIdAndMemberId(id: Long, memberId: Long) =
         jpaRepository.findByIdAndMemberId(id = id, memberId = memberId)

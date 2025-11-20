@@ -74,8 +74,7 @@ class MemberService(
     fun findMember(): Member {
         val memberId = SecurityContextUtil.getMemberId()
 
-        return memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
+        return memberRepository.findById(memberId)
     }
 
     @Transactional
@@ -86,8 +85,7 @@ class MemberService(
         birthDate: LocalDate?,
     ): Member {
         val memberId = SecurityContextUtil.getMemberId()
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
+        val member = memberRepository.findById(memberId)
 
         member.update(
             password = passwordEncoder.encode(password),
@@ -102,8 +100,7 @@ class MemberService(
     @Transactional
     fun deleteMember() {
         val memberId = SecurityContextUtil.getMemberId()
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw EntityNotFoundException(kClass = Member::class, id = memberId)
+        val member = memberRepository.findById(memberId)
 
         memberRepository.delete(member)
     }
