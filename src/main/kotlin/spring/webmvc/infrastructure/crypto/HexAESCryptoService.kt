@@ -1,8 +1,8 @@
 package spring.webmvc.infrastructure.crypto
 
 import org.springframework.stereotype.Component
-import spring.webmvc.infrastructure.util.hexToBytes
-import spring.webmvc.infrastructure.util.toHex
+import spring.webmvc.infrastructure.extensions.hexToByteArray
+import spring.webmvc.infrastructure.extensions.toHexString
 import java.nio.charset.StandardCharsets
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
@@ -21,14 +21,14 @@ class HexAESCryptoService(
 
         val encryptedBytes = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
 
-        encryptedBytes.toHex()
+        encryptedBytes.toHexString()
     }.getOrElse { throw RuntimeException(it) }
 
     override fun decrypt(encryptedText: String): String = runCatching {
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
             .apply { init(Cipher.DECRYPT_MODE, secretKey, ivParameter) }
 
-        val decryptedBytes = cipher.doFinal(encryptedText.hexToBytes())
+        val decryptedBytes = cipher.doFinal(encryptedText.hexToByteArray())
 
         String(decryptedBytes, StandardCharsets.UTF_8)
     }.getOrElse { throw RuntimeException(it) }
