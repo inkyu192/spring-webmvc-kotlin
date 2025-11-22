@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.event.NotificationEvent
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.entity.Role
+import spring.webmvc.domain.model.enums.MemberType
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.RoleRepository
@@ -44,6 +45,7 @@ class MemberService(
             name = name,
             phone = phone,
             birthDate = birthDate,
+            type = MemberType.CUSTOMER
         )
 
         val roleMap = roleRepository.findAllById(roleIds).associateBy { it.id }

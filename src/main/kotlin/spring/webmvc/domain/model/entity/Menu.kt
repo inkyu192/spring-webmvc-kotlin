@@ -10,7 +10,7 @@ class Menu protected constructor(
     parent: Menu?,
 ) : BaseTime() {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

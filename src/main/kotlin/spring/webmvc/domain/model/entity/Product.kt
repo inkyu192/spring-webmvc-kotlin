@@ -14,7 +14,7 @@ abstract class Product protected constructor(
     quantity: Long,
 ) : BaseCreator() {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

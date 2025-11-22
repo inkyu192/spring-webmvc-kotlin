@@ -13,7 +13,7 @@ class PermissionMenu protected constructor(
     val menu: Menu,
 ) {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

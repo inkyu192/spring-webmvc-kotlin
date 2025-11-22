@@ -13,7 +13,7 @@ class RolePermission protected constructor(
     val role: Role,
 ) {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

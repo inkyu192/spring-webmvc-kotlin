@@ -7,7 +7,7 @@ class Role protected constructor(
     name: String,
 ) : BaseTime() {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

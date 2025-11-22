@@ -2,6 +2,7 @@ package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
 import spring.webmvc.domain.converter.CryptoAttributeConverter
+import spring.webmvc.domain.model.enums.MemberType
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.LocalDate
@@ -14,9 +15,10 @@ class Member protected constructor(
     name: String,
     phone: Phone,
     birthDate: LocalDate,
+    type: MemberType,
 ) : BaseTime() {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 
@@ -32,6 +34,10 @@ class Member protected constructor(
         protected set
 
     var birthDate = birthDate
+        protected set
+
+    @Enumerated(EnumType.STRING)
+    var type = type
         protected set
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -55,12 +61,14 @@ class Member protected constructor(
             name: String,
             phone: String,
             birthDate: LocalDate,
+            type: MemberType,
         ) = Member(
             email = Email.create(email),
             password = password,
             name = name,
             phone = Phone.create(phone),
             birthDate = birthDate,
+            type = type,
         )
     }
 

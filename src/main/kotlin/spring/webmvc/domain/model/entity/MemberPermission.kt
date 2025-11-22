@@ -13,7 +13,7 @@ class MemberPermission protected constructor(
     val member: Member,
 ) {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

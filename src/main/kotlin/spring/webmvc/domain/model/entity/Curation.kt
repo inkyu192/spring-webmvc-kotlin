@@ -9,7 +9,7 @@ class Curation protected constructor(
     sortOrder: Long,
 ) : BaseCreator() {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

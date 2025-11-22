@@ -19,7 +19,7 @@ class MongoTestContainerConfig {
         private const val MONGO_PORT = 27017
 
         @Container
-        private val mongoDBContainer = MongoDBContainer("mongo:latest").apply {
+        private val mongoDBContainer = MongoDBContainer("mongo:7.0").apply {
             withExposedPorts(MONGO_PORT)
             waitingFor(Wait.forListeningPort())
             withStartupTimeout(Duration.ofSeconds(60))

@@ -16,7 +16,7 @@ class Order protected constructor(
     val member: Member,
 ) : BaseTime() {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

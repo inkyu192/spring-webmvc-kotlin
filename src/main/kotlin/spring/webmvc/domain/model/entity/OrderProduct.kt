@@ -16,7 +16,7 @@ class OrderProduct protected constructor(
     val order: Order,
 ) {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 

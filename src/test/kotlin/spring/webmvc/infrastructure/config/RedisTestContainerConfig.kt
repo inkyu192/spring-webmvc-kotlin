@@ -18,7 +18,7 @@ class RedisTestContainerConfig {
         private const val REDIS_PORT = 6379
 
         @Container
-        private val redisContainer = GenericContainer<Nothing>("redis:latest").apply {
+        private val redisContainer = GenericContainer<Nothing>("redis:7.4.7").apply {
             withExposedPorts(REDIS_PORT)
             waitingFor(Wait.forListeningPort())
             withStartupTimeout(Duration.ofSeconds(60))

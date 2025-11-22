@@ -13,7 +13,7 @@ class CurationProduct protected constructor(
     val product: Product,
 ) {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
 
