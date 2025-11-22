@@ -3,9 +3,9 @@ plugins {
 	kotlin("plugin.spring") version "1.9.25"
 	kotlin("plugin.jpa") version "1.9.25"
 	kotlin("kapt")  version "1.9.25"
-	id("org.springframework.boot") version "3.4.4"
+	id("org.springframework.boot") version "3.5.8"
 	id("io.spring.dependency-management") version "1.1.7"
-	id("org.asciidoctor.jvm.convert") version "3.3.2"
+	id("org.asciidoctor.jvm.convert") version "4.0.5"
 }
 
 group = "spring.webmvc"
@@ -33,13 +33,13 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.mysql:mysql-connector-j")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("org.testcontainers:junit-jupiter")
-	testImplementation("org.testcontainers:postgresql")
+	testImplementation("org.testcontainers:mysql")
 	testImplementation("org.testcontainers:testcontainers")
 	testImplementation("org.testcontainers:localstack")
 	testImplementation("org.testcontainers:mongodb")
