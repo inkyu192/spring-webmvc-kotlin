@@ -2,7 +2,6 @@ spring:
   application:
     name: spring-webmvc-kotlin
   jpa:
-    hibernate.ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -10,6 +9,13 @@ spring:
         format_sql: true
         default_batch_fetch_size: 10
     open-in-view: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      encoding: UTF-8
+      continue-on-error: false
 
 logging:
   level:
