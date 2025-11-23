@@ -4,8 +4,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
 import spring.webmvc.domain.model.entity.Menu
 import spring.webmvc.domain.model.entity.QMenu.menu
-import spring.webmvc.domain.model.entity.QPermissionMenu.permissionMenu
 import spring.webmvc.domain.model.entity.QPermission.permission
+import spring.webmvc.domain.model.entity.QPermissionMenu.permissionMenu
 
 @Repository
 class MenuQuerydslRepository(

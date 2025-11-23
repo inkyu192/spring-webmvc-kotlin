@@ -13,7 +13,7 @@
 ```yaml
 services:
   mysql:
-    container_name: mysql-container
+    container_name: mysql
     image: mysql:8.4.7
     environment:
         MYSQL_DATABASE: my_db
@@ -22,12 +22,11 @@ services:
         MYSQL_ROOT_PASSWORD: root_password
     ports:
       - "3306:3306"
-    command: --default-authentication-plugin=mysql_native_password
     networks:
       - application-network
 
   redis:
-    container_name: redis-container
+    container_name: redis
     image: redis:7.4.7
     ports:
       - "6379:6379"
@@ -35,7 +34,7 @@ services:
       - application-network
 
   mongodb:
-    container_name: mongodb-container
+    container_name: mongodb
     image: mongo:7.0
     ports:
       - "27017:27017"
@@ -43,7 +42,7 @@ services:
       - application-network
 
   localstack:
-    container_name: localstack-container
+    container_name: localstack
     image: localstack/localstack:3.8.1
     ports:
       - "4566:4566"
