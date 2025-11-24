@@ -1,8 +1,9 @@
-package spring.webmvc.presentation.controller
+package spring.webmvc.presentation.controller.customer
 
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -12,6 +13,9 @@ import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.service.MemberService
@@ -24,9 +28,9 @@ import java.time.Instant
 import java.time.LocalDate
 
 
-@WebMvcTest(MemberController::class)
+@WebMvcTest(CustomerMemberController::class)
 @Import(WebMvcTestConfig::class)
-class MemberControllerTest() : MockMvcRestDocsSetup() {
+class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
     @MockitoBean
     private lateinit var memberService: MemberService
     private lateinit var member: Member
@@ -39,7 +43,15 @@ class MemberControllerTest() : MockMvcRestDocsSetup() {
     private lateinit var permissionIds: MutableList<Long>
 
     @BeforeEach
-    fun setUp() {
+    fun beforeEach() {
+        val authentication = UsernamePasswordAuthenticationToken(
+            1L,
+            null,
+            listOf(SimpleGrantedAuthority("TEST")),
+        )
+
+        SecurityContextHolder.getContext().authentication = authentication
+
         email = "test@gmail.com"
         password = "password"
         name = "name"
@@ -56,22 +68,17 @@ class MemberControllerTest() : MockMvcRestDocsSetup() {
         whenever(member.createdAt).thenReturn(Instant.now())
     }
 
+    @AfterEach
+    fun afterEach() {
+        SecurityContextHolder.clearContext()
+    }
+
     @Test
     fun createMember() {
-        whenever(
-            memberService.createMember(
-                email = email,
-                password = password,
-                name = name,
-                phone = phone,
-                birthDate = birthDate,
-                roleIds = roleIds,
-                permissionIds = permissionIds,
-            )
-        ).thenReturn(member)
+        whenever(memberService.createMember(command = any())).thenReturn(member)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.post("/members")
+            RestDocumentationRequestBuilders.post("/customer/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -90,7 +97,7 @@ class MemberControllerTest() : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "member-create",
+                    "customer-member-create",
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("password").description("패스워드"),
@@ -114,16 +121,16 @@ class MemberControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun findMember() {
-        whenever(memberService.findMember()).thenReturn(member)
+        whenever(memberService.findMember(any())).thenReturn(member)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/members")
+            RestDocumentationRequestBuilders.get("/customer/members")
                 .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "member-get",
+                    "customer-member-get",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -141,17 +148,10 @@ class MemberControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun updateMember() {
-        whenever(
-            memberService.updateMember(
-                password = password,
-                name = name,
-                phone = phone,
-                birthDate = birthDate,
-            )
-        ).thenReturn(member)
+        whenever(memberService.updateMember(command = any())).thenReturn(member)
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/members")
+            RestDocumentationRequestBuilders.patch("/customer/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer accessToken")
                 .content(
@@ -168,7 +168,7 @@ class MemberControllerTest() : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "member-update",
+                    "customer-member-update",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -192,18 +192,46 @@ class MemberControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun deleteMember() {
-        doNothing().whenever(memberService).deleteMember()
-
         mockMvc.perform(
-            RestDocumentationRequestBuilders.delete("/members")
+            RestDocumentationRequestBuilders.delete("/customer/members")
                 .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "member-delete",
+                    "customer-member-delete",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun updatePassword() {
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.patch("/customer/members/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer accessToken")
+                .content(
+                    """
+                        {
+                          "currentPassword": "currentPassword",
+                          "newPassword": "newPassword"
+                        }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "customer-member-password-update",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("currentPassword").description("현재 패스워드"),
+                        PayloadDocumentation.fieldWithPath("newPassword").description("새 패스워드")
                     )
                 )
             )

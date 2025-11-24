@@ -9,7 +9,7 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 @Component
-class HexAESCryptoService(
+class AesHexCryptoService(
     cryptoProperties: CryptoProperties,
 ) : CryptoService {
     private val secretKey = SecretKeySpec(cryptoProperties.secretKey.toByteArray(StandardCharsets.UTF_8), "AES")

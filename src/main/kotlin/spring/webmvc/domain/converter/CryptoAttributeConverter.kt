@@ -8,8 +8,8 @@ import spring.webmvc.infrastructure.crypto.CryptoService
 @Component
 @Converter
 class CryptoAttributeConverter(
-    private val hexAESCryptoService: CryptoService,
+    private val aesHexCryptoService: CryptoService,
 ) : AttributeConverter<String?, String?> {
-    override fun convertToDatabaseColumn(attribute: String?) = attribute?.let { hexAESCryptoService.encrypt(it) }
-    override fun convertToEntityAttribute(dbData: String?) = dbData?.let { hexAESCryptoService.decrypt(it) }
+    override fun convertToDatabaseColumn(attribute: String?) = attribute?.let { aesHexCryptoService.encrypt(it) }
+    override fun convertToEntityAttribute(dbData: String?) = dbData?.let { aesHexCryptoService.decrypt(it) }
 }

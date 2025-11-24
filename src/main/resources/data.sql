@@ -89,12 +89,12 @@ INSERT INTO permission_menu (permission_id, menu_id) VALUES
     (10, 6), (10, 17), (10, 18), (10, 19),
     (11, 6), (11, 17), (11, 18), (11, 19);
 
-INSERT INTO member (id, email, password, name, phone, birth_date, type, created_at, updated_at) VALUES
-    (1, 'operator@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Operator User', '010-1234-5678', '1990-01-01', 'OPERATOR', NOW(6), NOW(6)),
-    (2, 'operator.cs@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CS Manager', '010-1111-2222', '1992-03-15', 'OPERATOR', NOW(6), NOW(6)),
-    (3, 'partner@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner User', '010-2345-6789', '1992-05-15', 'PARTNER', NOW(6), NOW(6)),
-    (4, 'partner.staff@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner Staff', '010-3333-4444', '1995-08-20', 'PARTNER', NOW(6), NOW(6)),
-    (5, 'customer@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Customer User', '010-3456-7890', '1995-10-20', 'CUSTOMER', NOW(6), NOW(6));
+INSERT INTO member (id, email, password, name, phone, birth_date, type, status, created_at, updated_at) VALUES
+    (1, 'operator@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Operator User', '010-1234-5678', '1990-01-01', 'OPERATOR', 'ACTIVE', NOW(6), NOW(6)),
+    (2, 'operator.cs@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CS Manager', '010-1111-2222', '1992-03-15', 'OPERATOR', 'ACTIVE', NOW(6), NOW(6)),
+    (3, 'partner@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner User', '010-2345-6789', '1992-05-15', 'PARTNER', 'ACTIVE', NOW(6), NOW(6)),
+    (4, 'partner.staff@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner Staff', '010-3333-4444', '1995-08-20', 'PARTNER', 'ACTIVE', NOW(6), NOW(6)),
+    (5, 'customer@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Customer User', '010-3456-7890', '1995-10-20', 'CUSTOMER', 'ACTIVE', NOW(6), NOW(6));
 
 INSERT INTO member_role (member_id, role_id) VALUES
     (1, 1),

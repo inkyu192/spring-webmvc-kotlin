@@ -27,10 +27,15 @@ CREATE TABLE member (
     phone VARCHAR(255) NOT NULL,
     birth_date DATE NOT NULL,
     type VARCHAR(255) NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    deleted_at DATETIME(6),
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    CONSTRAINT chk_member_type CHECK (type IN ('OPERATOR', 'PARTNER', 'CUSTOMER'))
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
+
+CREATE INDEX idx_member_phone ON member(phone);
+CREATE INDEX idx_member_created_at ON member(created_at);
+CREATE INDEX idx_member_name_created_at ON member(name, created_at);
 
 CREATE TABLE role (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -99,8 +104,7 @@ CREATE TABLE product (
     created_by BIGINT,
     updated_by BIGINT,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    CONSTRAINT chk_category CHECK (category IN ('FLIGHT', 'ACCOMMODATION', 'TICKET'))
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
 
 CREATE TABLE flight (
@@ -138,8 +142,7 @@ CREATE TABLE orders (
     member_id BIGINT NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    CONSTRAINT fk_orders_member FOREIGN KEY (member_id) REFERENCES member(id),
-    CONSTRAINT chk_order_status CHECK (status IN ('ORDER', 'CONFIRM', 'CANCEL'))
+    CONSTRAINT fk_orders_member FOREIGN KEY (member_id) REFERENCES member(id)
 );
 
 CREATE TABLE order_product (

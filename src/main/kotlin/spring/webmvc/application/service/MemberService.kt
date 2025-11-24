@@ -4,59 +4,46 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import spring.webmvc.application.dto.query.MemberSearchQuery
 import spring.webmvc.application.event.NotificationEvent
+import spring.webmvc.domain.dto.command.MemberCreateCommand
+import spring.webmvc.domain.dto.command.MemberStatusUpdateCommand
+import spring.webmvc.domain.dto.command.MemberUpdateCommand
+import spring.webmvc.domain.dto.command.PasswordChangeCommand
 import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.entity.Role
-import spring.webmvc.domain.model.enums.MemberType
 import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.domain.repository.MemberRepository
+import spring.webmvc.domain.repository.PermissionRepository
 import spring.webmvc.domain.repository.RoleRepository
-import spring.webmvc.infrastructure.security.SecurityContextUtil
+import spring.webmvc.domain.service.MemberDomainService
 import spring.webmvc.presentation.exception.DuplicateEntityException
-import spring.webmvc.presentation.exception.EntityNotFoundException
-import java.time.LocalDate
 
 @Service
 @Transactional(readOnly = true)
 class MemberService(
     private val memberRepository: MemberRepository,
     private val roleRepository: RoleRepository,
-    private val permissionService: PermissionService,
+    private val permissionRepository: PermissionRepository,
+    private val memberDomainService: MemberDomainService,
     private val passwordEncoder: PasswordEncoder,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
-    fun createMember(
-        email: String,
-        password: String,
-        name: String,
-        phone: String,
-        birthDate: LocalDate,
-        roleIds: List<Long>,
-        permissionIds: List<Long>,
-    ): Member {
-        if (memberRepository.existsByEmail(Email.create(email))) {
-            throw DuplicateEntityException(kClass = Member::class, name = email)
+    fun createMember(command: MemberCreateCommand): Member {
+        if (memberRepository.existsByEmail(Email.create(command.email))) {
+            throw DuplicateEntityException(kClass = Member::class, name = command.email)
         }
 
-        val member = Member.create(
-            email = email,
-            password = passwordEncoder.encode(password),
-            name = name,
-            phone = phone,
-            birthDate = birthDate,
-            type = MemberType.CUSTOMER
-        )
+        val roles = roleRepository.findAllById(command.roleIds)
+        val permissions = permissionRepository.findAllById(command.permissionIds)
 
-        val roleMap = roleRepository.findAllById(roleIds).associateBy { it.id }
-        roleIds.forEach {
-            val role = roleMap[it] ?: throw EntityNotFoundException(kClass = Role::class, id = it)
-            member.addRole(role)
-        }
-
-        permissionService.addPermission(
-            permissionIds = permissionIds,
-            consumer = member::addPermission
+        val member = memberDomainService.createMember(
+            command = command.copy(
+                password = passwordEncoder.encode(command.password),
+            ),
+            roles = roles,
+            permissions = permissions,
         )
 
         memberRepository.save(member)
@@ -73,37 +60,46 @@ class MemberService(
         return member
     }
 
-    fun findMember(): Member {
-        val memberId = SecurityContextUtil.getMemberId()
+    fun findMembers(query: MemberSearchQuery) = memberRepository.findAll(
+        pageable = query.pageable,
+        email = query.email?.let { Email.create(it) },
+        phone = query.phone?.let { Phone.create(it) },
+        name = query.name,
+        status = query.status,
+        createdFrom = query.createdFrom,
+        createdTo = query.createdTo,
+    )
 
-        return memberRepository.findById(memberId)
-    }
+    fun findMember(memberId: Long) = memberRepository.findById(memberId)
 
     @Transactional
-    fun updateMember(
-        password: String?,
-        name: String?,
-        phone: String?,
-        birthDate: LocalDate?,
-    ): Member {
-        val memberId = SecurityContextUtil.getMemberId()
-        val member = memberRepository.findById(memberId)
+    fun updateMember(command: MemberUpdateCommand): Member {
+        val member = memberRepository.findById(command.memberId)
 
         member.update(
-            password = passwordEncoder.encode(password),
-            name = name,
-            phone = phone,
-            birthDate = birthDate,
+            name = command.name,
+            phone = command.phone,
+            birthDate = command.birthDate,
         )
 
         return member
     }
 
     @Transactional
-    fun deleteMember() {
-        val memberId = SecurityContextUtil.getMemberId()
-        val member = memberRepository.findById(memberId)
+    fun updateMemberStatus(command: MemberStatusUpdateCommand): Member {
+        val member = memberRepository.findById(command.memberId)
 
-        memberRepository.delete(member)
+        member.updateStatus(command.status)
+
+        return member
+    }
+
+    @Transactional
+    fun updatePassword(command: PasswordChangeCommand) {
+        val member = memberRepository.findById(command.memberId)
+
+        require(passwordEncoder.matches(command.currentPassword, member.password))
+
+        member.updatePassword(passwordEncoder.encode(command.newPassword))
     }
 }

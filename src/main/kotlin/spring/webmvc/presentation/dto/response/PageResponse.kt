@@ -19,6 +19,17 @@ data class OffsetPageResponse(
         hasNext = page.hasNext(),
         hasPrevious = page.hasPrevious(),
     )
+
+    companion object {
+        fun from(page: Page<*>) = OffsetPageResponse(
+            page = page.number,
+            size = page.size,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            hasNext = page.hasNext(),
+            hasPrevious = page.hasPrevious(),
+        )
+    }
 }
 
 data class CursorPageResponse(

@@ -2,9 +2,11 @@ package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
 import spring.webmvc.domain.converter.CryptoAttributeConverter
+import spring.webmvc.domain.model.enums.MemberStatus
 import spring.webmvc.domain.model.enums.MemberType
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
+import java.time.Instant
 import java.time.LocalDate
 
 @Entity
@@ -16,6 +18,7 @@ class Member protected constructor(
     phone: Phone,
     birthDate: LocalDate,
     type: MemberType,
+    status: MemberStatus,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +41,13 @@ class Member protected constructor(
 
     @Enumerated(EnumType.STRING)
     var type = type
+        protected set
+
+    @Enumerated(EnumType.STRING)
+    var status: MemberStatus = status
+        protected set
+
+    var deletedAt: Instant? = null
         protected set
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -69,6 +79,7 @@ class Member protected constructor(
             phone = Phone.create(phone),
             birthDate = birthDate,
             type = type,
+            status = MemberStatus.ACTIVE,
         )
     }
 
@@ -80,10 +91,20 @@ class Member protected constructor(
         _memberPermissions.add(MemberPermission.create(member = this, permission = permission))
     }
 
-    fun update(password: String?, name: String?, phone: String?, birthDate: LocalDate?) {
-        password?.let { this.password = password }
+    fun update(name: String?, phone: String?, birthDate: LocalDate?) {
         name?.let { this.name = name }
         phone?.let { this.phone = Phone.create(phone) }
         birthDate?.let { this.birthDate = birthDate }
+    }
+
+    fun updateStatus(status: MemberStatus) {
+        this.status = status
+        if (status == MemberStatus.WITHDRAWN) {
+            this.deletedAt = Instant.now()
+        }
+    }
+
+    fun updatePassword(newPassword: String) {
+        this.password = newPassword
     }
 }
