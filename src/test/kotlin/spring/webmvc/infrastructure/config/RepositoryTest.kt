@@ -7,6 +7,6 @@ import org.springframework.context.annotation.Import
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 @DataJpaTest
-@Import(MySQLTestContainerConfig::class, DataJpaTestConfig::class)
+@Import(MySQLTestContainerConfig::class, JpaTestConfig::class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 annotation class RepositoryTest

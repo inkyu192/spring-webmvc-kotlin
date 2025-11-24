@@ -1,5 +1,6 @@
 package spring.webmvc.infrastructure.config
 
+import com.linecorp.kotlinjdsl.render.jpql.JpqlRenderContext
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import org.springframework.context.annotation.Bean
@@ -18,4 +19,7 @@ class JpaConfig {
 
     @Bean
     fun jpaQueryFactory(entityManager: EntityManager) = JPAQueryFactory(entityManager)
+
+    @Bean
+    fun jpqlRenderContext() = JpqlRenderContext()
 }

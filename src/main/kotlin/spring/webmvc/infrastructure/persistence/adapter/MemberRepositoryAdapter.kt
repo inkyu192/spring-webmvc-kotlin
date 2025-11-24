@@ -9,6 +9,7 @@ import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.infrastructure.extensions.findByIdOrThrow
 import spring.webmvc.infrastructure.persistence.jpa.MemberJpaRepository
+import spring.webmvc.infrastructure.persistence.jpa.MemberKotlinJdslRepository
 import spring.webmvc.infrastructure.persistence.jpa.MemberQuerydslRepository
 import java.time.Instant
 
@@ -16,6 +17,7 @@ import java.time.Instant
 class MemberRepositoryAdapter(
     private val jpaRepository: MemberJpaRepository,
     private val querydslRepository: MemberQuerydslRepository,
+    private val kotlinJdslRepository: MemberKotlinJdslRepository,
 ) : MemberRepository {
     override fun findById(id: Long): Member = jpaRepository.findByIdOrThrow(id)
 
@@ -27,7 +29,7 @@ class MemberRepositoryAdapter(
         status: MemberStatus?,
         createdFrom: Instant,
         createdTo: Instant,
-    ) = querydslRepository.findAll(
+    ) = kotlinJdslRepository.findAll(
         pageable = pageable,
         email = email,
         phone = phone,

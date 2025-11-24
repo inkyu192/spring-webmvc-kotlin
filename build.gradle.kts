@@ -57,6 +57,10 @@ dependencies {
 
 	implementation("software.amazon.awssdk:s3:2.31.25")
 
+	implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.6.1")
+	implementation("com.linecorp.kotlin-jdsl:jpql-render:3.6.1")
+	implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.6.1")
+
 	testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
 	testImplementation("io.kotest:kotest-assertions-core:5.9.1")
 	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
