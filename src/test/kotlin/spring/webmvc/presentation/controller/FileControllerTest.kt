@@ -2,6 +2,7 @@ package spring.webmvc.presentation.controller
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -13,7 +14,7 @@ import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spring.webmvc.infrastructure.common.FileType
+import spring.webmvc.domain.model.enums.FileType
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.infrastructure.external.S3Service
 import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
@@ -38,7 +39,7 @@ class FileControllerTest : MockMvcRestDocsSetup() {
         )
 
         data = MockMultipartFile(
-            "data",
+            "request",
             "",
             "application/json",
             "{\"type\": \"TEMP\"}".toByteArray(StandardCharsets.UTF_8)
@@ -49,7 +50,7 @@ class FileControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun uploadFile() {
-        whenever(methodCall = s3Service.putObject(fileType = FileType.TEMP, file = file)).thenReturn(key)
+        whenever(methodCall = s3Service.putObject(fileType = any(), file = any())).thenReturn(key)
 
         // When & Then
         mockMvc.perform(
@@ -67,7 +68,7 @@ class FileControllerTest : MockMvcRestDocsSetup() {
                     ),
                     RequestDocumentation.requestParts(
                         RequestDocumentation.partWithName("file").description("파일"),
-                        RequestDocumentation.partWithName("data").description("데이터")
+                        RequestDocumentation.partWithName("request").description("요청 데이터")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("key").description("키")

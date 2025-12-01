@@ -2,10 +2,13 @@ package spring.webmvc.presentation.controller.operator
 
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
+import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.MemberService
+import spring.webmvc.domain.model.enums.MemberType
+import spring.webmvc.presentation.dto.request.MemberCreateRequest
 import spring.webmvc.presentation.dto.request.MemberSearchRequest
 import spring.webmvc.presentation.dto.request.MemberStatusUpdateRequest
 import spring.webmvc.presentation.dto.response.MemberPageResponse
@@ -16,6 +19,17 @@ import spring.webmvc.presentation.dto.response.MemberResponse
 class OperatorMemberController(
     private val memberService: MemberService,
 ) {
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createMember(
+        @RequestBody @Validated request: MemberCreateRequest,
+    ): MemberResponse {
+        val command = request.toCommand(MemberType.OPERATOR)
+        val member = memberService.createMember(command)
+
+        return MemberResponse.from(member)
+    }
+
     @GetMapping
     @PreAuthorize("hasAuthority('OPERATOR_MEMBER_READ')")
     fun findMembers(

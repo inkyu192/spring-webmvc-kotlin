@@ -1,35 +1,102 @@
 package spring.webmvc.presentation.controller
 
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.AuthService
-import spring.webmvc.presentation.dto.request.MemberLoginRequest
-import spring.webmvc.presentation.dto.request.TokenRequest
+import spring.webmvc.presentation.dto.request.*
 import spring.webmvc.presentation.dto.response.TokenResponse
 
-@RestController
+@Controller
 @RequestMapping("/auth")
 class AuthController(
-    private val authService: AuthService
+    private val authService: AuthService,
 ) {
     @PostMapping("/login")
-    fun login(@RequestBody @Validated memberLoginRequest: MemberLoginRequest) =
-        TokenResponse(
-            tokenResult = authService.login(
-                email = memberLoginRequest.email,
-                password = memberLoginRequest.password
-            )
-        )
+    @ResponseBody
+    fun login(
+        @RequestBody @Validated request: LoginRequest,
+    ): TokenResponse {
+        val command = request.toCommand()
+        val tokenResult = authService.login(command)
+
+        return TokenResponse.from(tokenResult)
+    }
 
     @PostMapping("/token/refresh")
-    fun refreshToken(@RequestBody @Validated tokenRequest: TokenRequest) =
-        TokenResponse(
-            tokenResult = authService.refreshToken(
-                accessToken = tokenRequest.accessToken,
-                refreshToken = tokenRequest.refreshToken
-            )
-        )
+    @ResponseBody
+    fun refreshToken(
+        @RequestBody @Validated request: TokenRequest,
+    ): TokenResponse {
+        val command = request.toCommand()
+        val tokenResult = authService.refreshToken(command)
+
+        return TokenResponse.from(tokenResult)
+    }
+
+    @PostMapping("/join/verify/request")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun requestJoinVerify(
+        @RequestBody @Validated request: JoinVerifyRequest,
+    ) {
+        val command = request.toCommand()
+        authService.requestJoinVerify(command)
+    }
+
+    @GetMapping("/join/verify")
+    fun getJoinVerifyForm(
+        @RequestParam token: String,
+        model: Model,
+    ): String {
+        model.addAttribute("token", token)
+        return "email/join-verify-form"
+    }
+
+    @PostMapping("/join/verify/confirm")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun confirmJoinVerify(
+        @RequestBody @Validated request: JoinVerifyConfirmRequest,
+    ) {
+        val command = request.toCommand()
+        authService.confirmJoinVerify(command)
+    }
+
+    @GetMapping("/join/verify/success")
+    fun joinVerifySuccess() = "email/join-verify-success"
+
+    @PostMapping("/password/reset/request")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun requestPasswordReset(
+        @RequestBody @Validated request: PasswordResetRequest,
+    ) {
+        val command = request.toCommand()
+        authService.requestPasswordReset(command)
+    }
+
+    @GetMapping("/password/reset")
+    fun getPasswordResetForm(
+        @RequestParam token: String,
+        model: Model,
+    ): String {
+        model.addAttribute("token", token)
+        return "email/password-reset-form"
+    }
+
+    @PostMapping("/password/reset/confirm")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun confirmPasswordReset(
+        @RequestBody @Validated request: PasswordResetConfirmRequest,
+    ) {
+        val command = request.toCommand()
+        authService.confirmPasswordReset(command)
+    }
+
+    @GetMapping("/password/reset/success")
+    fun passwordResetSuccess() = "email/password-reset-success"
 }

@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.common
+package spring.webmvc.domain.model.enums
 
 enum class FileType(
     val directory: String,

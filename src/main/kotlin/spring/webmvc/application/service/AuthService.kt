@@ -1,14 +1,21 @@
 package spring.webmvc.application.service
 
 import io.jsonwebtoken.ExpiredJwtException
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.DisabledException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.result.TokenResult
+import spring.webmvc.application.event.SendPasswordResetEmailEvent
+import spring.webmvc.application.event.SendVerifyEmailEvent
+import spring.webmvc.domain.dto.command.*
 import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.domain.model.enums.MemberStatus
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.repository.MemberRepository
+import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.security.JwtProvider
 
@@ -19,12 +26,21 @@ class AuthService(
     private val tokenCacheRepository: TokenCacheRepository,
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val authCacheRepository: AuthCacheRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
-    fun login(email: String, password: String): TokenResult {
-        val member = memberRepository.findByEmail(Email.create(email))
-            ?.takeIf { passwordEncoder.matches(password, it.password) }
-            ?: throw BadCredentialsException("잘못된 아이디 또는 비밀번호입니다.")
+    fun login(command: LoginCommand): TokenResult {
+        val member = memberRepository.findByEmail(command.email)
+            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+
+        if (!passwordEncoder.matches(command.password, member.password)) {
+            throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+        }
+
+        if (member.isNotActive()) {
+            throw DisabledException("계정이 활성화되지 않았습니다.")
+        }
 
         val memberId = checkNotNull(member.id)
 
@@ -39,14 +55,14 @@ class AuthService(
         return TokenResult(accessToken = accessToken, refreshToken = refreshToken)
     }
 
-    fun refreshToken(accessToken: String, refreshToken: String): TokenResult {
-        val memberId = extractMemberId(accessToken)
-        jwtProvider.parseRefreshToken(refreshToken)
+    fun refreshToken(command: RefreshTokenCommand): TokenResult {
+        val memberId = extractMemberId(command.accessToken)
+        jwtProvider.parseRefreshToken(command.refreshToken)
 
         val member = memberRepository.findById(memberId)
 
-        if (!tokenCacheRepository.getRefreshToken(memberId).equals(refreshToken)) {
-            throw BadCredentialsException("유효하지 않은 인증 정보입니다. 다시 로그인해 주세요.")
+        if (tokenCacheRepository.getRefreshToken(memberId) != command.refreshToken) {
+            throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
         }
 
         return TokenResult(
@@ -54,7 +70,7 @@ class AuthService(
                 memberId = memberId,
                 permissions = getPermissions(member),
             ),
-            refreshToken = refreshToken,
+            refreshToken = command.refreshToken,
         )
     }
 
@@ -79,5 +95,41 @@ class AuthService(
             .map { it.permission.name }
 
         return (rolePermissions + directPermissions).distinct()
+    }
+
+    fun requestJoinVerify(command: JoinVerifyRequestCommand) {
+        eventPublisher.publishEvent(SendVerifyEmailEvent(email = command.email))
+    }
+
+    @Transactional
+    fun confirmJoinVerify(command: JoinVerifyConfirmCommand) {
+        val email = authCacheRepository.getJoinVerifyToken(command.token)
+            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+
+        val member = memberRepository.findByEmail(Email.create(email))
+            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+
+        member.updateStatus(MemberStatus.ACTIVE)
+
+        authCacheRepository.deleteJoinVerifyToken(command.token)
+    }
+
+    fun requestPasswordReset(command: PasswordResetRequestCommand) {
+        memberRepository.findByEmail(command.email) ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+
+        eventPublisher.publishEvent(SendPasswordResetEmailEvent(email = command.email))
+    }
+
+    @Transactional
+    fun confirmPasswordReset(command: PasswordResetConfirmCommand) {
+        val email = authCacheRepository.getPasswordResetToken(command.token)
+            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+
+        val member = memberRepository.findByEmail(Email.create(email))
+            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+
+        member.updatePassword(passwordEncoder.encode(command.password))
+
+        authCacheRepository.deletePasswordResetToken(command.token)
     }
 }

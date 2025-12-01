@@ -1,11 +1,19 @@
 spring:
   application:
     name: spring-webmvc-kotlin
+  datasource:
+    url: jdbc:mysql://localhost:3306/my_db
+    username: my_user
+    password: my_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-#        show_sql: true
         format_sql: true
         default_batch_fetch_size: 10
     open-in-view: false
@@ -16,6 +24,17 @@ spring:
       data-locations: classpath:data.sql
       encoding: UTF-8
       continue-on-error: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:
@@ -23,7 +42,6 @@ logging:
       hibernate:
         SQL: debug
         type: info
-#        orm.jdbc.bind: TRACE
 
 jwt:
   access-token:

@@ -66,20 +66,20 @@ class Member protected constructor(
 
     companion object {
         fun create(
-            email: String,
+            email: Email,
             password: String,
             name: String,
-            phone: String,
+            phone: Phone,
             birthDate: LocalDate,
             type: MemberType,
         ) = Member(
-            email = Email.create(email),
+            email = email,
             password = password,
             name = name,
-            phone = Phone.create(phone),
+            phone = phone,
             birthDate = birthDate,
             type = type,
-            status = MemberStatus.ACTIVE,
+            status = MemberStatus.PENDING,
         )
     }
 
@@ -91,9 +91,9 @@ class Member protected constructor(
         _memberPermissions.add(MemberPermission.create(member = this, permission = permission))
     }
 
-    fun update(name: String?, phone: String?, birthDate: LocalDate?) {
+    fun update(name: String?, phone: Phone?, birthDate: LocalDate?) {
         name?.let { this.name = name }
-        phone?.let { this.phone = Phone.create(phone) }
+        phone?.let { this.phone = phone }
         birthDate?.let { this.birthDate = birthDate }
     }
 
@@ -107,4 +107,6 @@ class Member protected constructor(
     fun updatePassword(newPassword: String) {
         this.password = newPassword
     }
+
+    fun isNotActive() = this.status != MemberStatus.ACTIVE
 }

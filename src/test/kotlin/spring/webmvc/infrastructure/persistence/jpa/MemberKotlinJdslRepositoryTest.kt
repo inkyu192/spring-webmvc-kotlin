@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest
 import spring.webmvc.domain.model.entity.Member
 import spring.webmvc.domain.model.enums.MemberType
 import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.RepositoryTest
 import spring.webmvc.infrastructure.crypto.CryptoService
 import java.time.Instant
@@ -37,26 +38,26 @@ class MemberKotlinJdslRepositoryTest(
         whenever(cryptoService.decrypt(any())).thenAnswer { it.getArgument<String>(0) }
 
         member1 = Member.create(
-            email = "test1@example.com",
+            email = Email.create("test1@example.com"),
             password = "password123",
             name = "홍길동",
-            phone = "010-1111-1111",
+            phone = Phone.create("010-1111-1111"),
             birthDate = LocalDate.of(1990, 1, 1),
             type = MemberType.CUSTOMER,
         )
         member2 = Member.create(
-            email = "test2@example.com",
+            email = Email.create("test2@example.com"),
             password = "password123",
             name = "김철수",
-            phone = "010-2222-2222",
+            phone = Phone.create("010-2222-2222"),
             birthDate = LocalDate.of(1985, 5, 15),
             type = MemberType.CUSTOMER,
         )
         member3 = Member.create(
-            email = "test3@example.com",
+            email = Email.create("test3@example.com"),
             password = "password123",
             name = "이영희",
-            phone = "010-3333-3333",
+            phone = Phone.create("010-3333-3333"),
             birthDate = LocalDate.of(1995, 12, 25),
             type = MemberType.PARTNER,
         )

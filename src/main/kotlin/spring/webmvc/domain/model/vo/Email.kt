@@ -9,7 +9,7 @@ import spring.webmvc.domain.converter.CryptoAttributeConverter
 class Email protected constructor(
     @Convert(converter = CryptoAttributeConverter::class)
     @Column(name = "email", unique = true)
-    val value: String
+    val value: String,
 ) {
     companion object {
         private val EMAIL_PATTERN = Regex("^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")

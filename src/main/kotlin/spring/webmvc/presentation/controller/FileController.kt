@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import spring.webmvc.infrastructure.common.FileUtil
 import spring.webmvc.infrastructure.external.S3Service
 import spring.webmvc.presentation.dto.request.FileUploadRequest
 import spring.webmvc.presentation.dto.response.FileResponse
@@ -18,10 +17,11 @@ class FileController(
 ) {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    fun uploadFile(@RequestPart file: MultipartFile, @RequestPart data: FileUploadRequest): FileResponse {
-        FileUtil.validate(fileType = data.type, file = file)
-
-        val key = s3Service.putObject(fileType = data.type, file = file)
+    fun uploadFile(
+        @RequestPart file: MultipartFile,
+        @RequestPart request: FileUploadRequest,
+    ): FileResponse {
+        val key = s3Service.putObject(fileType = request.type, file = file)
         return FileResponse(key = key)
     }
 }

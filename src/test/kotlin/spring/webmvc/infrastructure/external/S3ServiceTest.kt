@@ -11,7 +11,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
-import spring.webmvc.infrastructure.common.FileType
+import spring.webmvc.domain.model.enums.FileType
 import spring.webmvc.infrastructure.config.LocalStackTestContainerConfig
 
 class S3ServiceTest : DescribeSpec({
@@ -39,13 +39,13 @@ class S3ServiceTest : DescribeSpec({
 
     describe("putObject") {
         it("MultipartFile S3 업로드 후 key 반환한다") {
-            val filename = "file.txt"
+            val filename = "file.jpg"
             val content = "content"
 
             val multipartFile = MockMultipartFile(
                 filename,
                 filename,
-                MediaType.TEXT_PLAIN_VALUE,
+                MediaType.IMAGE_JPEG_VALUE,
                 content.toByteArray(Charsets.UTF_8)
             )
 
@@ -66,13 +66,13 @@ class S3ServiceTest : DescribeSpec({
 
     describe("copyObject") {
         it("S3 객체를 복사한다") {
-            val filename = "file.txt"
+            val filename = "file.jpg"
             val content = "content"
 
             val multipartFile = MockMultipartFile(
                 filename,
                 filename,
-                MediaType.TEXT_PLAIN_VALUE,
+                MediaType.IMAGE_JPEG_VALUE,
                 content.toByteArray(Charsets.UTF_8)
             )
 

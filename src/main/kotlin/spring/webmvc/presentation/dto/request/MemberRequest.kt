@@ -1,6 +1,5 @@
 package spring.webmvc.presentation.dto.request
 
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Pattern
 import org.springframework.data.domain.Pageable
 import spring.webmvc.application.dto.query.MemberSearchQuery
@@ -10,11 +9,14 @@ import spring.webmvc.domain.dto.command.MemberUpdateCommand
 import spring.webmvc.domain.dto.command.PasswordChangeCommand
 import spring.webmvc.domain.model.enums.MemberStatus
 import spring.webmvc.domain.model.enums.MemberType
+import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 import java.time.LocalDate
+import jakarta.validation.constraints.Email as EmailValidation
 
 data class MemberCreateRequest(
-    @field:Email
+    @field:EmailValidation
     val email: String,
     val password: String,
     val name: String,
@@ -25,22 +27,16 @@ data class MemberCreateRequest(
     val permissionIds: List<Long> = emptyList(),
 ) {
     fun toCommand(memberType: MemberType) = MemberCreateCommand(
-        email = email,
+        email = Email.create(email),
         password = password,
         name = name,
-        phone = phone,
+        phone = Phone.create(phone),
         birthDate = birthDate,
         memberType = memberType,
         roleIds = roleIds,
         permissionIds = permissionIds,
     )
 }
-
-data class MemberLoginRequest(
-    @field:Email
-    val email: String,
-    val password: String,
-)
 
 data class MemberUpdateRequest(
     val name: String?,
@@ -51,7 +47,7 @@ data class MemberUpdateRequest(
     fun toCommand(memberId: Long) = MemberUpdateCommand(
         memberId = memberId,
         name = name,
-        phone = phone,
+        phone = phone?.let { Phone.create(phone) },
         birthDate = birthDate,
     )
 }
@@ -71,7 +67,7 @@ data class PasswordChangeRequest(
 ) {
     fun toCommand(memberId: Long) = PasswordChangeCommand(
         memberId = memberId,
-        currentPassword = currentPassword,
+        oldPassword = currentPassword,
         newPassword = newPassword,
     )
 }
@@ -86,8 +82,8 @@ data class MemberSearchRequest(
 ) {
     fun toQuery(pageable: Pageable) = MemberSearchQuery(
         pageable = pageable,
-        email = email,
-        phone = phone,
+        email = email?.let { Email.create(it) },
+        phone = phone?.let { Phone.create(it) },
         name = name,
         status = status,
         createdFrom = createdFrom,

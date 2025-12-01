@@ -2,6 +2,7 @@ package spring.webmvc.presentation.controller
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -38,7 +39,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun login() {
-        whenever(authService.login(email = email, password = password)).thenReturn(tokenResult)
+        whenever(authService.login(any())).thenReturn(tokenResult)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/login")
@@ -70,7 +71,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun refreshToken() {
-        whenever(authService.refreshToken(accessToken = accessToken, refreshToken = refreshToken))
+        whenever(authService.refreshToken(any()))
             .thenReturn(tokenResult)
 
         mockMvc.perform(
@@ -96,6 +97,115 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("accessToken").description("액세스 토큰"),
                         PayloadDocumentation.fieldWithPath("refreshToken").description("리프레시 토큰")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun requestJoinVerify() {
+        whenever(authService.requestJoinVerify(any())).then { }
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/auth/join/verify/request")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                          "email": "$email"
+                        }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "join-verify-request",
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("email").description("이메일")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun confirmJoinVerify() {
+        val token = "verifyToken123"
+        whenever(authService.confirmJoinVerify(any())).then { }
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/auth/join/verify/confirm")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                          "token": "$token"
+                        }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "join-verify-confirm",
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("token").description("토큰")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun requestPasswordReset() {
+        whenever(authService.requestPasswordReset(any())).then { }
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/auth/password/reset/request")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                          "email": "$email"
+                        }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "password-reset-request",
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("email").description("이메일")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun confirmPasswordReset() {
+        val token = "resetToken123"
+        val newPassword = "newPassword123"
+        whenever(authService.confirmPasswordReset(any())).then { }
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/auth/password/reset/confirm")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                          "token": "$token",
+                          "password": "$newPassword"
+                        }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "password-reset-confirm",
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("token").description("토큰"),
+                        PayloadDocumentation.fieldWithPath("password").description("비밀번호")
                     )
                 )
             )

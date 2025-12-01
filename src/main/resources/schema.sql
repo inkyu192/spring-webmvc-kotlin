@@ -63,33 +63,33 @@ CREATE TABLE menu (
 );
 
 CREATE TABLE member_role (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
-    PRIMARY KEY (member_id, role_id),
     CONSTRAINT fk_member_role_member FOREIGN KEY (member_id) REFERENCES member(id),
     CONSTRAINT fk_member_role_role FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
 CREATE TABLE member_permission (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id BIGINT NOT NULL,
     permission_id BIGINT NOT NULL,
-    PRIMARY KEY (member_id, permission_id),
     CONSTRAINT fk_member_permission_member FOREIGN KEY (member_id) REFERENCES member(id),
     CONSTRAINT fk_member_permission_permission FOREIGN KEY (permission_id) REFERENCES permission(id)
 );
 
 CREATE TABLE role_permission (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     role_id BIGINT NOT NULL,
     permission_id BIGINT NOT NULL,
-    PRIMARY KEY (role_id, permission_id),
     CONSTRAINT fk_role_permission_role FOREIGN KEY (role_id) REFERENCES role(id),
     CONSTRAINT fk_role_permission_permission FOREIGN KEY (permission_id) REFERENCES permission(id)
 );
 
 CREATE TABLE permission_menu (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     permission_id BIGINT NOT NULL,
     menu_id BIGINT NOT NULL,
-    PRIMARY KEY (permission_id, menu_id),
     CONSTRAINT fk_permission_menu_permission FOREIGN KEY (permission_id) REFERENCES permission(id),
     CONSTRAINT fk_permission_menu_menu FOREIGN KEY (menu_id) REFERENCES menu(id)
 );

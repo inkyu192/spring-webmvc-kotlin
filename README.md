@@ -1,13 +1,15 @@
 ## 개발 환경
 - **Language:** Kotlin
-- **Library / Framework:** Spring Web MVC, Spring Data JPA, Querydsl, Spring REST Docs
-- **Database:** MySQL, Redis, MongoDB
-- **Test:** JUnit 5, Mockito, Kotest, MockK, Testcontainers
+- **Library / Framework:** Spring Web MVC, Spring Data JPA, Kotlin JDSL, Querydsl, Spring REST Docs
+- **Database:** MySQL, Redis
+- **Test:** JUnit 5, Mockito, MockK, Testcontainers
 - **Infrastructure**: Docker, Docker Compose, LocalStack
 
 ---
 
 ## 환경 설정
+
+### Docker 설정
 `docker-compose.yml`을 사용하여 MySQL, Redis, LocalStack 실행할 수 있다.
 
 ```yaml
@@ -33,14 +35,6 @@ services:
     networks:
       - application-network
 
-  mongodb:
-    container_name: mongodb
-    image: mongo:7.0
-    ports:
-      - "27017:27017"
-    networks:
-      - application-network
-
   localstack:
     container_name: localstack
     image: localstack/localstack:3.8.1
@@ -61,6 +55,12 @@ networks:
   application-network:
     name: application-network
 ```
+
+### SMTP 설정
+이메일 발송 기능을 사용하려면 SMTP 서버 정보를 환경 변수로 설정해야 한다.
+
+- `SMTP_USERNAME`: Gmail 계정
+- `SMTP_PASSWORD`: Gmail 앱 비밀번호
 
 ---
 

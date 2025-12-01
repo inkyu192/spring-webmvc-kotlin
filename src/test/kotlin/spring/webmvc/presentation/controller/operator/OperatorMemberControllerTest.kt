@@ -38,9 +38,12 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
     private lateinit var memberService: MemberService
     private lateinit var member: Member
     private lateinit var email: String
+    private lateinit var password: String
     private lateinit var name: String
     private lateinit var phone: String
     private lateinit var birthDate: LocalDate
+    private lateinit var roleIds: MutableList<Long>
+    private lateinit var permissionIds: MutableList<Long>
 
     @BeforeEach
     fun beforeEach() {
@@ -56,9 +59,12 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
         SecurityContextHolder.getContext().authentication = authentication
 
         email = "test@gmail.com"
+        password = "password"
         name = "name"
         phone = "010-1234-1234"
         birthDate = LocalDate.now()
+        roleIds = mutableListOf()
+        permissionIds = mutableListOf(1L)
         member = mock<Member>()
         whenever(member.id).thenReturn(1L)
         whenever(member.email).thenReturn(Email.create(email))
@@ -71,6 +77,52 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
     @AfterEach
     fun afterEach() {
         SecurityContextHolder.clearContext()
+    }
+
+    @Test
+    fun createMember() {
+        whenever(memberService.createMember(command = any())).thenReturn(member)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/operator/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                          "email": "$email",
+                          "password": "$password",
+                          "name": "$name",
+                          "phone": "$phone",
+                          "birthDate": "$birthDate",
+                          "roleIds": $roleIds,
+                          "permissionIds": $permissionIds
+                        }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "operator-member-create",
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("email").description("계정"),
+                        PayloadDocumentation.fieldWithPath("password").description("패스워드"),
+                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
+                        PayloadDocumentation.fieldWithPath("phone").description("번호"),
+                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
+                        PayloadDocumentation.fieldWithPath("roleIds").description("역할목록"),
+                        PayloadDocumentation.fieldWithPath("permissionIds").description("권한목록")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("email").description("계정"),
+                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
+                        PayloadDocumentation.fieldWithPath("phone").description("번호"),
+                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
+                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시")
+                    )
+                )
+            )
     }
 
     @Test

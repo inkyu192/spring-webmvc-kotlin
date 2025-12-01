@@ -1,18 +1,17 @@
 package spring.webmvc.application.service
 
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.query.MemberSearchQuery
-import spring.webmvc.application.event.NotificationEvent
+import spring.webmvc.application.event.SendVerifyEmailEvent
 import spring.webmvc.domain.dto.command.MemberCreateCommand
 import spring.webmvc.domain.dto.command.MemberStatusUpdateCommand
 import spring.webmvc.domain.dto.command.MemberUpdateCommand
 import spring.webmvc.domain.dto.command.PasswordChangeCommand
 import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.vo.Email
-import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.PermissionRepository
 import spring.webmvc.domain.repository.RoleRepository
@@ -31,8 +30,8 @@ class MemberService(
 ) {
     @Transactional
     fun createMember(command: MemberCreateCommand): Member {
-        if (memberRepository.existsByEmail(Email.create(command.email))) {
-            throw DuplicateEntityException(kClass = Member::class, name = command.email)
+        if (memberRepository.existsByEmail(command.email)) {
+            throw DuplicateEntityException(kClass = Member::class, name = command.email.value)
         }
 
         val roles = roleRepository.findAllById(command.roleIds)
@@ -48,22 +47,15 @@ class MemberService(
 
         memberRepository.save(member)
 
-        eventPublisher.publishEvent(
-            NotificationEvent(
-                memberId = checkNotNull(member.id),
-                title = "회원가입 완료",
-                message = "회원가입을 환영합니다!",
-                url = "/test/123"
-            )
-        )
+        eventPublisher.publishEvent(SendVerifyEmailEvent(email = command.email))
 
         return member
     }
 
     fun findMembers(query: MemberSearchQuery) = memberRepository.findAll(
         pageable = query.pageable,
-        email = query.email?.let { Email.create(it) },
-        phone = query.phone?.let { Phone.create(it) },
+        email = query.email,
+        phone = query.phone,
         name = query.name,
         status = query.status,
         createdFrom = query.createdFrom,
@@ -98,7 +90,9 @@ class MemberService(
     fun updatePassword(command: PasswordChangeCommand) {
         val member = memberRepository.findById(command.memberId)
 
-        require(passwordEncoder.matches(command.currentPassword, member.password))
+        if (!passwordEncoder.matches(command.oldPassword, member.password)) {
+            throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+        }
 
         member.updatePassword(passwordEncoder.encode(command.newPassword))
     }
