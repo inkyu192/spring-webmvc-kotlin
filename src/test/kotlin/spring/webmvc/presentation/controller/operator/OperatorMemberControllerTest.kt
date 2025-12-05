@@ -1,11 +1,11 @@
 package spring.webmvc.presentation.controller.operator
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
@@ -19,7 +19,6 @@ import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.service.MemberService
 import spring.webmvc.domain.model.entity.Member
@@ -34,7 +33,7 @@ import java.time.LocalDate
 @WebMvcTest(OperatorMemberController::class)
 @Import(WebMvcTestConfig::class)
 class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
-    @MockitoBean
+    @MockkBean
     private lateinit var memberService: MemberService
     private lateinit var member: Member
     private lateinit var email: String
@@ -65,13 +64,13 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
         birthDate = LocalDate.now()
         roleIds = mutableListOf()
         permissionIds = mutableListOf(1L)
-        member = mock<Member>()
-        whenever(member.id).thenReturn(1L)
-        whenever(member.email).thenReturn(Email.create(email))
-        whenever(member.name).thenReturn(name)
-        whenever(member.phone).thenReturn(Phone.create(phone))
-        whenever(member.birthDate).thenReturn(birthDate)
-        whenever(member.createdAt).thenReturn(Instant.now())
+        member = mockk<Member>()
+        every { member.id } returns 1L
+        every { member.email } returns Email.create(email)
+        every { member.name } returns name
+        every { member.phone } returns Phone.create(phone)
+        every { member.birthDate } returns birthDate
+        every { member.createdAt } returns Instant.now()
     }
 
     @AfterEach
@@ -81,7 +80,7 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun createMember() {
-        whenever(memberService.createMember(command = any())).thenReturn(member)
+        every { memberService.createMember(command = any()) } returns member
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/operator/members")
@@ -128,7 +127,7 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
     @Test
     fun findMembers() {
         val page = PageImpl(listOf(member), PageRequest.of(0, 20), 1)
-        whenever(memberService.findMembers(any())).thenReturn(page)
+        every { memberService.findMembers(any()) } returns page
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/operator/members")
@@ -173,7 +172,7 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun findMember() {
-        whenever(memberService.findMember(1L)).thenReturn(member)
+        every { memberService.findMember(1L) } returns member
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/operator/members/{id}", 1L)
@@ -203,7 +202,7 @@ class OperatorMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun updateMemberStatus() {
-        whenever(memberService.updateMemberStatus(any())).thenReturn(member)
+        every { memberService.updateMemberStatus(any()) } returns member
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/operator/members/{id}/status", 1L)

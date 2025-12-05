@@ -1,11 +1,13 @@
 package spring.webmvc.presentation.controller.customer
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -16,7 +18,6 @@ import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.service.MemberService
 import spring.webmvc.domain.model.entity.Member
@@ -31,7 +32,7 @@ import java.time.LocalDate
 @WebMvcTest(CustomerMemberController::class)
 @Import(WebMvcTestConfig::class)
 class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
-    @MockitoBean
+    @MockkBean
     private lateinit var memberService: MemberService
     private lateinit var member: Member
     private lateinit var email: String
@@ -59,13 +60,13 @@ class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
         birthDate = LocalDate.now()
         roleIds = mutableListOf()
         permissionIds = mutableListOf(1L)
-        member = mock<Member>()
-        whenever(member.id).thenReturn(1L)
-        whenever(member.email).thenReturn(Email.create(email))
-        whenever(member.name).thenReturn(name)
-        whenever(member.phone).thenReturn(Phone.create(phone))
-        whenever(member.birthDate).thenReturn(birthDate)
-        whenever(member.createdAt).thenReturn(Instant.now())
+        member = mockk<Member>()
+        every { member.id } returns 1L
+        every { member.email } returns Email.create(email)
+        every { member.name } returns name
+        every { member.phone } returns Phone.create(phone)
+        every { member.birthDate } returns birthDate
+        every { member.createdAt } returns Instant.now()
     }
 
     @AfterEach
@@ -75,7 +76,7 @@ class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun createMember() {
-        whenever(memberService.createMember(command = any())).thenReturn(member)
+        every { memberService.createMember(command = any()) } returns member
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/customer/members")
@@ -121,7 +122,7 @@ class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun findMember() {
-        whenever(memberService.findMember(any())).thenReturn(member)
+        every { memberService.findMember(any()) } returns member
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/customer/members")
@@ -148,7 +149,7 @@ class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun updateMember() {
-        whenever(memberService.updateMember(command = any())).thenReturn(member)
+        every { memberService.updateMember(command = any()) } returns member
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/customer/members")
@@ -192,6 +193,8 @@ class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun deleteMember() {
+        every { memberService.updateMemberStatus(any()) } returns member
+
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/customer/members")
                 .header("Authorization", "Bearer accessToken")
@@ -209,6 +212,8 @@ class CustomerMemberControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun updatePassword() {
+        every { memberService.updatePassword(any()) } just runs
+
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/customer/members/password")
                 .contentType(MediaType.APPLICATION_JSON)

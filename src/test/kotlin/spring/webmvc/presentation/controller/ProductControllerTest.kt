@@ -1,10 +1,9 @@
 package spring.webmvc.presentation.controller
 
-import io.mockk.every
-import io.mockk.spyk
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.*
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -13,7 +12,6 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.*
 import spring.webmvc.application.dto.result.AccommodationResult
@@ -37,7 +35,7 @@ import java.time.temporal.ChronoUnit
 @WebMvcTest(ProductController::class)
 @Import(WebMvcTestConfig::class)
 class ProductControllerTest() : MockMvcRestDocsSetup() {
-    @MockitoBean
+    @MockkBean
     private lateinit var productService: ProductService
     private lateinit var accommodation: Accommodation
     private lateinit var flight: Flight
@@ -158,7 +156,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun findProducts() {
-        whenever(productService.findProducts(cursorId = nextCursorId, size = size, name = name)).thenReturn(cursorPage)
+        every { productService.findProducts(cursorId = nextCursorId, size = size, name = name) } returns cursorPage
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products")
@@ -200,7 +198,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
     fun findTicket() {
         val category = Category.TICKET
 
-        whenever(productService.findProduct(id = productId, category = category)).thenReturn(ticketResult)
+        every { productService.findProduct(id = productId, category = category) } returns ticketResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/{id}", productId)
@@ -242,7 +240,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
     fun findFlight() {
         val category = Category.FLIGHT
 
-        whenever(productService.findProduct(id = productId, category = category)).thenReturn(flightResult)
+        every { productService.findProduct(id = productId, category = category) } returns flightResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/{id}", productId)
@@ -301,7 +299,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
             )
         )
 
-        whenever(productService.findProduct(id = productId, category = category)).thenReturn(accommodationResult)
+        every { productService.findProduct(id = productId, category = category) } returns accommodationResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/products/{id}", productId)
@@ -352,20 +350,20 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val ageLimit = "ageLimit"
         val createdAt = Instant.now()
 
-        val ticketResult = mock<TicketResult>()
-        whenever(ticketResult.id).thenReturn(productId)
-        whenever(ticketResult.category).thenReturn(category)
-        whenever(ticketResult.name).thenReturn(name)
-        whenever(ticketResult.description).thenReturn(description)
-        whenever(ticketResult.price).thenReturn(price)
-        whenever(ticketResult.quantity).thenReturn(quantity)
-        whenever(ticketResult.place).thenReturn(place)
-        whenever(ticketResult.performanceTime).thenReturn(performanceTime)
-        whenever(ticketResult.duration).thenReturn(duration)
-        whenever(ticketResult.ageLimit).thenReturn(ageLimit)
-        whenever(ticketResult.createdAt).thenReturn(createdAt)
+        val ticketResult = mockk<TicketResult>()
+        every { ticketResult.id } returns productId
+        every { ticketResult.category } returns category
+        every { ticketResult.name } returns name
+        every { ticketResult.description } returns description
+        every { ticketResult.price } returns price
+        every { ticketResult.quantity } returns quantity
+        every { ticketResult.place } returns place
+        every { ticketResult.performanceTime } returns performanceTime
+        every { ticketResult.duration } returns duration
+        every { ticketResult.ageLimit } returns ageLimit
+        every { ticketResult.createdAt } returns createdAt
 
-        whenever(productService.createProduct(any<TicketCreateCommand>())).thenReturn(ticketResult)
+        every { productService.createProduct(any<TicketCreateCommand>()) } returns ticketResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/products")
@@ -440,22 +438,22 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
         val createdAt = Instant.now()
 
-        val flightResult = mock<FlightResult>()
-        whenever(flightResult.id).thenReturn(productId)
-        whenever(flightResult.category).thenReturn(category)
-        whenever(flightResult.name).thenReturn(name)
-        whenever(flightResult.description).thenReturn(description)
-        whenever(flightResult.price).thenReturn(price)
-        whenever(flightResult.quantity).thenReturn(quantity)
-        whenever(flightResult.airline).thenReturn(airline)
-        whenever(flightResult.flightNumber).thenReturn(flightNumber)
-        whenever(flightResult.departureAirport).thenReturn(departureAirport)
-        whenever(flightResult.arrivalAirport).thenReturn(arrivalAirport)
-        whenever(flightResult.departureTime).thenReturn(departureTime)
-        whenever(flightResult.arrivalTime).thenReturn(arrivalTime)
-        whenever(flightResult.createdAt).thenReturn(createdAt)
+        val flightResult = mockk<FlightResult>()
+        every { flightResult.id } returns productId
+        every { flightResult.category } returns category
+        every { flightResult.name } returns name
+        every { flightResult.description } returns description
+        every { flightResult.price } returns price
+        every { flightResult.quantity } returns quantity
+        every { flightResult.airline } returns airline
+        every { flightResult.flightNumber } returns flightNumber
+        every { flightResult.departureAirport } returns departureAirport
+        every { flightResult.arrivalAirport } returns arrivalAirport
+        every { flightResult.departureTime } returns departureTime
+        every { flightResult.arrivalTime } returns arrivalTime
+        every { flightResult.createdAt } returns createdAt
 
-        whenever(productService.createProduct(any<FlightCreateCommand>())).thenReturn(flightResult)
+        every { productService.createProduct(any<FlightCreateCommand>()) } returns flightResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/products")
@@ -533,19 +531,19 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
         val createdAt = Instant.now()
 
-        val accommodationResult = mock<AccommodationResult>()
-        whenever(accommodationResult.id).thenReturn(productId)
-        whenever(accommodationResult.category).thenReturn(category)
-        whenever(accommodationResult.name).thenReturn(name)
-        whenever(accommodationResult.description).thenReturn(description)
-        whenever(accommodationResult.price).thenReturn(price)
-        whenever(accommodationResult.quantity).thenReturn(quantity)
-        whenever(accommodationResult.place).thenReturn(place)
-        whenever(accommodationResult.checkInTime).thenReturn(checkInTime)
-        whenever(accommodationResult.checkOutTime).thenReturn(checkOutTime)
-        whenever(accommodationResult.createdAt).thenReturn(createdAt)
+        val accommodationResult = mockk<AccommodationResult>()
+        every { accommodationResult.id } returns productId
+        every { accommodationResult.category } returns category
+        every { accommodationResult.name } returns name
+        every { accommodationResult.description } returns description
+        every { accommodationResult.price } returns price
+        every { accommodationResult.quantity } returns quantity
+        every { accommodationResult.place } returns place
+        every { accommodationResult.checkInTime } returns checkInTime
+        every { accommodationResult.checkOutTime } returns checkOutTime
+        every { accommodationResult.createdAt } returns createdAt
 
-        whenever(productService.createProduct(any<AccommodationCreateCommand>())).thenReturn(accommodationResult)
+        every { productService.createProduct(any<AccommodationCreateCommand>()) } returns accommodationResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/products")
@@ -615,25 +613,25 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val ageLimit = "ageLimit"
         val createdAt = Instant.now()
 
-        val ticketResult = mock<TicketResult>()
-        whenever(ticketResult.id).thenReturn(productId)
-        whenever(ticketResult.category).thenReturn(category)
-        whenever(ticketResult.name).thenReturn(name)
-        whenever(ticketResult.description).thenReturn(description)
-        whenever(ticketResult.price).thenReturn(price)
-        whenever(ticketResult.quantity).thenReturn(quantity)
-        whenever(ticketResult.place).thenReturn(place)
-        whenever(ticketResult.performanceTime).thenReturn(performanceTime)
-        whenever(ticketResult.duration).thenReturn(duration)
-        whenever(ticketResult.ageLimit).thenReturn(ageLimit)
-        whenever(ticketResult.createdAt).thenReturn(createdAt)
+        val ticketResult = mockk<TicketResult>()
+        every { ticketResult.id } returns productId
+        every { ticketResult.category } returns category
+        every { ticketResult.name } returns name
+        every { ticketResult.description } returns description
+        every { ticketResult.price } returns price
+        every { ticketResult.quantity } returns quantity
+        every { ticketResult.place } returns place
+        every { ticketResult.performanceTime } returns performanceTime
+        every { ticketResult.duration } returns duration
+        every { ticketResult.ageLimit } returns ageLimit
+        every { ticketResult.createdAt } returns createdAt
 
-        whenever(
+        every {
             productService.updateProduct(
-                id = eq(productId),
+                id = productId,
                 productUpdateCommand = any<TicketUpdateCommand>()
             )
-        ).thenReturn(ticketResult)
+        } returns ticketResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/products/{id}", productId)
@@ -708,27 +706,27 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val arrivalTime = Instant.now().plus(1, ChronoUnit.HOURS)
         val createdAt = Instant.now()
 
-        val flightResult = mock<FlightResult>()
-        whenever(flightResult.id).thenReturn(productId)
-        whenever(flightResult.category).thenReturn(category)
-        whenever(flightResult.name).thenReturn(name)
-        whenever(flightResult.description).thenReturn(description)
-        whenever(flightResult.price).thenReturn(price)
-        whenever(flightResult.quantity).thenReturn(quantity)
-        whenever(flightResult.airline).thenReturn(airline)
-        whenever(flightResult.flightNumber).thenReturn(flightNumber)
-        whenever(flightResult.departureAirport).thenReturn(departureAirport)
-        whenever(flightResult.arrivalAirport).thenReturn(arrivalAirport)
-        whenever(flightResult.departureTime).thenReturn(departureTime)
-        whenever(flightResult.arrivalTime).thenReturn(arrivalTime)
-        whenever(flightResult.createdAt).thenReturn(createdAt)
+        val flightResult = mockk<FlightResult>()
+        every { flightResult.id } returns productId
+        every { flightResult.category } returns category
+        every { flightResult.name } returns name
+        every { flightResult.description } returns description
+        every { flightResult.price } returns price
+        every { flightResult.quantity } returns quantity
+        every { flightResult.airline } returns airline
+        every { flightResult.flightNumber } returns flightNumber
+        every { flightResult.departureAirport } returns departureAirport
+        every { flightResult.arrivalAirport } returns arrivalAirport
+        every { flightResult.departureTime } returns departureTime
+        every { flightResult.arrivalTime } returns arrivalTime
+        every { flightResult.createdAt } returns createdAt
 
-        whenever(
+        every {
             productService.updateProduct(
-                id = eq(productId),
+                id = productId,
                 productUpdateCommand = any<FlightUpdateCommand>()
             )
-        ).thenReturn(flightResult)
+        } returns flightResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/products/{id}", productId)
@@ -806,24 +804,24 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val checkOutTime = Instant.now().plus(1, ChronoUnit.DAYS)
         val createdAt = Instant.now()
 
-        val accommodationResult = mock<AccommodationResult>()
-        whenever(accommodationResult.id).thenReturn(productId)
-        whenever(accommodationResult.category).thenReturn(category)
-        whenever(accommodationResult.name).thenReturn(name)
-        whenever(accommodationResult.description).thenReturn(description)
-        whenever(accommodationResult.price).thenReturn(price)
-        whenever(accommodationResult.quantity).thenReturn(quantity)
-        whenever(accommodationResult.place).thenReturn(place)
-        whenever(accommodationResult.checkInTime).thenReturn(checkInTime)
-        whenever(accommodationResult.checkOutTime).thenReturn(checkOutTime)
-        whenever(accommodationResult.createdAt).thenReturn(createdAt)
+        val accommodationResult = mockk<AccommodationResult>()
+        every { accommodationResult.id } returns productId
+        every { accommodationResult.category } returns category
+        every { accommodationResult.name } returns name
+        every { accommodationResult.description } returns description
+        every { accommodationResult.price } returns price
+        every { accommodationResult.quantity } returns quantity
+        every { accommodationResult.place } returns place
+        every { accommodationResult.checkInTime } returns checkInTime
+        every { accommodationResult.checkOutTime } returns checkOutTime
+        every { accommodationResult.createdAt } returns createdAt
 
-        whenever(
+        every {
             productService.updateProduct(
-                id = eq(productId),
+                id = productId,
                 productUpdateCommand = any<AccommodationUpdateCommand>()
             )
-        ).thenReturn(accommodationResult)
+        } returns accommodationResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/products/{id}", productId)
@@ -884,7 +882,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val productId = 1L
         val category = Category.TICKET
 
-        doNothing().whenever(productService).deleteProduct(category = category, id = productId)
+        every { productService.deleteProduct(category = category, id = productId) } just runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/products/{id}", productId)
@@ -911,7 +909,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val productId = 1L
         val category = Category.FLIGHT
 
-        doNothing().whenever(productService).deleteProduct(category = category, id = productId)
+        every { productService.deleteProduct(category = category, id = productId) } just runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/products/{id}", productId)
@@ -938,7 +936,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
         val productId = 1L
         val category = Category.ACCOMMODATION
 
-        doNothing().whenever(productService).deleteProduct(category = category, id = productId)
+        every { productService.deleteProduct(category = category, id = productId) } just runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/products/{id}", productId)

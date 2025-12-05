@@ -2,7 +2,7 @@ package spring.webmvc.infrastructure.persistence.jpa
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -81,9 +81,9 @@ class ProductQuerydslRepositoryTest(
 
         val result = productQuerydslRepository.findAll(cursorId = nextCursorId, size = size, name = name)
 
-        assertThat(result.content.size).isEqualTo(size)
-        assertThat(result.size).isEqualTo(size)
-        assertThat(result.hasNext).isTrue
-        assertThat(result.nextCursorId).isEqualTo(product1.id)
+        Assertions.assertThat(result.content.size).isEqualTo(size)
+        Assertions.assertThat(result.size).isEqualTo(size)
+        Assertions.assertThat(result.hasNext).isTrue
+        Assertions.assertThat(result.nextCursorId).isEqualTo(product1.id)
     }
 }

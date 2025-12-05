@@ -1,10 +1,10 @@
 package spring.webmvc.presentation.controller
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.spyk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -13,7 +13,6 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.result.CurationProductResult
@@ -29,7 +28,7 @@ import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 @WebMvcTest(CurationController::class)
 @Import(WebMvcTestConfig::class)
 class CurationControllerTest() : MockMvcRestDocsSetup() {
-    @MockitoBean
+    @MockkBean
     private lateinit var curationService: CurationService
     private lateinit var curation1: Curation
     private lateinit var curation2: Curation
@@ -38,23 +37,23 @@ class CurationControllerTest() : MockMvcRestDocsSetup() {
 
     @BeforeEach
     fun setUp() {
-        curation1 = spy(
+        curation1 = spyk(
             Curation.create(
                 title = "여름 휴가 패키지",
                 isExposed = true,
                 sortOrder = 1L
             )
-        ).apply { whenever(id).thenReturn(1L) }
+        ).apply { every { id } returns 1L }
 
-        curation2 = spy(
+        curation2 = spyk(
             Curation.create(
                 title = "겨울 스키 패키지",
                 isExposed = true,
                 sortOrder = 2L
             )
-        ).apply { whenever(id).thenReturn(2L) }
+        ).apply { every { id } returns 2L }
 
-        product1 = spy(
+        product1 = spyk(
             Accommodation.create(
                 name = "제주도 호텔",
                 description = "제주도 3박4일",
@@ -64,9 +63,9 @@ class CurationControllerTest() : MockMvcRestDocsSetup() {
                 checkInTime = java.time.Instant.now(),
                 checkOutTime = java.time.Instant.now().plusSeconds(3600 * 24 * 4)
             )
-        ).apply { whenever(id).thenReturn(1L) }
+        ).apply { every { id } returns 1L }
 
-        product2 = spy(
+        product2 = spyk(
             Flight.create(
                 name = "부산 항공권",
                 description = "부산 왕복 항공권",
@@ -79,14 +78,14 @@ class CurationControllerTest() : MockMvcRestDocsSetup() {
                 departureTime = java.time.Instant.now(),
                 arrivalTime = java.time.Instant.now().plusSeconds(3600 * 2)
             )
-        ).apply { whenever(id).thenReturn(2L) }
+        ).apply { every { id } returns 2L }
     }
 
     @Test
     fun createCuration() {
         val id = 1L
 
-        whenever(curationService.createCuration(any<CurationCreateCommand>())).thenReturn(id)
+        every { curationService.createCuration(any<CurationCreateCommand>()) } returns id
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/curations")
@@ -137,7 +136,7 @@ class CurationControllerTest() : MockMvcRestDocsSetup() {
 
         val result = listOf(curationResult1, curationResult2)
 
-        whenever(curationService.findCurations()).thenReturn(result)
+        every { curationService.findCurations() } returns result
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations")
@@ -164,7 +163,7 @@ class CurationControllerTest() : MockMvcRestDocsSetup() {
         val cursorPage = CursorPage(listOf(product1, product2), size, false, null)
         val curationProductResult = CurationProductResult(curation1, cursorPage)
 
-        whenever(curationService.findCurationProduct(curationId, cursorId, size)).thenReturn(curationProductResult)
+        every { curationService.findCurationProduct(curationId, cursorId, size) } returns curationProductResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations/{id}", curationId)

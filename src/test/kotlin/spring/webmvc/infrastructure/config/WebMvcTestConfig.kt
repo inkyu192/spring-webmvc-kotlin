@@ -1,6 +1,6 @@
 package spring.webmvc.infrastructure.config
 
-import org.mockito.kotlin.mock
+import io.mockk.mockk
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import spring.webmvc.infrastructure.common.ResponseWriter
@@ -12,14 +12,14 @@ import spring.webmvc.infrastructure.security.JwtProvider
 class WebMvcTestConfig {
 
     @Bean
-    fun jwtProvider() = mock<JwtProvider>()
+    fun jwtProvider() = mockk<JwtProvider>()
 
     @Bean
-    fun responseWriter() = mock<ResponseWriter>()
+    fun responseWriter() = mockk<ResponseWriter>()
 
     @Bean
-    fun problemDetailUtil() = mock<UriFactory>()
+    fun problemDetailUtil() = mockk<UriFactory>()
 
     @Bean
-    fun httpLog() = mock<HttpLog>()
+    fun httpLog() = mockk<HttpLog>()
 }

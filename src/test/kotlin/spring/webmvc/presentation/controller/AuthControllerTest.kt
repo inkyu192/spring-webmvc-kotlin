@@ -1,16 +1,17 @@
 package spring.webmvc.presentation.controller
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.just
+import io.mockk.runs
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.application.service.AuthService
@@ -20,7 +21,7 @@ import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 @WebMvcTest(AuthController::class)
 @Import(WebMvcTestConfig::class)
 class AuthControllerTest : MockMvcRestDocsSetup() {
-    @MockitoBean
+    @MockkBean
     private lateinit var authService: AuthService
     private lateinit var accessToken: String
     private lateinit var refreshToken: String
@@ -39,7 +40,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun login() {
-        whenever(authService.login(any())).thenReturn(tokenResult)
+        every { authService.login(any()) } returns tokenResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/login")
@@ -71,8 +72,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun refreshToken() {
-        whenever(authService.refreshToken(any()))
-            .thenReturn(tokenResult)
+        every { authService.refreshToken(any()) } returns tokenResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/token/refresh")
@@ -104,7 +104,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun requestJoinVerify() {
-        whenever(authService.requestJoinVerify(any())).then { }
+        every { authService.requestJoinVerify(any()) } just runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/join/verify/request")
@@ -131,7 +131,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
     @Test
     fun confirmJoinVerify() {
         val token = "verifyToken123"
-        whenever(authService.confirmJoinVerify(any())).then { }
+        every { authService.confirmJoinVerify(any()) } just runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/join/verify/confirm")
@@ -157,7 +157,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun requestPasswordReset() {
-        whenever(authService.requestPasswordReset(any())).then { }
+        every { authService.requestPasswordReset(any()) } just runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/password/reset/request")
@@ -185,7 +185,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
     fun confirmPasswordReset() {
         val token = "resetToken123"
         val newPassword = "newPassword123"
-        whenever(authService.confirmPasswordReset(any())).then { }
+        every { authService.confirmPasswordReset(any()) } just runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/password/reset/confirm")

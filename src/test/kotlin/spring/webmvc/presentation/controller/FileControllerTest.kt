@@ -1,9 +1,9 @@
 package spring.webmvc.presentation.controller
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.mock.web.MockMultipartFile
@@ -12,9 +12,7 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spring.webmvc.domain.model.enums.FileType
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.infrastructure.external.S3Service
 import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
@@ -23,7 +21,7 @@ import java.nio.charset.StandardCharsets
 @WebMvcTest(FileController::class)
 @Import(WebMvcTestConfig::class)
 class FileControllerTest : MockMvcRestDocsSetup() {
-    @MockitoBean
+    @MockkBean
     private lateinit var s3Service: S3Service
     private lateinit var file: MockMultipartFile
     private lateinit var data: MockMultipartFile
@@ -50,7 +48,7 @@ class FileControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun uploadFile() {
-        whenever(methodCall = s3Service.putObject(fileType = any(), file = any())).thenReturn(key)
+        every { s3Service.putObject(fileType = any(), file = any()) } returns key
 
         // When & Then
         mockMvc.perform(

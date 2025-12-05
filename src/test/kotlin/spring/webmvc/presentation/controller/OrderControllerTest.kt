@@ -1,9 +1,10 @@
 package spring.webmvc.presentation.controller
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
@@ -15,7 +16,6 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.dto.command.OrderProductCreateCommand
@@ -31,7 +31,7 @@ import java.time.Instant
 @WebMvcTest(OrderController::class)
 @Import(WebMvcTestConfig::class)
 class OrderControllerTest() : MockMvcRestDocsSetup() {
-    @MockitoBean
+    @MockkBean
     private lateinit var orderService: OrderService
     private lateinit var order: Order
     private lateinit var product: Product
@@ -51,18 +51,18 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
         orderProductCreateCommand = OrderProductCreateCommand(id = productId, quantity = quantity)
         orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))
 
-        order = mock<Order>()
-        product = mock<Product>()
-        orderProduct = mock<OrderProduct>()
+        order = mockk<Order>()
+        product = mockk<Product>()
+        orderProduct = mockk<OrderProduct>()
 
-        whenever(order.id).thenReturn(orderId)
-        whenever(order.orderedAt).thenReturn(Instant.now())
-        whenever(order.status).thenReturn(OrderStatus.ORDER)
-        whenever(order.orderProducts).thenReturn(listOf(orderProduct))
-        whenever(product.name).thenReturn("name")
-        whenever(orderProduct.quantity).thenReturn(3)
-        whenever(orderProduct.orderPrice).thenReturn(5000)
-        whenever(orderProduct.product).thenReturn(product)
+        every { order.id } returns orderId
+        every { order.orderedAt } returns Instant.now()
+        every { order.status } returns OrderStatus.ORDER
+        every { order.orderProducts } returns listOf(orderProduct)
+        every { product.name } returns "name"
+        every { orderProduct.quantity } returns 3
+        every { orderProduct.orderPrice } returns 5000
+        every { orderProduct.product } returns product
 
         pageable = PageRequest.of(0, 10)
         page = PageImpl(listOf(order), pageable, 1)
@@ -70,7 +70,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun createOrder() {
-        whenever(orderService.createOrder(orderCreateCommand)).thenReturn(order)
+        every { orderService.createOrder(orderCreateCommand) } returns order
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/orders")
@@ -114,7 +114,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun findOrders() {
-        whenever(orderService.findOrders(pageable = pageable, orderStatus = orderStatus)).thenReturn(page)
+        every { orderService.findOrders(pageable = pageable, orderStatus = orderStatus) } returns page
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders")
@@ -175,7 +175,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun findOrder() {
-        whenever(orderService.findOrder(id = orderId)).thenReturn(order)
+        every { orderService.findOrder(id = orderId) } returns order
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/orders/{id}", orderId)
@@ -205,7 +205,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
 
     @Test
     fun cancelOder() {
-        whenever(orderService.cancelOrder(id = orderId)).thenReturn(order)
+        every { orderService.cancelOrder(id = orderId) } returns order
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.patch("/orders/{id}", orderId)

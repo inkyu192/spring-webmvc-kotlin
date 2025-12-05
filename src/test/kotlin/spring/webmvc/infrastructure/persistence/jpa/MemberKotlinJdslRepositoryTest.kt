@@ -1,13 +1,12 @@
 package spring.webmvc.infrastructure.persistence.jpa
 
 import com.linecorp.kotlinjdsl.render.jpql.JpqlRenderContext
+import io.mockk.every
 import jakarta.persistence.EntityManager
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import spring.webmvc.domain.model.entity.Member
@@ -34,8 +33,8 @@ class MemberKotlinJdslRepositoryTest(
 
     @BeforeEach
     fun setUp() {
-        whenever(cryptoService.encrypt(any())).thenAnswer { it.getArgument<String>(0) }
-        whenever(cryptoService.decrypt(any())).thenAnswer { it.getArgument<String>(0) }
+        every { cryptoService.encrypt(any()) } answers { firstArg() }
+        every { cryptoService.decrypt(any()) } answers { firstArg() }
 
         member1 = Member.create(
             email = Email.create("test1@example.com"),
@@ -87,9 +86,9 @@ class MemberKotlinJdslRepositoryTest(
             createdTo = createdTo,
         )
 
-        assertThat(result.totalElements).isEqualTo(1)
-        assertThat(result.content).hasSize(1)
-        assertThat(result.content[0].email.value).isEqualTo("test1@example.com")
+        Assertions.assertThat(result.totalElements).isEqualTo(1)
+        Assertions.assertThat(result.content).hasSize(1)
+        Assertions.assertThat(result.content[0].email.value).isEqualTo("test1@example.com")
     }
 
     @Test
@@ -109,8 +108,8 @@ class MemberKotlinJdslRepositoryTest(
             createdTo = createdTo,
         )
 
-        assertThat(result.totalElements).isEqualTo(3)
-        assertThat(result.content).hasSize(2)
-        assertThat(result.totalPages).isEqualTo(2)
+        Assertions.assertThat(result.totalElements).isEqualTo(3)
+        Assertions.assertThat(result.content).hasSize(2)
+        Assertions.assertThat(result.totalPages).isEqualTo(2)
     }
 }
