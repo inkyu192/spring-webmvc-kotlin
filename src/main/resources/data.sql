@@ -1,22 +1,12 @@
 INSERT INTO permission (id, name, created_at, updated_at) VALUES
-    (1, 'OPERATOR_DASHBOARD', NOW(6), NOW(6)),
-    (2, 'OPERATOR_MEMBER_READ', NOW(6), NOW(6)),
-    (3, 'OPERATOR_MEMBER_WRITE', NOW(6), NOW(6)),
-    (4, 'OPERATOR_PRODUCT_READ', NOW(6), NOW(6)),
-    (5, 'OPERATOR_PRODUCT_WRITE', NOW(6), NOW(6)),
-    (6, 'OPERATOR_ORDER_READ', NOW(6), NOW(6)),
-    (7, 'OPERATOR_ORDER_WRITE', NOW(6), NOW(6)),
-    (8, 'OPERATOR_CURATION_READ', NOW(6), NOW(6)),
-    (9, 'OPERATOR_CURATION_WRITE', NOW(6), NOW(6)),
-    (10, 'OPERATOR_SYSTEM_READ', NOW(6), NOW(6)),
-    (11, 'OPERATOR_SYSTEM_WRITE', NOW(6), NOW(6)),
-    (12, 'PARTNER_DASHBOARD', NOW(6), NOW(6)),
-    (13, 'PARTNER_PRODUCT_READ', NOW(6), NOW(6)),
-    (14, 'PARTNER_PRODUCT_WRITE', NOW(6), NOW(6)),
-    (15, 'PARTNER_ORDER_READ', NOW(6), NOW(6)),
-    (16, 'PARTNER_CURATION_READ', NOW(6), NOW(6)),
-    (17, 'PARTNER_CURATION_WRITE', NOW(6), NOW(6)),
-    (18, 'PARTNER_SETTLEMENT_READ', NOW(6), NOW(6));
+    (1, 'USER_READ', NOW(6), NOW(6)),
+    (2, 'USER_WRITE', NOW(6), NOW(6)),
+    (3, 'PRODUCT_READ', NOW(6), NOW(6)),
+    (4, 'PRODUCT_WRITE', NOW(6), NOW(6)),
+    (5, 'ORDER_READ', NOW(6), NOW(6)),
+    (6, 'ORDER_WRITE', NOW(6), NOW(6)),
+    (8, 'CURATION_READ', NOW(6), NOW(6)),
+    (9, 'CURATION_WRITE', NOW(6), NOW(6));
 
 INSERT INTO role (id, name, created_at, updated_at) VALUES
     (1, 'OPERATOR', NOW(6), NOW(6)),
@@ -26,82 +16,75 @@ INSERT INTO role (id, name, created_at, updated_at) VALUES
     (5, 'CUSTOMER', NOW(6), NOW(6));
 
 INSERT INTO role_permission (role_id, permission_id) VALUES
-    (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6),
-    (1, 7), (1, 8), (1, 9), (1, 10), (1, 11);
-
-INSERT INTO role_permission (role_id, permission_id) VALUES
-    (2, 1), (2, 2), (2, 6), (2, 7);
-
-INSERT INTO role_permission (role_id, permission_id) VALUES
-    (3, 12), (3, 13), (3, 14), (3, 15), (3, 16), (3, 17), (3, 18);
-
-INSERT INTO role_permission (role_id, permission_id) VALUES
-    (4, 12), (4, 13), (4, 15);
+    (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 8), (1, 9),
+    (2, 1), (2, 2), (2, 5), (2, 6),
+    (3, 3), (3, 4), (3, 5), (3, 6), (3, 8), (3, 9),
+    (4, 3), (4, 5);
 
 INSERT INTO menu (id, name, path, sort_order, parent_id, created_at, updated_at) VALUES
-    (1, '대시보드', '/dashboard', 1, NULL, NOW(6), NOW(6)),
-    (2, '상품관리', NULL, 2, NULL, NOW(6), NOW(6)),
-    (3, '주문관리', NULL, 3, NULL, NOW(6), NOW(6)),
-    (4, '회원관리', NULL, 4, NULL, NOW(6), NOW(6)),
-    (5, '큐레이션관리', NULL, 5, NULL, NOW(6), NOW(6)),
-    (6, '시스템관리', NULL, 6, NULL, NOW(6), NOW(6));
+    (1, '회원', NULL, 1, NULL, NOW(6), NOW(6)),
+    (2, '상품', NULL, 2, NULL, NOW(6), NOW(6)),
+    (3, '주문', NULL, 3, NULL, NOW(6), NOW(6)),
+    (4, '큐레이션', NULL, 4, NULL, NOW(6), NOW(6));
 
 INSERT INTO menu (id, name, path, sort_order, parent_id, created_at, updated_at) VALUES
-    (7, '상품목록', '/products', 1, 2, NOW(6), NOW(6)),
-    (8, '항공권관리', '/products/flights', 2, 2, NOW(6), NOW(6)),
-    (9, '숙박관리', '/products/accommodations', 3, 2, NOW(6), NOW(6)),
-    (10, '티켓관리', '/products/tickets', 4, 2, NOW(6), NOW(6)),
-    (11, '주문목록', '/orders', 1, 3, NOW(6), NOW(6)),
-    (12, '주문통계', '/orders/statistics', 2, 3, NOW(6), NOW(6)),
-    (13, '회원목록', '/members', 1, 4, NOW(6), NOW(6)),
-    (14, '회원통계', '/members/statistics', 2, 4, NOW(6), NOW(6)),
-    (15, '큐레이션목록', '/curations', 1, 5, NOW(6), NOW(6)),
-    (16, '큐레이션생성', '/curations/new', 2, 5, NOW(6), NOW(6)),
-    (17, '권한관리', '/system/permissions', 1, 6, NOW(6), NOW(6)),
-    (18, '역할관리', '/system/roles', 2, 6, NOW(6), NOW(6)),
-    (19, '메뉴관리', '/system/menus', 3, 6, NOW(6), NOW(6));
+    (5, '회원관리', '/users', 1, 1, NOW(6), NOW(6)),
+    (6, '항공권관리', '/products/flights', 1, 2, NOW(6), NOW(6)),
+    (7, '숙박관리', '/products/accommodations', 2, 2, NOW(6), NOW(6)),
+    (8, '티켓관리', '/products/tickets', 3, 2, NOW(6), NOW(6)),
+    (9, '주문관리', '/orders', 1, 3, NOW(6), NOW(6)),
+    (10, '큐레이션관리', '/curations', 1, 4, NOW(6), NOW(6));
 
 INSERT INTO permission_menu (permission_id, menu_id) VALUES
-    (1, 1), (12, 1);
+    (1, 1), (1, 5),
+    (2, 1), (2, 5),
+    (3, 2), (3, 6), (3, 7), (3, 8),
+    (4, 2), (4, 6), (4, 7), (4, 8),
+    (5, 3), (5, 9),
+    (6, 3), (6, 9),
+    (8, 4), (8, 10),
+    (9, 4), (9, 10);
 
-INSERT INTO permission_menu (permission_id, menu_id) VALUES
-    (4, 2), (4, 7), (4, 8), (4, 9), (4, 10),
-    (5, 2), (5, 7), (5, 8), (5, 9), (5, 10),
-    (13, 2), (13, 7), (13, 8), (13, 9), (13, 10),
-    (14, 2), (14, 7), (14, 8), (14, 9), (14, 10);
-
-INSERT INTO permission_menu (permission_id, menu_id) VALUES
-    (6, 3), (6, 11), (6, 12),
-    (7, 3), (7, 11), (7, 12),
-    (15, 3), (15, 11), (15, 12);
-
-INSERT INTO permission_menu (permission_id, menu_id) VALUES
-    (2, 4), (2, 13), (2, 14),
-    (3, 4), (3, 13), (3, 14);
-
-INSERT INTO permission_menu (permission_id, menu_id) VALUES
-    (8, 5), (8, 15),
-    (9, 5), (9, 15), (9, 16),
-    (16, 5), (16, 15),
-    (17, 5), (17, 15), (17, 16);
-
-INSERT INTO permission_menu (permission_id, menu_id) VALUES
-    (10, 6), (10, 17), (10, 18), (10, 19),
-    (11, 6), (11, 17), (11, 18), (11, 19);
-
-INSERT INTO member (id, email, password, name, phone, birth_date, type, status, created_at, updated_at) VALUES
+INSERT INTO user (id, email, password, name, phone, birth_date, type, status, created_at, updated_at) VALUES
     (1, 'operator@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Operator User', '010-1234-5678', '1990-01-01', 'OPERATOR', 'ACTIVE', NOW(6), NOW(6)),
     (2, 'operator.cs@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CS Manager', '010-1111-2222', '1992-03-15', 'OPERATOR', 'ACTIVE', NOW(6), NOW(6)),
     (3, 'partner@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner User', '010-2345-6789', '1992-05-15', 'PARTNER', 'ACTIVE', NOW(6), NOW(6)),
     (4, 'partner.staff@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner Staff', '010-3333-4444', '1995-08-20', 'PARTNER', 'ACTIVE', NOW(6), NOW(6)),
     (5, 'customer@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Customer User', '010-3456-7890', '1995-10-20', 'CUSTOMER', 'ACTIVE', NOW(6), NOW(6));
 
-INSERT INTO member_role (member_id, role_id) VALUES
+INSERT INTO user_role (user_id, role_id) VALUES
     (1, 1),
     (2, 2),
     (3, 3),
     (4, 4),
     (5, 5);
+
+INSERT INTO company (id, name, business_number, address, phone_number, created_at, updated_at) VALUES
+    (1, '테크 코퍼레이션', '123-45-67890', '서울특별시 강남구 테헤란로 123', '02-1234-5678', NOW(6), NOW(6)),
+    (2, '글로벌 파트너스', '234-56-78901', '서울특별시 서초구 서초대로 456', '02-2345-6789', NOW(6), NOW(6)),
+    (3, '이노베이션 그룹', '345-67-89012', '경기도 성남시 분당구 판교역로 789', '031-3456-7890', NOW(6), NOW(6)),
+    (4, '비즈니스 솔루션', '456-78-90123', '서울특별시 마포구 월드컵북로 321', '02-4567-8901', NOW(6), NOW(6)),
+    (5, '엔터프라이즈 주식회사', '567-89-01234', '부산광역시 해운대구 센텀중앙로 654', '051-5678-9012', NOW(6), NOW(6));
+
+INSERT INTO user_company (user_id, company_id) VALUES
+    (1, 1),
+    (1, 2),
+    (2, 1),
+    (3, 2),
+    (3, 3),
+    (4, 3),
+    (5, 4),
+    (5, 5);
+
+INSERT INTO delivery_address (id, user_id, name, recipient_name, recipient_phone, postal_code, address, address_detail, is_default, created_at, updated_at) VALUES
+    (1, 1, '집', 'Operator User', '010-1234-5678', '06234', '서울특별시 강남구 테헤란로 123', '101동 1001호', true, NOW(6), NOW(6)),
+    (2, 1, '회사', 'Operator User', '010-1234-5678', '06123', '서울특별시 강남구 역삼동 456', '5층', false, NOW(6), NOW(6)),
+    (3, 2, '집', 'CS Manager', '010-1111-2222', '06345', '서울특별시 서초구 서초대로 789', '202동 502호', true, NOW(6), NOW(6)),
+    (4, 3, '집', 'Partner User', '010-2345-6789', '13487', '경기도 성남시 분당구 판교역로 111', '301동 1203호', true, NOW(6), NOW(6)),
+    (5, 3, '사무실', 'Partner User', '010-2345-6789', '13488', '경기도 성남시 분당구 판교동 222', '7층 701호', false, NOW(6), NOW(6)),
+    (6, 4, '집', 'Partner Staff', '010-3333-4444', '13489', '경기도 성남시 분당구 서현동 333', '103동 803호', true, NOW(6), NOW(6)),
+    (7, 5, '집', 'Customer User', '010-3456-7890', '48058', '부산광역시 해운대구 센텀중앙로 444', '205동 1505호', true, NOW(6), NOW(6)),
+    (8, 5, '부모님댁', 'Customer User 부친', '010-9999-8888', '06789', '서울특별시 강동구 천호대로 555', '단독주택', false, NOW(6), NOW(6));
 
 INSERT INTO product (id, category, name, description, price, quantity, created_by, updated_by, created_at, updated_at) VALUES
     (1, 'FLIGHT', '인천-도쿄 왕복', '대한항공 직항 이코노미 클래스', 450000, 100, 1, 1, NOW(6), NOW(6)),
@@ -179,7 +162,9 @@ INSERT INTO curation_product (curation_id, product_id, sort_order) VALUES
 ALTER TABLE permission AUTO_INCREMENT = 51;
 ALTER TABLE role AUTO_INCREMENT = 51;
 ALTER TABLE menu AUTO_INCREMENT = 51;
-ALTER TABLE member AUTO_INCREMENT = 51;
+ALTER TABLE user AUTO_INCREMENT = 51;
+ALTER TABLE company AUTO_INCREMENT = 51;
+ALTER TABLE delivery_address AUTO_INCREMENT = 51;
 ALTER TABLE product AUTO_INCREMENT = 51;
 ALTER TABLE curation AUTO_INCREMENT = 51;
 ALTER TABLE order_product AUTO_INCREMENT = 51;

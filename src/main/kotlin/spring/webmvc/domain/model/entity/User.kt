@@ -2,23 +2,23 @@ package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
 import spring.webmvc.domain.converter.CryptoAttributeConverter
-import spring.webmvc.domain.model.enums.MemberStatus
-import spring.webmvc.domain.model.enums.MemberType
+import spring.webmvc.domain.model.enums.UserStatus
+import spring.webmvc.domain.model.enums.UserType
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 import java.time.LocalDate
 
 @Entity
-class Member protected constructor(
+class User protected constructor(
     @Embedded
     val email: Email,
     password: String,
     name: String,
     phone: Phone,
     birthDate: LocalDate,
-    type: MemberType,
-    status: MemberStatus,
+    type: UserType,
+    status: UserStatus,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,25 +44,39 @@ class Member protected constructor(
         protected set
 
     @Enumerated(EnumType.STRING)
-    var status: MemberStatus = status
+    var status: UserStatus = status
         protected set
 
     var deletedAt: Instant? = null
         protected set
 
-    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val _memberRoles = mutableListOf<MemberRole>()
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    private val _userRoles = mutableListOf<UserRole>()
 
     @get:Transient
-    val memberRoles: List<MemberRole>
-        get() = _memberRoles.toList()
+    val userRoles: List<UserRole>
+        get() = _userRoles.toList()
 
-    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val _memberPermissions = mutableListOf<MemberPermission>()
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    private val _userPermissions = mutableListOf<UserPermission>()
 
     @get:Transient
-    val memberPermissions: List<MemberPermission>
-        get() = _memberPermissions.toList()
+    val userPermissions: List<UserPermission>
+        get() = _userPermissions.toList()
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    private val _userCompanies = mutableListOf<UserCompany>()
+
+    @get:Transient
+    val userCompanies: List<UserCompany>
+        get() = _userCompanies.toList()
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    private val _deliveryAddresses = mutableListOf<DeliveryAddress>()
+
+    @get:Transient
+    val deliveryAddresses: List<DeliveryAddress>
+        get() = _deliveryAddresses.toList()
 
     companion object {
         fun create(
@@ -71,24 +85,24 @@ class Member protected constructor(
             name: String,
             phone: Phone,
             birthDate: LocalDate,
-            type: MemberType,
-        ) = Member(
+            type: UserType,
+        ) = User(
             email = email,
             password = password,
             name = name,
             phone = phone,
             birthDate = birthDate,
             type = type,
-            status = MemberStatus.PENDING,
+            status = UserStatus.PENDING,
         )
     }
 
     fun addRole(role: Role) {
-        _memberRoles.add(MemberRole.create(member = this, role = role))
+        _userRoles.add(UserRole.create(user = this, role = role))
     }
 
     fun addPermission(permission: Permission) {
-        _memberPermissions.add(MemberPermission.create(member = this, permission = permission))
+        _userPermissions.add(UserPermission.create(user = this, permission = permission))
     }
 
     fun update(name: String?, phone: Phone?, birthDate: LocalDate?) {
@@ -97,9 +111,9 @@ class Member protected constructor(
         birthDate?.let { this.birthDate = birthDate }
     }
 
-    fun updateStatus(status: MemberStatus) {
+    fun updateStatus(status: UserStatus) {
         this.status = status
-        if (status == MemberStatus.WITHDRAWN) {
+        if (status == UserStatus.WITHDRAWN) {
             this.deletedAt = Instant.now()
         }
     }
@@ -108,5 +122,5 @@ class Member protected constructor(
         this.password = newPassword
     }
 
-    fun isNotActive() = this.status != MemberStatus.ACTIVE
+    fun isNotActive() = this.status != UserStatus.ACTIVE
 }

@@ -8,7 +8,7 @@ import spring.webmvc.domain.converter.CryptoAttributeConverter
 @Embeddable
 class Email protected constructor(
     @Convert(converter = CryptoAttributeConverter::class)
-    @Column(name = "email", unique = true)
+    @Column(name = "email")
     val value: String,
 ) {
     companion object {

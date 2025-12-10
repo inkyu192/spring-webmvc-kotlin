@@ -5,15 +5,15 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
-import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.entity.QMember.member
-import spring.webmvc.domain.model.enums.MemberStatus
+import spring.webmvc.domain.model.entity.QUser.user
+import spring.webmvc.domain.model.entity.User
+import spring.webmvc.domain.model.enums.UserStatus
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 
 @Repository
-class MemberQuerydslRepository(
+class UserQuerydslRepository(
     private val jpaQueryFactory: JPAQueryFactory,
 ) {
     fun findAll(
@@ -21,13 +21,13 @@ class MemberQuerydslRepository(
         email: Email?,
         phone: Phone?,
         name: String?,
-        status: MemberStatus?,
+        status: UserStatus?,
         createdFrom: Instant,
         createdTo: Instant,
-    ): Page<Member> {
+    ): Page<User> {
         val total = jpaQueryFactory
-            .select(member.count())
-            .from(member)
+            .select(user.count())
+            .from(user)
             .where(
                 eqEmail(email),
                 eqPhone(phone),
@@ -38,7 +38,7 @@ class MemberQuerydslRepository(
             .fetchOne() ?: 0L
 
         val content = jpaQueryFactory
-            .selectFrom(member)
+            .selectFrom(user)
             .where(
                 eqEmail(email),
                 eqPhone(phone),
@@ -46,7 +46,7 @@ class MemberQuerydslRepository(
                 eqStatus(status),
                 betweenCreatedAt(createdFrom, createdTo),
             )
-            .orderBy(member.id.desc())
+            .orderBy(user.id.desc())
             .limit(pageable.pageSize.toLong())
             .offset(pageable.offset)
             .fetch()
@@ -54,13 +54,13 @@ class MemberQuerydslRepository(
         return PageImpl(content, pageable, total)
     }
 
-    private fun eqEmail(email: Email?) = email?.let { member.email.eq(it) }
+    private fun eqEmail(email: Email?) = email?.let { user.email.eq(it) }
 
-    private fun eqPhone(phone: Phone?) = phone?.let { member.phone.eq(it) }
+    private fun eqPhone(phone: Phone?) = phone?.let { user.phone.eq(it) }
 
-    private fun eqName(name: String?) = name?.let { member.name.eq(it) }
+    private fun eqName(name: String?) = name?.let { user.name.eq(it) }
 
-    private fun eqStatus(status: MemberStatus?) = status?.let { member.status.eq(it) }
+    private fun eqStatus(status: UserStatus?) = status?.let { user.status.eq(it) }
 
-    private fun betweenCreatedAt(from: Instant, to: Instant) = member.createdAt.between(from, to)
+    private fun betweenCreatedAt(from: Instant, to: Instant) = user.createdAt.between(from, to)
 }

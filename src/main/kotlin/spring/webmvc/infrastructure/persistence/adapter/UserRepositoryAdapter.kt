@@ -2,31 +2,31 @@ package spring.webmvc.infrastructure.persistence.adapter
 
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
-import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.enums.MemberStatus
+import spring.webmvc.domain.model.entity.User
+import spring.webmvc.domain.model.enums.UserStatus
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
-import spring.webmvc.domain.repository.MemberRepository
+import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.infrastructure.extensions.findByIdOrThrow
-import spring.webmvc.infrastructure.persistence.jpa.MemberJpaRepository
-import spring.webmvc.infrastructure.persistence.jpa.MemberKotlinJdslRepository
-import spring.webmvc.infrastructure.persistence.jpa.MemberQuerydslRepository
+import spring.webmvc.infrastructure.persistence.jpa.UserJpaRepository
+import spring.webmvc.infrastructure.persistence.jpa.UserKotlinJdslRepository
+import spring.webmvc.infrastructure.persistence.jpa.UserQuerydslRepository
 import java.time.Instant
 
 @Component
-class MemberRepositoryAdapter(
-    private val jpaRepository: MemberJpaRepository,
-    private val querydslRepository: MemberQuerydslRepository,
-    private val kotlinJdslRepository: MemberKotlinJdslRepository,
-) : MemberRepository {
-    override fun findById(id: Long): Member = jpaRepository.findByIdOrThrow(id)
+class UserRepositoryAdapter(
+    private val jpaRepository: UserJpaRepository,
+    private val querydslRepository: UserQuerydslRepository,
+    private val kotlinJdslRepository: UserKotlinJdslRepository,
+) : UserRepository {
+    override fun findById(id: Long): User = jpaRepository.findByIdOrThrow(id)
 
     override fun findAll(
         pageable: Pageable,
         email: Email?,
         phone: Phone?,
         name: String?,
-        status: MemberStatus?,
+        status: UserStatus?,
         createdFrom: Instant,
         createdTo: Instant,
     ) = kotlinJdslRepository.findAll(
@@ -43,5 +43,5 @@ class MemberRepositoryAdapter(
 
     override fun existsByEmail(email: Email) = jpaRepository.existsByEmail(email)
 
-    override fun save(member: Member) = jpaRepository.save(member)
+    override fun save(user: User) = jpaRepository.save(user)
 }

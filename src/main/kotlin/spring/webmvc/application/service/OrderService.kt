@@ -9,9 +9,9 @@ import spring.webmvc.application.dto.command.OrderProductCreateCommand
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.domain.repository.MemberRepository
 import spring.webmvc.domain.repository.OrderRepository
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.infrastructure.security.SecurityContextUtil
 import spring.webmvc.presentation.exception.EntityNotFoundException
@@ -21,19 +21,19 @@ import spring.webmvc.presentation.exception.InsufficientQuantityException
 @Transactional(readOnly = true)
 class OrderService(
     private val productCacheRepository: ProductCacheRepository,
-    private val memberRepository: MemberRepository,
+    private val userRepository: UserRepository,
     private val productRepository: ProductRepository,
     private val orderRepository: OrderRepository,
 ) {
     @Transactional
     fun createOrder(orderCreateCommand: OrderCreateCommand): Order {
-        val memberId = SecurityContextUtil.getMemberId()
-        val member = memberRepository.findById(id = memberId)
+        val userId = SecurityContextUtil.getUserId()
+        val user = userRepository.findById(id = userId)
 
         val productMap = productRepository.findAllById(ids = orderCreateCommand.products.map { it.id })
             .associateBy { it.id }
 
-        val order = Order.create(member = member)
+        val order = Order.create(user = user)
         val processedProducts = mutableListOf<OrderProductCreateCommand>()
 
         try {
@@ -89,19 +89,19 @@ class OrderService(
     }
 
     fun findOrders(pageable: Pageable, orderStatus: OrderStatus?): Page<Order> {
-        val memberId = SecurityContextUtil.getMemberId()
+        val userId = SecurityContextUtil.getUserId()
 
         return orderRepository.findAll(
             pageable = pageable,
-            memberId = memberId,
+            userId = userId,
             orderStatus = orderStatus
         )
     }
 
     fun findOrder(id: Long): Order {
-        val memberId = SecurityContextUtil.getMemberId()
+        val userId = SecurityContextUtil.getUserId()
 
-        val order = orderRepository.findByIdAndMemberId(id = id, memberId = memberId)
+        val order = orderRepository.findByIdAndUserId(id = id, userId = userId)
             ?: throw EntityNotFoundException(kClass = Order::class, id = id)
 
         return order
@@ -109,9 +109,9 @@ class OrderService(
 
     @Transactional
     fun cancelOrder(id: Long): Order {
-        val memberId = SecurityContextUtil.getMemberId()
+        val userId = SecurityContextUtil.getUserId()
 
-        val order = orderRepository.findByIdAndMemberId(id = id, memberId = memberId)
+        val order = orderRepository.findByIdAndUserId(id = id, userId = userId)
             ?: throw EntityNotFoundException(kClass = Order::class, id = id)
 
         order.cancel()

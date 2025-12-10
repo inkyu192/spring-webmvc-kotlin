@@ -12,8 +12,8 @@ class Order protected constructor(
     status: OrderStatus,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    val member: Member,
+    @JoinColumn(name = "user_id")
+    val user: User,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,10 +32,10 @@ class Order protected constructor(
         get() = _orderProducts.toList()
 
     companion object {
-        fun create(member: Member) = Order(
+        fun create(user: User) = Order(
             orderedAt = Instant.now(),
             status = OrderStatus.ORDER,
-            member = member,
+            user = user,
         )
     }
 

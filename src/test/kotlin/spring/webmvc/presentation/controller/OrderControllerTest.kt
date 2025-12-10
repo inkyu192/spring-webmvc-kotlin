@@ -42,7 +42,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
     private lateinit var page: PageImpl<Order>
     private val productId = 1L
     private val quantity = 3L
-    private val memberId = 1L
+    private val userId = 1L
     private val orderId = 1L
     private val orderStatus = OrderStatus.ORDER
 
@@ -121,7 +121,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
                 .header("Authorization", "Bearer access-token")
                 .queryParam("page", pageable.pageNumber.toString())
                 .queryParam("size", pageable.pageSize.toString())
-                .queryParam("memberId", memberId.toString())
+                .queryParam("userId", userId.toString())
                 .queryParam("orderStatus", orderStatus.toString())
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -134,7 +134,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
                     RequestDocumentation.queryParameters(
                         RequestDocumentation.parameterWithName("page").description("페이지 번호").optional(),
                         RequestDocumentation.parameterWithName("size").description("페이지 크기").optional(),
-                        RequestDocumentation.parameterWithName("memberId").description("회원아아디").optional(),
+                        RequestDocumentation.parameterWithName("userId").description("회원아아디").optional(),
                         RequestDocumentation.parameterWithName("orderStatus").description("주문상태").optional()
                     ),
                     PayloadDocumentation.responseFields(
@@ -184,7 +184,7 @@ class OrderControllerTest() : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "order-get",
+                    "order-detail",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),

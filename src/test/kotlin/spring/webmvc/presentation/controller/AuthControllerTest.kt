@@ -15,8 +15,13 @@ import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.application.service.AuthService
+import spring.webmvc.domain.model.entity.User
+import spring.webmvc.domain.model.enums.UserType
+import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
+import java.time.LocalDate
 
 @WebMvcTest(AuthController::class)
 @Import(WebMvcTestConfig::class)
@@ -39,11 +44,65 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
     }
 
     @Test
-    fun login() {
-        every { authService.login(any()) } returns tokenResult
+    fun signUp() {
+        val user = io.mockk.spyk(
+            User.create(
+                email = Email.create(email),
+                password = password,
+                name = "홍길동",
+                phone = Phone.create("010-1234-5678"),
+                birthDate = LocalDate.of(1990, 1, 1),
+                type = UserType.CUSTOMER,
+            )
+        )
+        every { user.id } returns 1L
+        every { authService.signUp(any()) } returns user
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.post("/auth/login")
+            RestDocumentationRequestBuilders.post("/auth/sign-up")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                          "email": "$email",
+                          "password": "$password",
+                          "name": "홍길동",
+                          "phone": "010-1234-5678",
+                          "birthDate": "1990-01-01",
+                          "type": "CUSTOMER",
+                          "roleIds": [],
+                          "permissionIds": []
+                        }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andDo(
+                MockMvcRestDocumentation.document(
+                    "sign-up",
+                    PayloadDocumentation.requestFields(
+                        PayloadDocumentation.fieldWithPath("email").description("이메일"),
+                        PayloadDocumentation.fieldWithPath("password").description("패스워드"),
+                        PayloadDocumentation.fieldWithPath("name").description("이름"),
+                        PayloadDocumentation.fieldWithPath("phone").description("전화번호"),
+                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
+                        PayloadDocumentation.fieldWithPath("type").description("회원 유형 (CUSTOMER, PARTNER, OPERATOR)"),
+                        PayloadDocumentation.fieldWithPath("roleIds").description("역할 ID 목록"),
+                        PayloadDocumentation.fieldWithPath("permissionIds").description("권한 ID 목록")
+                    ),
+                    PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("id").description("회원 ID")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun signIn() {
+        every { authService.signIn(any()) } returns tokenResult
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -57,7 +116,7 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "login",
+                    "sign-in",
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("password").description("패스워드")

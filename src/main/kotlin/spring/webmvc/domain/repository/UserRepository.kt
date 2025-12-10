@@ -2,24 +2,24 @@ package spring.webmvc.domain.repository
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.enums.MemberStatus
+import spring.webmvc.domain.model.entity.User
+import spring.webmvc.domain.model.enums.UserStatus
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 
-interface MemberRepository {
-    fun findById(id: Long): Member
+interface UserRepository {
+    fun findById(id: Long): User
     fun findAll(
         pageable: Pageable,
         email: Email?,
         phone: Phone?,
         name: String?,
-        status: MemberStatus?,
+        status: UserStatus?,
         createdFrom: Instant,
         createdTo: Instant,
-    ): Page<Member>
-    fun findByEmail(email: Email): Member?
+    ): Page<User>
+    fun findByEmail(email: Email): User?
     fun existsByEmail(email: Email): Boolean
-    fun save(member: Member): Member
+    fun save(user: User): User
 }

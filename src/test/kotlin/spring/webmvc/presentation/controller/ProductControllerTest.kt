@@ -208,7 +208,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "ticket-get",
+                    "ticket-detail",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -250,7 +250,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "flight-get",
+                    "flight-detail",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -309,7 +309,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "accommodation-get",
+                    "accommodation-detail",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),

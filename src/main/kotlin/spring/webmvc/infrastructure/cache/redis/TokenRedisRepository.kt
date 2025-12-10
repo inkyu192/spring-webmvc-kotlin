@@ -12,24 +12,24 @@ class TokenRedisRepository(
     private val logger = LoggerFactory.getLogger(TokenRedisRepository::class.java)
 
     companion object {
-        private const val REFRESH_TOKEN_KEY = "member:%d:token:refresh"
+        private const val REFRESH_TOKEN_KEY = "user:%d:token:refresh"
     }
 
-    override fun setRefreshToken(memberId: Long, refreshToken: String) {
-        val key = REFRESH_TOKEN_KEY.format(memberId)
+    override fun setRefreshToken(userId: Long, refreshToken: String) {
+        val key = REFRESH_TOKEN_KEY.format(userId)
         runCatching {
             redisTemplate.opsForValue().set(key, refreshToken)
         }.onFailure {
-            logger.error("Failed to set refresh token for memberId={}: {}", memberId, it.message, it)
+            logger.error("Failed to set refresh token for userId={}: {}", userId, it.message, it)
         }
     }
 
-    override fun getRefreshToken(memberId: Long): String? {
-        val key = REFRESH_TOKEN_KEY.format(memberId)
+    override fun getRefreshToken(userId: Long): String? {
+        val key = REFRESH_TOKEN_KEY.format(userId)
         return runCatching {
             redisTemplate.opsForValue().get(key)
         }.onFailure {
-            logger.warn("Failed to get refresh token for memberId={}: {}", memberId, it.message)
+            logger.warn("Failed to get refresh token for userId={}: {}", userId, it.message)
         }.getOrElse { null }
     }
 }

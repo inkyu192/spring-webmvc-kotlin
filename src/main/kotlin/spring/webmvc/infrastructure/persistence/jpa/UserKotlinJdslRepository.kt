@@ -10,14 +10,14 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
-import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.enums.MemberStatus
+import spring.webmvc.domain.model.entity.User
+import spring.webmvc.domain.model.enums.UserStatus
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 
 @Repository
-class MemberKotlinJdslRepository(
+class UserKotlinJdslRepository(
     private val entityManager: EntityManager,
     private val context: JpqlRenderContext,
 ) {
@@ -26,14 +26,14 @@ class MemberKotlinJdslRepository(
         email: Email?,
         phone: Phone?,
         name: String?,
-        status: MemberStatus?,
+        status: UserStatus?,
         createdFrom: Instant,
         createdTo: Instant,
-    ): Page<Member> {
+    ): Page<User> {
         val total = entityManager.createQuery(
             query = jpql {
-                select(count(entity(Member::class)))
-                    .from(entity(Member::class))
+                select(count(entity(User::class)))
+                    .from(entity(User::class))
                     .whereAnd(
                         eqEmail(email),
                         eqPhone(phone),
@@ -46,8 +46,8 @@ class MemberKotlinJdslRepository(
 
         val content = entityManager.createQuery(
             query = jpql {
-                select(entity(Member::class))
-                    .from(entity(Member::class))
+                select(entity(User::class))
+                    .from(entity(User::class))
                     .whereAnd(
                         eqEmail(email),
                         eqPhone(phone),
@@ -55,7 +55,7 @@ class MemberKotlinJdslRepository(
                         eqStatus(status),
                         betweenCreatedAt(createdFrom, createdTo),
                     )
-                    .orderBy(path(Member::id).desc())
+                    .orderBy(path(User::id).desc())
             }, context = context
         )
             .setFirstResult(pageable.offset.toInt())
@@ -66,17 +66,17 @@ class MemberKotlinJdslRepository(
     }
 
     private fun Jpql.eqEmail(email: Email?): Predicate? =
-        email?.let { path(Member::email).eq(it) }
+        email?.let { path(User::email).eq(it) }
 
     private fun Jpql.eqPhone(phone: Phone?): Predicate? =
-        phone?.let { path(Member::phone).eq(it) }
+        phone?.let { path(User::phone).eq(it) }
 
     private fun Jpql.eqName(name: String?): Predicate? =
-        name?.let { path(Member::name).eq(it) }
+        name?.let { path(User::name).eq(it) }
 
-    private fun Jpql.eqStatus(status: MemberStatus?): Predicate? =
-        status?.let { path(Member::status).eq(it) }
+    private fun Jpql.eqStatus(status: UserStatus?): Predicate? =
+        status?.let { path(User::status).eq(it) }
 
     private fun Jpql.betweenCreatedAt(from: Instant, to: Instant): Predicate =
-        path(Member::createdAt).between(from, to)
+        path(User::createdAt).between(from, to)
 }

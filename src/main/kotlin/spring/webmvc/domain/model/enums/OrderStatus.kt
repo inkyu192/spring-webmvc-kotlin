@@ -7,7 +7,8 @@ enum class OrderStatus(
 ) {
     ORDER("주문"),
     CONFIRM("확정"),
-    CANCEL("취소");
+    CANCEL("취소"),
+    ;
 
     companion object {
         @JsonCreator

@@ -15,7 +15,7 @@ import java.util.*
 class JpaConfig {
 
     @Bean
-    fun auditorProvider() = AuditorAware { Optional.ofNullable(SecurityContextUtil.getMemberIdOrNull()) }
+    fun auditorProvider() = AuditorAware { Optional.ofNullable(SecurityContextUtil.getUserIdOrNull()) }
 
     @Bean
     fun jpaQueryFactory(entityManager: EntityManager) = JPAQueryFactory(entityManager)

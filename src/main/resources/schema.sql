@@ -10,16 +10,19 @@ DROP TABLE IF EXISTS flight;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS permission_menu;
 DROP TABLE IF EXISTS role_permission;
-DROP TABLE IF EXISTS member_permission;
-DROP TABLE IF EXISTS member_role;
+DROP TABLE IF EXISTS user_permission;
+DROP TABLE IF EXISTS user_role;
+DROP TABLE IF EXISTS user_company;
+DROP TABLE IF EXISTS delivery_address;
 DROP TABLE IF EXISTS menu;
 DROP TABLE IF EXISTS permission;
 DROP TABLE IF EXISTS role;
-DROP TABLE IF EXISTS member;
+DROP TABLE IF EXISTS company;
+DROP TABLE IF EXISTS user;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-CREATE TABLE member (
+CREATE TABLE user (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
@@ -33,9 +36,22 @@ CREATE TABLE member (
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
 
-CREATE INDEX idx_member_phone ON member(phone);
-CREATE INDEX idx_member_created_at ON member(created_at);
-CREATE INDEX idx_member_name_created_at ON member(name, created_at);
+CREATE INDEX idx_user_phone ON user(phone);
+CREATE INDEX idx_user_created_at ON user(created_at);
+CREATE INDEX idx_user_name_created_at ON user(name, created_at);
+
+CREATE TABLE company (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    business_number VARCHAR(255) NOT NULL UNIQUE,
+    address VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(255) NOT NULL,
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+);
+
+CREATE INDEX idx_company_name ON company(name);
+CREATE INDEX idx_company_business_number ON company(business_number);
 
 CREATE TABLE role (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -62,21 +78,47 @@ CREATE TABLE menu (
     CONSTRAINT fk_menu_parent FOREIGN KEY (parent_id) REFERENCES menu(id)
 );
 
-CREATE TABLE member_role (
+CREATE TABLE user_role (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
-    CONSTRAINT fk_member_role_member FOREIGN KEY (member_id) REFERENCES member(id),
-    CONSTRAINT fk_member_role_role FOREIGN KEY (role_id) REFERENCES role(id)
+    CONSTRAINT fk_user_role_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_user_role_role FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
-CREATE TABLE member_permission (
+CREATE TABLE user_permission (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
     permission_id BIGINT NOT NULL,
-    CONSTRAINT fk_member_permission_member FOREIGN KEY (member_id) REFERENCES member(id),
-    CONSTRAINT fk_member_permission_permission FOREIGN KEY (permission_id) REFERENCES permission(id)
+    CONSTRAINT fk_user_permission_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_user_permission_permission FOREIGN KEY (permission_id) REFERENCES permission(id)
 );
+
+CREATE TABLE user_company (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    company_id BIGINT NOT NULL,
+    CONSTRAINT fk_user_company_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_user_company_company FOREIGN KEY (company_id) REFERENCES company(id)
+);
+
+CREATE TABLE delivery_address (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    recipient_name VARCHAR(100) NOT NULL,
+    recipient_phone VARCHAR(20) NOT NULL,
+    postal_code VARCHAR(10) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    address_detail VARCHAR(255) NOT NULL,
+    is_default BIT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    CONSTRAINT fk_delivery_address_user FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+CREATE INDEX idx_delivery_address_user_id ON delivery_address(user_id);
+CREATE INDEX idx_delivery_address_is_default ON delivery_address(user_id, is_default);
 
 CREATE TABLE role_permission (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -139,10 +181,10 @@ CREATE TABLE orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     ordered_at DATETIME(6) NOT NULL,
     status VARCHAR(255) NOT NULL,
-    member_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    CONSTRAINT fk_orders_member FOREIGN KEY (member_id) REFERENCES member(id)
+    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
 CREATE TABLE order_product (

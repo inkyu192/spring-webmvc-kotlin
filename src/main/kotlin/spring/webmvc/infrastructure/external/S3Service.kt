@@ -8,11 +8,8 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CopyObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import spring.webmvc.domain.model.enums.FileType
 import spring.webmvc.presentation.exception.AwsIntegrationException
 import java.net.URLConnection
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Component
@@ -23,11 +20,9 @@ class S3Service(
 ) {
     private val logger = LoggerFactory.getLogger(S3Service::class.java)
 
-    fun putObject(fileType: FileType, file: MultipartFile): String {
-        validateFile(fileType, file)
-
+    fun putObject(file: MultipartFile): String {
         val filename = requireNotNull(file.originalFilename)
-        val key = generateKey(directory = fileType.directory, filename = filename)
+        val key = "temp/${UUID.randomUUID()}.${extractExtension(filename)}"
         val contentType = URLConnection.guessContentTypeFromName(filename)
 
         val request = PutObjectRequest.builder()
@@ -46,8 +41,13 @@ class S3Service(
         return key
     }
 
-    fun copyObject(sourceKey: String, destinationType: FileType) {
-        val destinationKey = replaceDirectory(sourceKey = sourceKey, destinationDirectory = destinationType.directory)
+    fun copyObject(
+        sourceKey: String,
+        fileType: FileType,
+        id: Long,
+    ) {
+        val fileName = sourceKey.substringAfterLast('/')
+        val destinationKey = "data/${fileType.path}/$id/$fileName"
 
         val copyRequest = CopyObjectRequest.builder()
             .sourceBucket(bucket)
@@ -64,32 +64,6 @@ class S3Service(
         }
     }
 
-    private fun validateFile(fileType: FileType, file: MultipartFile) {
-        val filename = file.originalFilename
-            ?: throw IllegalArgumentException("파일 이름이 존재하지 않습니다.")
-
-        if (!filename.contains(".")) {
-            throw IllegalArgumentException("확장자가 없는 파일입니다.")
-        }
-
-        val extension = extractExtension(filename)
-        if (!fileType.allowedExtensions.contains(extension)) {
-            throw IllegalArgumentException("허용되지 않은 확장자입니다: $extension")
-        }
-
-        if (file.size > fileType.maxSize) {
-            throw IllegalArgumentException("파일 크기가 허용된 범위를 초과했습니다.")
-        }
-    }
-
-    private fun generateKey(directory: String, filename: String): String {
-        val extension = extractExtension(filename)
-        val localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-        val uuid = UUID.randomUUID().toString()
-
-        return "$directory/$localDate/$uuid.$extension"
-    }
-
     private fun extractExtension(filename: String): String {
         val lastDot = filename.lastIndexOf('.')
         return if (lastDot == -1 || lastDot == filename.length - 1) {
@@ -97,13 +71,5 @@ class S3Service(
         } else {
             filename.substring(lastDot + 1)
         }
-    }
-
-    private fun replaceDirectory(sourceKey: String, destinationDirectory: String): String {
-        val parts = sourceKey.split("/", limit = 2)
-        if (parts.size != 2) {
-            throw IllegalArgumentException("Invalid sourceKey format: $sourceKey")
-        }
-        return "${destinationDirectory}/${parts[1]}"
     }
 }

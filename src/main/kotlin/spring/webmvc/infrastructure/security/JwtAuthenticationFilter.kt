@@ -36,11 +36,11 @@ class JwtAuthenticationFilter(
     private fun createAuthentication(token: String): Authentication {
         val claims = jwtProvider.parseAccessToken(token)
 
-        val memberId = claims["memberId"].toString().toLong()
+        val userId = claims["userId"].toString().toLong()
         val permissions = claims["permissions", List::class.java]
 
         val authorities = permissions.map { SimpleGrantedAuthority(it as String) }
 
-        return UsernamePasswordAuthenticationToken(memberId, token, authorities)
+        return UsernamePasswordAuthenticationToken(userId, token, authorities)
     }
 }

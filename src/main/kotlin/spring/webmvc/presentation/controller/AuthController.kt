@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.AuthService
 import spring.webmvc.presentation.dto.request.*
+import spring.webmvc.presentation.dto.response.SignUpResponse
 import spring.webmvc.presentation.dto.response.TokenResponse
 
 @Controller
@@ -14,13 +15,25 @@ import spring.webmvc.presentation.dto.response.TokenResponse
 class AuthController(
     private val authService: AuthService,
 ) {
-    @PostMapping("/login")
+    @PostMapping("/sign-up")
     @ResponseBody
-    fun login(
-        @RequestBody @Validated request: LoginRequest,
+    @ResponseStatus(HttpStatus.CREATED)
+    fun signUp(
+        @RequestBody @Validated request: SignUpRequest,
+    ): SignUpResponse {
+        val command = request.toCommand()
+        val user = authService.signUp(command)
+
+        return SignUpResponse.from(user)
+    }
+
+    @PostMapping("/sign-in")
+    @ResponseBody
+    fun signIn(
+        @RequestBody @Validated request: SignInRequest,
     ): TokenResponse {
         val command = request.toCommand()
-        val tokenResult = authService.login(command)
+        val tokenResult = authService.signIn(command)
 
         return TokenResponse.from(tokenResult)
     }

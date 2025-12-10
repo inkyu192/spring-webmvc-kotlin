@@ -61,11 +61,11 @@ class JwtAuthenticationFilterTest {
     fun doFilterWhenTokenValidationSucceeds() {
         val token = "valid.jwt.token"
         val claims = mockk<Claims>(relaxed = true)
-        val memberId = 1L
+        val userId = 1L
         val permissions = listOf("PRODUCT_READER")
 
         every { jwtProvider.parseAccessToken(any()) } returns claims
-        every { claims["memberId"] } returns memberId
+        every { claims["userId"] } returns userId
         every { claims["permissions", List::class.java] } returns permissions
 
         request.addHeader("Authorization", "Bearer $token")

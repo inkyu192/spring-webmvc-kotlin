@@ -7,74 +7,113 @@ import org.springframework.security.authentication.DisabledException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import spring.webmvc.application.dto.command.JoinVerifyConfirmCommand
+import spring.webmvc.application.dto.command.JoinVerifyRequestCommand
+import spring.webmvc.application.dto.command.PasswordResetConfirmCommand
+import spring.webmvc.application.dto.command.PasswordResetRequestCommand
+import spring.webmvc.application.dto.command.RefreshTokenCommand
+import spring.webmvc.application.dto.command.SignInCommand
+import spring.webmvc.application.dto.command.SignUpCommand
 import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.application.event.SendPasswordResetEmailEvent
 import spring.webmvc.application.event.SendVerifyEmailEvent
-import spring.webmvc.domain.dto.command.*
-import spring.webmvc.domain.model.entity.Member
-import spring.webmvc.domain.model.enums.MemberStatus
+import spring.webmvc.domain.model.entity.User
+import spring.webmvc.domain.model.enums.UserStatus
 import spring.webmvc.domain.model.vo.Email
-import spring.webmvc.domain.repository.MemberRepository
+import spring.webmvc.domain.repository.PermissionRepository
+import spring.webmvc.domain.repository.RoleRepository
+import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.security.JwtProvider
+import spring.webmvc.presentation.exception.DuplicateEntityException
 
 @Service
 @Transactional(readOnly = true)
 class AuthService(
     private val jwtProvider: JwtProvider,
     private val tokenCacheRepository: TokenCacheRepository,
-    private val memberRepository: MemberRepository,
+    private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val authCacheRepository: AuthCacheRepository,
     private val eventPublisher: ApplicationEventPublisher,
+    private val roleRepository: RoleRepository,
+    private val permissionRepository: PermissionRepository,
 ) {
     @Transactional
-    fun login(command: LoginCommand): TokenResult {
-        val member = memberRepository.findByEmail(command.email)
+    fun signUp(command: SignUpCommand): User {
+        if (userRepository.existsByEmail(command.email)) {
+            throw DuplicateEntityException(kClass = User::class, name = command.email.value)
+        }
+
+        val roles = roleRepository.findAllById(command.roleIds)
+        val permissions = permissionRepository.findAllById(command.permissionIds)
+
+        val user = User.create(
+            email = command.email,
+            password = command.password,
+            name = command.name,
+            phone = command.phone,
+            birthDate = command.birthDate,
+            type = command.type,
+        )
+
+        roles.forEach { user.addRole(it) }
+        permissions.forEach { user.addPermission(it) }
+
+        userRepository.save(user)
+
+        eventPublisher.publishEvent(SendVerifyEmailEvent(email = command.email))
+
+        return user
+    }
+
+    @Transactional
+    fun signIn(command: SignInCommand): TokenResult {
+        val user = userRepository.findByEmail(command.email)
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
-        if (!passwordEncoder.matches(command.password, member.password)) {
+        if (!passwordEncoder.matches(command.password, user.password)) {
             throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
         }
 
-        if (member.isNotActive()) {
+        if (user.isNotActive()) {
             throw DisabledException("계정이 활성화되지 않았습니다.")
         }
 
-        val memberId = checkNotNull(member.id)
+        val userId = checkNotNull(user.id)
 
         val accessToken = jwtProvider.createAccessToken(
-            memberId = memberId,
-            permissions = getPermissions(member)
+            userId = userId,
+            permissions = getPermissions(user)
         )
         val refreshToken = jwtProvider.createRefreshToken()
 
-        tokenCacheRepository.setRefreshToken(memberId = memberId, refreshToken = refreshToken)
+        tokenCacheRepository.setRefreshToken(userId = userId, refreshToken = refreshToken)
 
         return TokenResult(accessToken = accessToken, refreshToken = refreshToken)
     }
 
     fun refreshToken(command: RefreshTokenCommand): TokenResult {
-        val memberId = extractMemberId(command.accessToken)
+        val userId = extractUserId(command.accessToken)
         jwtProvider.parseRefreshToken(command.refreshToken)
 
-        val member = memberRepository.findById(memberId)
+        val user = userRepository.findById(userId)
 
-        if (tokenCacheRepository.getRefreshToken(memberId) != command.refreshToken) {
+        if (tokenCacheRepository.getRefreshToken(userId) != command.refreshToken) {
             throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
         }
 
         return TokenResult(
             accessToken = jwtProvider.createAccessToken(
-                memberId = memberId,
-                permissions = getPermissions(member),
+                userId = userId,
+                permissions = getPermissions(user),
             ),
             refreshToken = command.refreshToken,
         )
     }
 
-    private fun extractMemberId(accessToken: String): Long {
+    private fun extractUserId(accessToken: String): Long {
         val claims = runCatching { jwtProvider.parseAccessToken(accessToken) }
             .getOrElse { throwable ->
                 when (throwable) {
@@ -83,15 +122,15 @@ class AuthService(
                 }
             }
 
-        return claims["memberId"].toString().toLong()
+        return claims["userId"].toString().toLong()
     }
 
-    private fun getPermissions(member: Member): List<String> {
-        val rolePermissions = member.memberRoles
+    private fun getPermissions(user: User): List<String> {
+        val rolePermissions = user.userRoles
             .flatMap { it.role.rolePermissions }
             .map { it.permission.name }
 
-        val directPermissions = member.memberPermissions
+        val directPermissions = user.userPermissions
             .map { it.permission.name }
 
         return (rolePermissions + directPermissions).distinct()
@@ -106,16 +145,16 @@ class AuthService(
         val email = authCacheRepository.getJoinVerifyToken(command.token)
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
-        val member = memberRepository.findByEmail(Email.create(email))
+        val user = userRepository.findByEmail(Email.create(email))
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
-        member.updateStatus(MemberStatus.ACTIVE)
+        user.updateStatus(UserStatus.ACTIVE)
 
         authCacheRepository.deleteJoinVerifyToken(command.token)
     }
 
     fun requestPasswordReset(command: PasswordResetRequestCommand) {
-        memberRepository.findByEmail(command.email) ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+        userRepository.findByEmail(command.email) ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
         eventPublisher.publishEvent(SendPasswordResetEmailEvent(email = command.email))
     }
@@ -125,10 +164,10 @@ class AuthService(
         val email = authCacheRepository.getPasswordResetToken(command.token)
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
-        val member = memberRepository.findByEmail(Email.create(email))
+        val user = userRepository.findByEmail(Email.create(email))
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
-        member.updatePassword(passwordEncoder.encode(command.password))
+        user.updatePassword(passwordEncoder.encode(command.password))
 
         authCacheRepository.deletePasswordResetToken(command.token)
     }

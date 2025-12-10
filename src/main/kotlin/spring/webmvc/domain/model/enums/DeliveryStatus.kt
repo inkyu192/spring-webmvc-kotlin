@@ -7,7 +7,8 @@ enum class DeliveryStatus(
 ) {
     READY("준비"),
     CANCEL("취소"),
-    COMP("완료");
+    COMP("완료"),
+    ;
 
     companion object {
         @JsonCreator

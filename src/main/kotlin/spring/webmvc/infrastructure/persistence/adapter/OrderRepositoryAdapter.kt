@@ -14,13 +14,13 @@ class OrderRepositoryAdapter(
     private val jpaRepository: OrderJpaRepository,
     private val querydslRepository: OrderQuerydslRepository,
 ) : OrderRepository {
-    override fun findAll(pageable: Pageable, memberId: Long?, orderStatus: OrderStatus?) =
-        querydslRepository.findAll(pageable = pageable, memberId = memberId, orderStatus = orderStatus)
+    override fun findAll(pageable: Pageable, userId: Long?, orderStatus: OrderStatus?) =
+        querydslRepository.findAll(pageable = pageable, userId = userId, orderStatus = orderStatus)
 
     override fun findById(id: Long): Order = jpaRepository.findByIdOrThrow(id = id)
 
-    override fun findByIdAndMemberId(id: Long, memberId: Long) =
-        jpaRepository.findByIdAndMemberId(id = id, memberId = memberId)
+    override fun findByIdAndUserId(id: Long, userId: Long) =
+        jpaRepository.findByIdAndUserId(id = id, userId = userId)
 
     override fun save(order: Order) = jpaRepository.save(order)
 }

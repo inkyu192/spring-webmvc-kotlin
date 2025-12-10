@@ -1,26 +1,27 @@
-package spring.webmvc.presentation.controller.partner
+package spring.webmvc.presentation.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.runs
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
+import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spring.webmvc.application.service.MemberService
-import spring.webmvc.domain.model.entity.Member
+import spring.webmvc.application.service.UserService
+import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -29,26 +30,27 @@ import java.time.Instant
 import java.time.LocalDate
 
 
-@WebMvcTest(PartnerMemberController::class)
+@WebMvcTest(UserController::class)
 @Import(WebMvcTestConfig::class)
-class PartnerMemberControllerTest : MockMvcRestDocsSetup() {
+class UserControllerTest : MockMvcRestDocsSetup() {
     @MockkBean
-    private lateinit var memberService: MemberService
-    private lateinit var member: Member
+    private lateinit var userService: UserService
+    private lateinit var user: User
     private lateinit var email: String
     private lateinit var password: String
     private lateinit var name: String
     private lateinit var phone: String
     private lateinit var birthDate: LocalDate
-    private lateinit var roleIds: MutableList<Long>
-    private lateinit var permissionIds: MutableList<Long>
 
     @BeforeEach
     fun beforeEach() {
         val authentication = UsernamePasswordAuthenticationToken(
             1L,
             null,
-            listOf(SimpleGrantedAuthority("TEST")),
+            listOf(
+                SimpleGrantedAuthority("USER_READ"),
+                SimpleGrantedAuthority("USER_WRITE"),
+            ),
         )
 
         SecurityContextHolder.getContext().authentication = authentication
@@ -58,15 +60,13 @@ class PartnerMemberControllerTest : MockMvcRestDocsSetup() {
         name = "name"
         phone = "010-1234-1234"
         birthDate = LocalDate.now()
-        roleIds = mutableListOf()
-        permissionIds = mutableListOf(1L)
-        member = mockk<Member>()
-        every { member.id } returns 1L
-        every { member.email } returns Email.create(email)
-        every { member.name } returns name
-        every { member.phone } returns Phone.create(phone)
-        every { member.birthDate } returns birthDate
-        every { member.createdAt } returns Instant.now()
+        user = mockk<User>()
+        every { user.id } returns 1L
+        every { user.email } returns Email.create(email)
+        every { user.name } returns name
+        every { user.phone } returns Phone.create(phone)
+        every { user.birthDate } returns birthDate
+        every { user.createdAt } returns Instant.now()
     }
 
     @AfterEach
@@ -75,65 +75,68 @@ class PartnerMemberControllerTest : MockMvcRestDocsSetup() {
     }
 
     @Test
-    fun createMember() {
-        every { memberService.createMember(command = any()) } returns member
+    fun findUsers() {
+        val page = PageImpl(listOf(user), PageRequest.of(0, 20), 1)
+        every { userService.findUsers(any()) } returns page
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.post("/partner/members")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
-                        {
-                          "email": "$email",
-                          "password": "$password",
-                          "name": "$name",
-                          "phone": "$phone",
-                          "birthDate": "$birthDate",
-                          "roleIds": $roleIds,
-                          "permissionIds": $permissionIds
-                        }
-                    """.trimIndent()
-                )
+            RestDocumentationRequestBuilders.get("/users")
+                .header("Authorization", "Bearer accessToken")
+                .param("createdFrom", "2024-01-01T00:00:00Z")
+                .param("createdTo", "2024-12-31T23:59:59Z")
         )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "partner-member-create",
-                    PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("email").description("계정"),
-                        PayloadDocumentation.fieldWithPath("password").description("패스워드"),
-                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
-                        PayloadDocumentation.fieldWithPath("phone").description("번호"),
-                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
-                        PayloadDocumentation.fieldWithPath("roleIds").description("역할목록"),
-                        PayloadDocumentation.fieldWithPath("permissionIds").description("권한목록")
+                    "user-list",
+                    HeaderDocumentation.requestHeaders(
+                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    RequestDocumentation.queryParameters(
+                        RequestDocumentation.parameterWithName("page").description("페이지 번호").optional(),
+                        RequestDocumentation.parameterWithName("size").description("페이지 크기").optional(),
+                        RequestDocumentation.parameterWithName("email").description("이메일").optional(),
+                        RequestDocumentation.parameterWithName("phone").description("전화번호").optional(),
+                        RequestDocumentation.parameterWithName("name").description("이름").optional(),
+                        RequestDocumentation.parameterWithName("status").description("상태").optional(),
+                        RequestDocumentation.parameterWithName("createdFrom").description("생성일 시작"),
+                        RequestDocumentation.parameterWithName("createdTo").description("생성일 종료"),
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("email").description("계정"),
-                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
-                        PayloadDocumentation.fieldWithPath("phone").description("번호"),
-                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
-                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시")
+                        PayloadDocumentation.fieldWithPath("users[].id").description("아이디"),
+                        PayloadDocumentation.fieldWithPath("users[].email").description("계정"),
+                        PayloadDocumentation.fieldWithPath("users[].name").description("회원명"),
+                        PayloadDocumentation.fieldWithPath("users[].phone").description("번호"),
+                        PayloadDocumentation.fieldWithPath("users[].birthDate").description("생년월일"),
+                        PayloadDocumentation.fieldWithPath("users[].createdAt").description("생성일시"),
+                        PayloadDocumentation.fieldWithPath("page.page").description("현재 페이지"),
+                        PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
+                        PayloadDocumentation.fieldWithPath("page.totalElements").description("전체 요소 수"),
+                        PayloadDocumentation.fieldWithPath("page.totalPages").description("전체 페이지 수"),
+                        PayloadDocumentation.fieldWithPath("page.hasNext").description("다음 페이지 여부"),
+                        PayloadDocumentation.fieldWithPath("page.hasPrevious").description("이전 페이지 여부"),
                     )
                 )
             )
     }
 
     @Test
-    fun findMember() {
-        every { memberService.findMember(1L) } returns member
+    fun findUser() {
+        every { userService.findUser(1L) } returns user
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/partner/members")
+            RestDocumentationRequestBuilders.get("/users/{id}", 1L)
                 .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "partner-member-get",
+                    "user-detail",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    RequestDocumentation.pathParameters(
+                        RequestDocumentation.parameterWithName("id").description("회원 아이디")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
@@ -148,11 +151,11 @@ class PartnerMemberControllerTest : MockMvcRestDocsSetup() {
     }
 
     @Test
-    fun updateMember() {
-        every { memberService.updateMember(command = any()) } returns member
+    fun updateUser() {
+        every { userService.updateUser(command = any()) } returns user
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/partner/members")
+            RestDocumentationRequestBuilders.patch("/users/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer accessToken")
                 .content(
@@ -169,9 +172,12 @@ class PartnerMemberControllerTest : MockMvcRestDocsSetup() {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "partner-member-update",
+                    "user-update",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    RequestDocumentation.pathParameters(
+                        RequestDocumentation.parameterWithName("id").description("회원 아이디")
                     ),
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("password").description("패스워드"),
@@ -192,51 +198,22 @@ class PartnerMemberControllerTest : MockMvcRestDocsSetup() {
     }
 
     @Test
-    fun deleteMember() {
-        every { memberService.updateMemberStatus(any()) } returns member
+    fun deleteUser() {
+        every { userService.updateUserStatus(any()) } returns user
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.delete("/partner/members")
+            RestDocumentationRequestBuilders.delete("/users/{id}", 1L)
                 .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "partner-member-delete",
-                    HeaderDocumentation.requestHeaders(
-                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
-                    )
-                )
-            )
-    }
-
-    @Test
-    fun updatePassword() {
-        every { memberService.updatePassword(any()) } just runs
-
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/partner/members/password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer accessToken")
-                .content(
-                    """
-                        {
-                          "currentPassword": "currentPassword",
-                          "newPassword": "newPassword"
-                        }
-                    """.trimIndent()
-                )
-        )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(
-                MockMvcRestDocumentation.document(
-                    "partner-member-password-update",
+                    "user-delete",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
-                    PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("currentPassword").description("현재 패스워드"),
-                        PayloadDocumentation.fieldWithPath("newPassword").description("새 패스워드")
+                    RequestDocumentation.pathParameters(
+                        RequestDocumentation.parameterWithName("id").description("회원 아이디")
                     )
                 )
             )

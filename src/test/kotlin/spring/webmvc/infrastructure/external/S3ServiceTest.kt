@@ -13,7 +13,7 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
-import spring.webmvc.domain.model.enums.FileType
+import spring.webmvc.infrastructure.external.FileType
 import spring.webmvc.infrastructure.config.LocalStackTestContainerConfig
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -72,7 +72,7 @@ class S3ServiceTest {
             content.toByteArray(Charsets.UTF_8)
         )
 
-        val key = s3Service.putObject(fileType = FileType.TEMP, file = multipartFile)
+        val key = s3Service.putObject(file = multipartFile)
 
         val response = s3Client.getObject(
             GetObjectRequest.builder()
@@ -99,14 +99,18 @@ class S3ServiceTest {
             content.toByteArray(Charsets.UTF_8)
         )
 
-        val sourceKey = s3Service.putObject(fileType = FileType.TEMP, file = multipartFile)
+        val sourceKey = s3Service.putObject(file = multipartFile)
+        val id = 123L
 
-        s3Service.copyObject(sourceKey = sourceKey, destinationType = FileType.PROFILE)
+        s3Service.copyObject(sourceKey = sourceKey, fileType = FileType.PROFILE, id = id)
+
+        val fileName = sourceKey.substringAfterLast('/')
+        val destinationKey = "data/${FileType.PROFILE.path}/$id/$fileName"
 
         val response = s3Client.getObject(
             GetObjectRequest.builder()
                 .bucket(bucket)
-                .key(sourceKey)
+                .key(destinationKey)
                 .build()
         )
 

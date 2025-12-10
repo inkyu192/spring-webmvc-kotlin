@@ -3,14 +3,14 @@ package spring.webmvc.domain.model.entity
 import jakarta.persistence.*
 
 @Entity
-class MemberPermission protected constructor(
+class UserRole protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "permission_id")
-    val permission: Permission,
+    @JoinColumn(name = "role_id")
+    val role: Role,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    val member: Member,
+    @JoinColumn(name = "user_id")
+    val user: User,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +18,6 @@ class MemberPermission protected constructor(
         protected set
 
     companion object {
-        fun create(member: Member, permission: Permission) = MemberPermission(member = member, permission = permission)
+        fun create(user: User, role: Role) = UserRole(user = user, role = role)
     }
 }

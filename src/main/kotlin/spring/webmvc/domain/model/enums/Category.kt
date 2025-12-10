@@ -5,5 +5,6 @@ enum class Category(
 ) {
     FLIGHT("항공권"),
     ACCOMMODATION("숙박"),
-    TICKET("티켓");
+    TICKET("티켓"),
+    ;
 }

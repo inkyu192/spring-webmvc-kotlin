@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.infrastructure.external.S3Service
 import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
-import java.nio.charset.StandardCharsets
 
 @WebMvcTest(FileController::class)
 @Import(WebMvcTestConfig::class)
@@ -24,7 +23,6 @@ class FileControllerTest : MockMvcRestDocsSetup() {
     @MockkBean
     private lateinit var s3Service: S3Service
     private lateinit var file: MockMultipartFile
-    private lateinit var data: MockMultipartFile
     private lateinit var key: String
 
     @BeforeEach
@@ -36,25 +34,17 @@ class FileControllerTest : MockMvcRestDocsSetup() {
             "test-image-content".toByteArray()
         )
 
-        data = MockMultipartFile(
-            "request",
-            "",
-            "application/json",
-            "{\"type\": \"TEMP\"}".toByteArray(StandardCharsets.UTF_8)
-        )
-
-        key = "profile/20240610/uuid.jpg"
+        key = "temp/uuid.jpg"
     }
 
     @Test
     fun uploadFile() {
-        every { s3Service.putObject(fileType = any(), file = any()) } returns key
+        every { s3Service.putObject(file = any()) } returns key
 
         // When & Then
         mockMvc.perform(
             RestDocumentationRequestBuilders.multipart("/files")
                 .file(file)
-                .file(data)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -65,8 +55,7 @@ class FileControllerTest : MockMvcRestDocsSetup() {
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     RequestDocumentation.requestParts(
-                        RequestDocumentation.partWithName("file").description("파일"),
-                        RequestDocumentation.partWithName("request").description("요청 데이터")
+                        RequestDocumentation.partWithName("file").description("파일")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("key").description("키")

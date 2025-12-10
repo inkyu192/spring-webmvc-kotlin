@@ -17,9 +17,9 @@ class JwtProvider(
     private val refreshTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(jwtProperties.refreshToken.key))
     private val refreshTokenExpirationTime = jwtProperties.refreshToken.expiration.toMillis()
 
-    fun createAccessToken(memberId: Long, permissions: List<String>): String =
+    fun createAccessToken(userId: Long, permissions: List<String>): String =
         Jwts.builder()
-            .claim("memberId", memberId)
+            .claim("userId", userId)
             .claim("permissions", permissions)
             .issuedAt(Date())
             .expiration(Date(Date().time + accessTokenExpirationTime))
