@@ -13,7 +13,6 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
-import spring.webmvc.infrastructure.external.FileType
 import spring.webmvc.infrastructure.config.LocalStackTestContainerConfig
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

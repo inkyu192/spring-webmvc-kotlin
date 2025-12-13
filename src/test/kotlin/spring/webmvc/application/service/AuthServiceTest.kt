@@ -9,35 +9,30 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.authentication.DisabledException
 import org.springframework.security.crypto.password.PasswordEncoder
-import spring.webmvc.application.dto.command.JoinVerifyConfirmCommand
-import spring.webmvc.application.dto.command.JoinVerifyRequestCommand
-import spring.webmvc.application.dto.command.PasswordResetConfirmCommand
-import spring.webmvc.application.dto.command.PasswordResetRequestCommand
-import spring.webmvc.application.dto.command.RefreshTokenCommand
-import spring.webmvc.application.dto.command.SignInCommand
-import spring.webmvc.application.dto.command.SignUpCommand
+import spring.webmvc.application.dto.command.*
 import spring.webmvc.application.event.SendPasswordResetEmailEvent
 import spring.webmvc.application.event.SendVerifyEmailEvent
 import spring.webmvc.domain.model.entity.User
-import spring.webmvc.domain.model.enums.UserStatus
-import spring.webmvc.domain.model.enums.UserType
+import spring.webmvc.domain.model.entity.UserCredential
+import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.domain.repository.PermissionRepository
 import spring.webmvc.domain.repository.RoleRepository
+import spring.webmvc.domain.repository.UserCredentialRepository
 import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
+import spring.webmvc.infrastructure.exception.DuplicateEntityException
 import spring.webmvc.infrastructure.security.JwtProvider
-import spring.webmvc.presentation.exception.DuplicateEntityException
 import java.time.LocalDate
 
 class AuthServiceTest {
     private val jwtProvider = mockk<JwtProvider>()
     private val tokenCacheRepository = mockk<TokenCacheRepository>()
     private val userRepository = mockk<UserRepository>()
+    private val userCredentialRepository = mockk<UserCredentialRepository>()
     private val passwordEncoder = mockk<PasswordEncoder>()
     private val authCacheRepository = mockk<AuthCacheRepository>()
     private val eventPublisher = mockk<ApplicationEventPublisher>()
@@ -47,6 +42,7 @@ class AuthServiceTest {
         jwtProvider = jwtProvider,
         tokenCacheRepository = tokenCacheRepository,
         userRepository = userRepository,
+        userCredentialRepository = userCredentialRepository,
         passwordEncoder = passwordEncoder,
         authCacheRepository = authCacheRepository,
         eventPublisher = eventPublisher,
@@ -55,6 +51,7 @@ class AuthServiceTest {
     )
 
     private lateinit var user: User
+    private lateinit var userCredential: UserCredential
     private lateinit var email: Email
     private val userId = 1L
     private val accessToken = "accessToken"
@@ -65,16 +62,22 @@ class AuthServiceTest {
         email = Email.create("test@example.com")
         user = spyk(
             User.create(
-                email = email,
-                password = "encodedPassword",
                 name = "홍길동",
                 phone = Phone.create("010-1234-5678"),
-                birthDate = LocalDate.of(1990, 1, 1),
-                type = UserType.CUSTOMER,
+                gender = Gender.MALE,
+                birthday = LocalDate.of(1990, 1, 1),
             )
         )
-        user.updateStatus(UserStatus.ACTIVE)
         every { user.id } returns userId
+
+        userCredential = spyk(
+            UserCredential.create(
+                user = user,
+                email = email,
+                password = "encodedPassword",
+            )
+        )
+        userCredential.verify()
     }
 
     @Test
@@ -85,22 +88,26 @@ class AuthServiceTest {
             password = "password123",
             name = "홍길동",
             phone = Phone.create("010-1234-5678"),
-            birthDate = LocalDate.of(1990, 1, 1),
-            type = UserType.CUSTOMER,
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
             roleIds = emptyList(),
             permissionIds = emptyList(),
         )
 
-        every { userRepository.existsByEmail(email) } returns false
+        every { userCredentialRepository.existsByEmail(email) } returns false
+        every { userRepository.existsByPhone(any()) } returns false
+        every { passwordEncoder.encode("password123") } returns "encodedPassword"
         every { roleRepository.findAllById(emptyList()) } returns emptyList()
         every { permissionRepository.findAllById(emptyList()) } returns emptyList()
         every { userRepository.save(any()) } returns user
+        every { userCredentialRepository.save(any()) } returns userCredential
         every { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) } just runs
 
         val result = authService.signUp(command)
 
         Assertions.assertThat(result).isNotNull
         verify { userRepository.save(any()) }
+        verify { userCredentialRepository.save(any()) }
         verify { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) }
     }
 
@@ -112,13 +119,35 @@ class AuthServiceTest {
             password = "password123",
             name = "홍길동",
             phone = Phone.create("010-1234-5678"),
-            birthDate = LocalDate.of(1990, 1, 1),
-            type = UserType.CUSTOMER,
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
             roleIds = emptyList(),
             permissionIds = emptyList(),
         )
 
-        every { userRepository.existsByEmail(email) } returns true
+        every { userCredentialRepository.existsByEmail(email) } returns true
+
+        Assertions.assertThatThrownBy { authService.signUp(command) }
+            .isInstanceOf(DuplicateEntityException::class.java)
+    }
+
+    @Test
+    @DisplayName("중복된 번호로 회원가입 시 DuplicateEntityException 발생")
+    fun signUpWithDuplicatePhone() {
+        val phone = Phone.create("010-1234-5678")
+        val command = SignUpCommand(
+            email = email,
+            password = "password123",
+            name = "홍길동",
+            phone = phone,
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
+            roleIds = emptyList(),
+            permissionIds = emptyList(),
+        )
+
+        every { userCredentialRepository.existsByEmail(email) } returns false
+        every { userRepository.existsByPhone(phone) } returns true
 
         Assertions.assertThatThrownBy { authService.signUp(command) }
             .isInstanceOf(DuplicateEntityException::class.java)
@@ -129,7 +158,7 @@ class AuthServiceTest {
     fun signIn() {
         val command = SignInCommand(email = email, password = "password123")
 
-        every { userRepository.findByEmail(email) } returns user
+        every { userCredentialRepository.findByEmail(email) } returns userCredential
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns true
         every { jwtProvider.createAccessToken(userId, emptyList()) } returns accessToken
         every { jwtProvider.createRefreshToken() } returns refreshToken
@@ -146,7 +175,7 @@ class AuthServiceTest {
     fun signInWithNonExistentEmail() {
         val command = SignInCommand(email = email, password = "password123")
 
-        every { userRepository.findByEmail(email) } returns null
+        every { userCredentialRepository.findByEmail(email) } returns null
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
             .isInstanceOf(BadCredentialsException::class.java)
@@ -158,7 +187,7 @@ class AuthServiceTest {
     fun signInWithWrongPassword() {
         val command = SignInCommand(email = email, password = "wrongPassword")
 
-        every { userRepository.findByEmail(email) } returns user
+        every { userCredentialRepository.findByEmail(email) } returns userCredential
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns false
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
@@ -167,17 +196,23 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("비활성 계정으로 로그인 시 DisabledException 발생")
-    fun signInWithInactiveUser() {
+    @DisplayName("이메일 인증 안된 계정으로 로그인 시 BadCredentialsException 발생")
+    fun signInWithUnverifiedEmail() {
         val command = SignInCommand(email = email, password = "password123")
+        val unverifiedCredential = spyk(
+            UserCredential.create(
+                user = user,
+                email = email,
+                password = "encodedPassword",
+            )
+        )
 
-        every { userRepository.findByEmail(email) } returns user
+        every { userCredentialRepository.findByEmail(email) } returns unverifiedCredential
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns true
-        every { user.isNotActive() } returns true
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
-            .isInstanceOf(DisabledException::class.java)
-            .hasMessage("계정이 활성화되지 않았습니다.")
+            .isInstanceOf(BadCredentialsException::class.java)
+            .hasMessage("이메일 인증이 필요합니다.")
     }
 
     @Test
@@ -231,15 +266,21 @@ class AuthServiceTest {
     fun confirmJoinVerify() {
         val token = "verifyToken"
         val command = JoinVerifyConfirmCommand(token = token)
-        user.updateStatus(UserStatus.PENDING)
+        val unverifiedCredential = spyk(
+            UserCredential.create(
+                user = user,
+                email = email,
+                password = "encodedPassword",
+            )
+        )
 
         every { authCacheRepository.getJoinVerifyToken(token) } returns email.value
-        every { userRepository.findByEmail(any()) } returns user
+        every { userCredentialRepository.findByEmail(any()) } returns unverifiedCredential
         every { authCacheRepository.deleteJoinVerifyToken(token) } just runs
 
         authService.confirmJoinVerify(command)
 
-        Assertions.assertThat(user.status).isEqualTo(UserStatus.ACTIVE)
+        Assertions.assertThat(unverifiedCredential.isVerified()).isTrue
     }
 
     @Test
@@ -260,12 +301,12 @@ class AuthServiceTest {
     fun requestPasswordReset() {
         val command = PasswordResetRequestCommand(email = email)
 
-        every { userRepository.findByEmail(email) } returns user
+        every { userCredentialRepository.findByEmail(email) } returns userCredential
         every { eventPublisher.publishEvent(SendPasswordResetEmailEvent(email)) } just runs
 
         authService.requestPasswordReset(command)
 
-        verify { userRepository.findByEmail(email) }
+        verify { userCredentialRepository.findByEmail(email) }
         verify { eventPublisher.publishEvent(SendPasswordResetEmailEvent(email)) }
     }
 
@@ -274,7 +315,7 @@ class AuthServiceTest {
     fun requestPasswordResetWithNonExistentEmail() {
         val command = PasswordResetRequestCommand(email = email)
 
-        every { userRepository.findByEmail(email) } returns null
+        every { userCredentialRepository.findByEmail(email) } returns null
 
         Assertions.assertThatThrownBy { authService.requestPasswordReset(command) }
             .isInstanceOf(BadCredentialsException::class.java)
@@ -290,13 +331,13 @@ class AuthServiceTest {
         val command = PasswordResetConfirmCommand(token = token, password = newPassword)
 
         every { authCacheRepository.getPasswordResetToken(token) } returns email.value
-        every { userRepository.findByEmail(any()) } returns user
+        every { userCredentialRepository.findByEmail(any()) } returns userCredential
         every { passwordEncoder.encode(newPassword) } returns encodedPassword
         every { authCacheRepository.deletePasswordResetToken(token) } just runs
 
         authService.confirmPasswordReset(command)
 
-        Assertions.assertThat(user.password).isEqualTo(encodedPassword)
+        Assertions.assertThat(userCredential.password).isEqualTo(encodedPassword)
     }
 
     @Test

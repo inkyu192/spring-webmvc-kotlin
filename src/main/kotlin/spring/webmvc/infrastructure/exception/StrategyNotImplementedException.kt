@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.exception
+package spring.webmvc.infrastructure.exception
 
 import org.springframework.http.HttpStatus
 import spring.webmvc.domain.model.enums.Category

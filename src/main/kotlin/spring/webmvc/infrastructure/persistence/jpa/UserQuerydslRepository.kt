@@ -7,8 +7,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import spring.webmvc.domain.model.entity.QUser.user
 import spring.webmvc.domain.model.entity.User
-import spring.webmvc.domain.model.enums.UserStatus
-import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 
@@ -18,10 +16,8 @@ class UserQuerydslRepository(
 ) {
     fun findAll(
         pageable: Pageable,
-        email: Email?,
         phone: Phone?,
         name: String?,
-        status: UserStatus?,
         createdFrom: Instant,
         createdTo: Instant,
     ): Page<User> {
@@ -29,10 +25,8 @@ class UserQuerydslRepository(
             .select(user.count())
             .from(user)
             .where(
-                eqEmail(email),
                 eqPhone(phone),
                 eqName(name),
-                eqStatus(status),
                 betweenCreatedAt(createdFrom, createdTo),
             )
             .fetchOne() ?: 0L
@@ -40,10 +34,8 @@ class UserQuerydslRepository(
         val content = jpaQueryFactory
             .selectFrom(user)
             .where(
-                eqEmail(email),
                 eqPhone(phone),
                 eqName(name),
-                eqStatus(status),
                 betweenCreatedAt(createdFrom, createdTo),
             )
             .orderBy(user.id.desc())
@@ -54,13 +46,9 @@ class UserQuerydslRepository(
         return PageImpl(content, pageable, total)
     }
 
-    private fun eqEmail(email: Email?) = email?.let { user.email.eq(it) }
-
     private fun eqPhone(phone: Phone?) = phone?.let { user.phone.eq(it) }
 
     private fun eqName(name: String?) = name?.let { user.name.eq(it) }
-
-    private fun eqStatus(status: UserStatus?) = status?.let { user.status.eq(it) }
 
     private fun betweenCreatedAt(from: Instant, to: Instant) = user.createdAt.between(from, to)
 }

@@ -8,7 +8,7 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CopyObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import spring.webmvc.presentation.exception.AwsIntegrationException
+import spring.webmvc.infrastructure.exception.AwsIntegrationException
 import java.net.URLConnection
 import java.util.*
 

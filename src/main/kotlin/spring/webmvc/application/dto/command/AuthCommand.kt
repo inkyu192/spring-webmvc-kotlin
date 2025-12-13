@@ -1,6 +1,6 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.domain.model.enums.UserType
+import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.LocalDate
@@ -10,8 +10,8 @@ data class SignUpCommand(
     val password: String,
     val name: String,
     val phone: Phone,
-    val birthDate: LocalDate,
-    val type: UserType,
+    val gender: Gender,
+    val birthday: LocalDate,
     val roleIds: List<Long>,
     val permissionIds: List<Long>,
 )

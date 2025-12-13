@@ -2,7 +2,7 @@ package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.presentation.exception.OrderCancelNotAllowedException
+import spring.webmvc.infrastructure.exception.OrderCancelNotAllowedException
 import java.time.Instant
 
 @Entity

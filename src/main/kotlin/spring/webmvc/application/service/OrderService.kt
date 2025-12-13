@@ -13,9 +13,9 @@ import spring.webmvc.domain.repository.OrderRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.ProductCacheRepository
+import spring.webmvc.infrastructure.exception.EntityNotFoundException
+import spring.webmvc.infrastructure.exception.InsufficientQuantityException
 import spring.webmvc.infrastructure.security.SecurityContextUtil
-import spring.webmvc.presentation.exception.EntityNotFoundException
-import spring.webmvc.presentation.exception.InsufficientQuantityException
 
 @Service
 @Transactional(readOnly = true)

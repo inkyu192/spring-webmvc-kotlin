@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.resource.NoResourceFoundException
 import spring.webmvc.infrastructure.common.UriFactory
-import spring.webmvc.presentation.exception.AbstractHttpException
-import spring.webmvc.presentation.exception.AbstractValidationException
+import spring.webmvc.infrastructure.exception.AbstractHttpException
 
 @RestControllerAdvice
 class ApplicationExceptionHandler(
@@ -23,10 +22,6 @@ class ApplicationExceptionHandler(
     fun handleBusinessException(e: AbstractHttpException) =
         ProblemDetail.forStatusAndDetail(e.httpStatus, e.message).apply {
             type = uriFactory.createApiDocUri(status)
-
-            if (e is AbstractValidationException) {
-                setProperty("fields", e.fields)
-            }
         }
 
     @ExceptionHandler(
@@ -37,7 +32,10 @@ class ApplicationExceptionHandler(
     fun handleResourceNotFound(errorResponse: ErrorResponse) =
         errorResponse.body.apply { type = uriFactory.createApiDocUri(status) }
 
-    @ExceptionHandler(HttpMessageNotReadableException::class, MethodArgumentTypeMismatchException::class)
+    @ExceptionHandler(
+        HttpMessageNotReadableException::class,
+        MethodArgumentTypeMismatchException::class,
+    )
     fun handleInvalidRequestBody(exception: Exception) =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.message).apply {
             type = uriFactory.createApiDocUri(HttpStatus.BAD_REQUEST)

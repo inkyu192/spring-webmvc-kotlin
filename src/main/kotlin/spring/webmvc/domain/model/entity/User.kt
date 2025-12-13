@@ -2,30 +2,21 @@ package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
 import spring.webmvc.domain.converter.CryptoAttributeConverter
-import spring.webmvc.domain.model.enums.UserStatus
-import spring.webmvc.domain.model.enums.UserType
-import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Phone
-import java.time.Instant
 import java.time.LocalDate
 
 @Entity
+@Table(name = "users")
 class User protected constructor(
-    @Embedded
-    val email: Email,
-    password: String,
     name: String,
     phone: Phone,
-    birthDate: LocalDate,
-    type: UserType,
-    status: UserStatus,
+    gender: Gender,
+    birthday: LocalDate,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
-        protected set
-
-    var password = password
         protected set
 
     @Convert(converter = CryptoAttributeConverter::class)
@@ -36,18 +27,11 @@ class User protected constructor(
     var phone = phone
         protected set
 
-    var birthDate = birthDate
-        protected set
-
     @Enumerated(EnumType.STRING)
-    var type = type
+    var gender = gender
         protected set
 
-    @Enumerated(EnumType.STRING)
-    var status: UserStatus = status
-        protected set
-
-    var deletedAt: Instant? = null
+    var birthday = birthday
         protected set
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -80,20 +64,15 @@ class User protected constructor(
 
     companion object {
         fun create(
-            email: Email,
-            password: String,
             name: String,
             phone: Phone,
-            birthDate: LocalDate,
-            type: UserType,
+            gender: Gender,
+            birthday: LocalDate,
         ) = User(
-            email = email,
-            password = password,
             name = name,
             phone = phone,
-            birthDate = birthDate,
-            type = type,
-            status = UserStatus.PENDING,
+            gender = gender,
+            birthday = birthday,
         )
     }
 
@@ -105,22 +84,10 @@ class User protected constructor(
         _userPermissions.add(UserPermission.create(user = this, permission = permission))
     }
 
-    fun update(name: String?, phone: Phone?, birthDate: LocalDate?) {
-        name?.let { this.name = name }
-        phone?.let { this.phone = phone }
-        birthDate?.let { this.birthDate = birthDate }
+    fun update(name: String?, phone: Phone?, birthday: LocalDate?, gender: Gender?) {
+        name?.let { this.name = it }
+        phone?.let { this.phone = it }
+        birthday?.let { this.birthday = it }
+        gender?.let { this.gender = it }
     }
-
-    fun updateStatus(status: UserStatus) {
-        this.status = status
-        if (status == UserStatus.WITHDRAWN) {
-            this.deletedAt = Instant.now()
-        }
-    }
-
-    fun updatePassword(newPassword: String) {
-        this.password = newPassword
-    }
-
-    fun isNotActive() = this.status != UserStatus.ACTIVE
 }

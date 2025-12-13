@@ -2,14 +2,8 @@ package spring.webmvc.presentation.dto.request
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
-import spring.webmvc.application.dto.command.JoinVerifyConfirmCommand
-import spring.webmvc.application.dto.command.JoinVerifyRequestCommand
-import spring.webmvc.application.dto.command.PasswordResetConfirmCommand
-import spring.webmvc.application.dto.command.PasswordResetRequestCommand
-import spring.webmvc.application.dto.command.RefreshTokenCommand
-import spring.webmvc.application.dto.command.SignInCommand
-import spring.webmvc.application.dto.command.SignUpCommand
-import spring.webmvc.domain.model.enums.UserType
+import spring.webmvc.application.dto.command.*
+import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.LocalDate
@@ -20,10 +14,10 @@ data class SignUpRequest(
     val email: String,
     val password: String,
     val name: String,
-    val type: UserType,
+    val gender: Gender,
     @field:Pattern(regexp = "^010-\\d{3,4}-\\d{4}$")
     val phone: String,
-    val birthDate: LocalDate,
+    val birthday: LocalDate,
     val roleIds: List<Long> = emptyList(),
     val permissionIds: List<Long> = emptyList(),
 ) {
@@ -32,8 +26,8 @@ data class SignUpRequest(
         password = password,
         name = name,
         phone = Phone.create(phone),
-        birthDate = birthDate,
-        type = type,
+        gender = gender,
+        birthday = birthday,
         roleIds = roleIds,
         permissionIds = permissionIds,
     )

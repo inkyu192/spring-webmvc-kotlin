@@ -7,8 +7,8 @@ import spring.webmvc.domain.model.cache.ProductCache
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.CurationProduct
 import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.infrastructure.exception.EntityNotFoundException
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
-import spring.webmvc.presentation.exception.EntityNotFoundException
 
 @Service
 class CurationDomainService {

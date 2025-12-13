@@ -45,46 +45,12 @@ INSERT INTO permission_menu (permission_id, menu_id) VALUES
     (8, 4), (8, 10),
     (9, 4), (9, 10);
 
-INSERT INTO user (id, email, password, name, phone, birth_date, type, status, created_at, updated_at) VALUES
-    (1, 'operator@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Operator User', '010-1234-5678', '1990-01-01', 'OPERATOR', 'ACTIVE', NOW(6), NOW(6)),
-    (2, 'operator.cs@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CS Manager', '010-1111-2222', '1992-03-15', 'OPERATOR', 'ACTIVE', NOW(6), NOW(6)),
-    (3, 'partner@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner User', '010-2345-6789', '1992-05-15', 'PARTNER', 'ACTIVE', NOW(6), NOW(6)),
-    (4, 'partner.staff@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Partner Staff', '010-3333-4444', '1995-08-20', 'PARTNER', 'ACTIVE', NOW(6), NOW(6)),
-    (5, 'customer@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Customer User', '010-3456-7890', '1995-10-20', 'CUSTOMER', 'ACTIVE', NOW(6), NOW(6));
-
-INSERT INTO user_role (user_id, role_id) VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5);
-
 INSERT INTO company (id, name, business_number, address, phone_number, created_at, updated_at) VALUES
     (1, '테크 코퍼레이션', '123-45-67890', '서울특별시 강남구 테헤란로 123', '02-1234-5678', NOW(6), NOW(6)),
     (2, '글로벌 파트너스', '234-56-78901', '서울특별시 서초구 서초대로 456', '02-2345-6789', NOW(6), NOW(6)),
     (3, '이노베이션 그룹', '345-67-89012', '경기도 성남시 분당구 판교역로 789', '031-3456-7890', NOW(6), NOW(6)),
     (4, '비즈니스 솔루션', '456-78-90123', '서울특별시 마포구 월드컵북로 321', '02-4567-8901', NOW(6), NOW(6)),
     (5, '엔터프라이즈 주식회사', '567-89-01234', '부산광역시 해운대구 센텀중앙로 654', '051-5678-9012', NOW(6), NOW(6));
-
-INSERT INTO user_company (user_id, company_id) VALUES
-    (1, 1),
-    (1, 2),
-    (2, 1),
-    (3, 2),
-    (3, 3),
-    (4, 3),
-    (5, 4),
-    (5, 5);
-
-INSERT INTO delivery_address (id, user_id, name, recipient_name, recipient_phone, postal_code, address, address_detail, is_default, created_at, updated_at) VALUES
-    (1, 1, '집', 'Operator User', '010-1234-5678', '06234', '서울특별시 강남구 테헤란로 123', '101동 1001호', true, NOW(6), NOW(6)),
-    (2, 1, '회사', 'Operator User', '010-1234-5678', '06123', '서울특별시 강남구 역삼동 456', '5층', false, NOW(6), NOW(6)),
-    (3, 2, '집', 'CS Manager', '010-1111-2222', '06345', '서울특별시 서초구 서초대로 789', '202동 502호', true, NOW(6), NOW(6)),
-    (4, 3, '집', 'Partner User', '010-2345-6789', '13487', '경기도 성남시 분당구 판교역로 111', '301동 1203호', true, NOW(6), NOW(6)),
-    (5, 3, '사무실', 'Partner User', '010-2345-6789', '13488', '경기도 성남시 분당구 판교동 222', '7층 701호', false, NOW(6), NOW(6)),
-    (6, 4, '집', 'Partner Staff', '010-3333-4444', '13489', '경기도 성남시 분당구 서현동 333', '103동 803호', true, NOW(6), NOW(6)),
-    (7, 5, '집', 'Customer User', '010-3456-7890', '48058', '부산광역시 해운대구 센텀중앙로 444', '205동 1505호', true, NOW(6), NOW(6)),
-    (8, 5, '부모님댁', 'Customer User 부친', '010-9999-8888', '06789', '서울특별시 강동구 천호대로 555', '단독주택', false, NOW(6), NOW(6));
 
 INSERT INTO product (id, category, name, description, price, quantity, created_by, updated_by, created_at, updated_at) VALUES
     (1, 'FLIGHT', '인천-도쿄 왕복', '대한항공 직항 이코노미 클래스', 450000, 100, 1, 1, NOW(6), NOW(6)),
@@ -162,7 +128,6 @@ INSERT INTO curation_product (curation_id, product_id, sort_order) VALUES
 ALTER TABLE permission AUTO_INCREMENT = 51;
 ALTER TABLE role AUTO_INCREMENT = 51;
 ALTER TABLE menu AUTO_INCREMENT = 51;
-ALTER TABLE user AUTO_INCREMENT = 51;
 ALTER TABLE company AUTO_INCREMENT = 51;
 ALTER TABLE delivery_address AUTO_INCREMENT = 51;
 ALTER TABLE product AUTO_INCREMENT = 51;

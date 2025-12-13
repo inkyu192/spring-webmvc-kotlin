@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import spring.webmvc.domain.model.entity.User
-import spring.webmvc.domain.model.enums.UserType
-import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.RepositoryTest
 import spring.webmvc.infrastructure.crypto.CryptoService
@@ -37,28 +36,22 @@ class UserKotlinJdslRepositoryTest(
         every { cryptoService.decrypt(any()) } answers { firstArg() }
 
         user1 = User.create(
-            email = Email.create("test1@example.com"),
-            password = "password123",
             name = "홍길동",
             phone = Phone.create("010-1111-1111"),
-            birthDate = LocalDate.of(1990, 1, 1),
-            type = UserType.CUSTOMER,
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
         )
         user2 = User.create(
-            email = Email.create("test2@example.com"),
-            password = "password123",
             name = "김철수",
             phone = Phone.create("010-2222-2222"),
-            birthDate = LocalDate.of(1985, 5, 15),
-            type = UserType.CUSTOMER,
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1985, 5, 15),
         )
         user3 = User.create(
-            email = Email.create("test3@example.com"),
-            password = "password123",
             name = "이영희",
             phone = Phone.create("010-3333-3333"),
-            birthDate = LocalDate.of(1995, 12, 25),
-            type = UserType.PARTNER,
+            gender = Gender.FEMALE,
+            birthday = LocalDate.of(1995, 12, 25),
         )
 
         entityManager.persist(user1)
@@ -70,25 +63,23 @@ class UserKotlinJdslRepositoryTest(
     }
 
     @Test
-    @DisplayName("findAll: 이메일 조건으로 회원을 조회한다")
-    fun findAllByEmail() {
+    @DisplayName("findAll: 전화번호 조건으로 회원을 조회한다")
+    fun findAllByPhone() {
         val pageable = PageRequest.of(0, 10)
         val createdFrom = Instant.now().minus(1, ChronoUnit.DAYS)
         val createdTo = Instant.now().plus(1, ChronoUnit.DAYS)
 
         val result = userKotlinJdslRepository.findAll(
             pageable = pageable,
-            email = Email.create("test1@example.com"),
-            phone = null,
+            phone = Phone.create("010-1111-1111"),
             name = null,
-            status = null,
             createdFrom = createdFrom,
             createdTo = createdTo,
         )
 
         Assertions.assertThat(result.totalElements).isEqualTo(1)
         Assertions.assertThat(result.content).hasSize(1)
-        Assertions.assertThat(result.content[0].email.value).isEqualTo("test1@example.com")
+        Assertions.assertThat(result.content[0].phone.value).isEqualTo("010-1111-1111")
     }
 
     @Test
@@ -100,10 +91,8 @@ class UserKotlinJdslRepositoryTest(
 
         val result = userKotlinJdslRepository.findAll(
             pageable = pageable,
-            email = null,
             phone = null,
             name = null,
-            status = null,
             createdFrom = createdFrom,
             createdTo = createdTo,
         )

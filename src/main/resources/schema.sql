@@ -18,27 +18,39 @@ DROP TABLE IF EXISTS menu;
 DROP TABLE IF EXISTS permission;
 DROP TABLE IF EXISTS role;
 DROP TABLE IF EXISTS company;
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS user_credential;
+DROP TABLE IF EXISTS user_oauth;
+DROP TABLE IF EXISTS users;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-CREATE TABLE user (
+CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    phone VARCHAR(255) NOT NULL,
-    birth_date DATE NOT NULL,
-    type VARCHAR(255) NOT NULL,
-    status VARCHAR(255) NOT NULL,
-    deleted_at DATETIME(6),
+    phone VARCHAR(255) NOT NULL UNIQUE,
+    gender VARCHAR(50) NOT NULL,
+    birthday DATE NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
 
-CREATE INDEX idx_user_phone ON user(phone);
-CREATE INDEX idx_user_created_at ON user(created_at);
-CREATE INDEX idx_user_name_created_at ON user(name, created_at);
+CREATE TABLE user_credential (
+    user_id BIGINT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    verified_at DATETIME(6),
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    CONSTRAINT fk_user_credential_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE user_oauth (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    oauth_provider VARCHAR(50) NOT NULL,
+    oauth_user_id VARCHAR(255) NOT NULL,
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    CONSTRAINT fk_user_oauth_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
 CREATE TABLE company (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -49,9 +61,6 @@ CREATE TABLE company (
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
-
-CREATE INDEX idx_company_name ON company(name);
-CREATE INDEX idx_company_business_number ON company(business_number);
 
 CREATE TABLE role (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -82,7 +91,7 @@ CREATE TABLE user_role (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
-    CONSTRAINT fk_user_role_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_user_role_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_user_role_role FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
@@ -90,7 +99,7 @@ CREATE TABLE user_permission (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     permission_id BIGINT NOT NULL,
-    CONSTRAINT fk_user_permission_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_user_permission_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_user_permission_permission FOREIGN KEY (permission_id) REFERENCES permission(id)
 );
 
@@ -98,7 +107,7 @@ CREATE TABLE user_company (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     company_id BIGINT NOT NULL,
-    CONSTRAINT fk_user_company_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_user_company_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_user_company_company FOREIGN KEY (company_id) REFERENCES company(id)
 );
 
@@ -114,11 +123,8 @@ CREATE TABLE delivery_address (
     is_default BIT(1) NOT NULL DEFAULT 0,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    CONSTRAINT fk_delivery_address_user FOREIGN KEY (user_id) REFERENCES user(id)
+    CONSTRAINT fk_delivery_address_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
-CREATE INDEX idx_delivery_address_user_id ON delivery_address(user_id);
-CREATE INDEX idx_delivery_address_is_default ON delivery_address(user_id, is_default);
 
 CREATE TABLE role_permission (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -184,7 +190,7 @@ CREATE TABLE orders (
     user_id BIGINT NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES user(id)
+    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE order_product (

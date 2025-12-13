@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
+import io.mockk.spyk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -16,8 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.application.service.AuthService
 import spring.webmvc.domain.model.entity.User
-import spring.webmvc.domain.model.enums.UserType
-import spring.webmvc.domain.model.vo.Email
+import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
 import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
@@ -45,14 +45,12 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun signUp() {
-        val user = io.mockk.spyk(
+        val user = spyk(
             User.create(
-                email = Email.create(email),
-                password = password,
                 name = "홍길동",
                 phone = Phone.create("010-1234-5678"),
-                birthDate = LocalDate.of(1990, 1, 1),
-                type = UserType.CUSTOMER,
+                gender = Gender.MALE,
+                birthday = LocalDate.of(1990, 1, 1),
             )
         )
         every { user.id } returns 1L
@@ -67,9 +65,9 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
                           "email": "$email",
                           "password": "$password",
                           "name": "홍길동",
+                          "gender": "MALE",
                           "phone": "010-1234-5678",
-                          "birthDate": "1990-01-01",
-                          "type": "CUSTOMER",
+                          "birthday": "1990-01-01",
                           "roleIds": [],
                           "permissionIds": []
                         }
@@ -84,9 +82,9 @@ class AuthControllerTest : MockMvcRestDocsSetup() {
                         PayloadDocumentation.fieldWithPath("email").description("이메일"),
                         PayloadDocumentation.fieldWithPath("password").description("패스워드"),
                         PayloadDocumentation.fieldWithPath("name").description("이름"),
+                        PayloadDocumentation.fieldWithPath("gender").description("성별 (MALE, FEMALE)"),
                         PayloadDocumentation.fieldWithPath("phone").description("전화번호"),
-                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
-                        PayloadDocumentation.fieldWithPath("type").description("회원 유형 (CUSTOMER, PARTNER, OPERATOR)"),
+                        PayloadDocumentation.fieldWithPath("birthday").description("생년월일"),
                         PayloadDocumentation.fieldWithPath("roleIds").description("역할 ID 목록"),
                         PayloadDocumentation.fieldWithPath("permissionIds").description("권한 ID 목록")
                     ),

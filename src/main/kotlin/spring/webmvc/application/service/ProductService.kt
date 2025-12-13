@@ -9,7 +9,7 @@ import spring.webmvc.application.strategy.ProductStrategy
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.domain.repository.cache.ProductCacheRepository
-import spring.webmvc.presentation.exception.StrategyNotImplementedException
+import spring.webmvc.infrastructure.exception.StrategyNotImplementedException
 
 @Service
 @Transactional(readOnly = true)

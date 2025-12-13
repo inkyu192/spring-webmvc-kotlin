@@ -11,8 +11,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import spring.webmvc.domain.model.entity.User
-import spring.webmvc.domain.model.enums.UserStatus
-import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 
@@ -23,10 +21,8 @@ class UserKotlinJdslRepository(
 ) {
     fun findAll(
         pageable: Pageable,
-        email: Email?,
         phone: Phone?,
         name: String?,
-        status: UserStatus?,
         createdFrom: Instant,
         createdTo: Instant,
     ): Page<User> {
@@ -35,10 +31,8 @@ class UserKotlinJdslRepository(
                 select(count(entity(User::class)))
                     .from(entity(User::class))
                     .whereAnd(
-                        eqEmail(email),
                         eqPhone(phone),
                         eqName(name),
-                        eqStatus(status),
                         betweenCreatedAt(createdFrom, createdTo),
                     )
             }, context = context
@@ -49,10 +43,8 @@ class UserKotlinJdslRepository(
                 select(entity(User::class))
                     .from(entity(User::class))
                     .whereAnd(
-                        eqEmail(email),
                         eqPhone(phone),
                         eqName(name),
-                        eqStatus(status),
                         betweenCreatedAt(createdFrom, createdTo),
                     )
                     .orderBy(path(User::id).desc())
@@ -65,17 +57,11 @@ class UserKotlinJdslRepository(
         return PageImpl(content, pageable, total)
     }
 
-    private fun Jpql.eqEmail(email: Email?): Predicate? =
-        email?.let { path(User::email).eq(it) }
-
     private fun Jpql.eqPhone(phone: Phone?): Predicate? =
         phone?.let { path(User::phone).eq(it) }
 
     private fun Jpql.eqName(name: String?): Predicate? =
         name?.let { path(User::name).eq(it) }
-
-    private fun Jpql.eqStatus(status: UserStatus?): Predicate? =
-        status?.let { path(User::status).eq(it) }
 
     private fun Jpql.betweenCreatedAt(from: Instant, to: Instant): Predicate =
         path(User::createdAt).between(from, to)

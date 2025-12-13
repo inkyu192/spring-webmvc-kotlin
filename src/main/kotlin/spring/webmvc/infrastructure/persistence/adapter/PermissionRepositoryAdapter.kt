@@ -1,15 +1,12 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
 import org.springframework.stereotype.Component
-import spring.webmvc.domain.model.entity.Permission
 import spring.webmvc.domain.repository.PermissionRepository
 import spring.webmvc.infrastructure.persistence.jpa.PermissionJpaRepository
 
 @Component
 class PermissionRepositoryAdapter(
-    private val jpaRepository: PermissionJpaRepository
+    private val jpaRepository: PermissionJpaRepository,
 ) : PermissionRepository {
     override fun findAllById(ids: Iterable<Long>) = jpaRepository.findAllById(ids)
-    override fun save(permission: Permission) = jpaRepository.save(permission)
-    override fun saveAll(permissions: Iterable<Permission>) = jpaRepository.saveAll(permissions)
 }

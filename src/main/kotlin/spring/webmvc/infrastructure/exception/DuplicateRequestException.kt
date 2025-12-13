@@ -1,7 +1,6 @@
-package spring.webmvc.application.exception
+package spring.webmvc.infrastructure.exception
 
 import org.springframework.http.HttpStatus
-import spring.webmvc.presentation.exception.AbstractHttpException
 
 class DuplicateRequestException(method: String, uri: String) :
     AbstractHttpException(

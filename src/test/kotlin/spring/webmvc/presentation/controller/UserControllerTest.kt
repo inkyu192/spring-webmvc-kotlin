@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.http.MediaType
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
@@ -20,8 +19,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import spring.webmvc.application.dto.result.UserDetail
 import spring.webmvc.application.service.UserService
 import spring.webmvc.domain.model.entity.User
+import spring.webmvc.domain.model.entity.UserCredential
+import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.WebMvcTestConfig
@@ -36,11 +38,13 @@ class UserControllerTest : MockMvcRestDocsSetup() {
     @MockkBean
     private lateinit var userService: UserService
     private lateinit var user: User
+    private lateinit var userCredential: UserCredential
+    private lateinit var userDetail: UserDetail
     private lateinit var email: String
-    private lateinit var password: String
     private lateinit var name: String
     private lateinit var phone: String
-    private lateinit var birthDate: LocalDate
+    private lateinit var birthday: LocalDate
+    private lateinit var gender: Gender
 
     @BeforeEach
     fun beforeEach() {
@@ -56,17 +60,28 @@ class UserControllerTest : MockMvcRestDocsSetup() {
         SecurityContextHolder.getContext().authentication = authentication
 
         email = "test@gmail.com"
-        password = "password"
-        name = "name"
+        name = "홍길동"
         phone = "010-1234-1234"
-        birthDate = LocalDate.now()
+        birthday = LocalDate.of(1990, 1, 1)
+        gender = Gender.MALE
+
         user = mockk<User>()
         every { user.id } returns 1L
-        every { user.email } returns Email.create(email)
         every { user.name } returns name
         every { user.phone } returns Phone.create(phone)
-        every { user.birthDate } returns birthDate
+        every { user.birthday } returns birthday
+        every { user.gender } returns gender
         every { user.createdAt } returns Instant.now()
+
+        userCredential = mockk<UserCredential>()
+        every { userCredential.email } returns Email.create(email)
+        every { userCredential.verifiedAt } returns Instant.now()
+
+        userDetail = UserDetail(
+            user = user,
+            credential = userCredential,
+            oauths = emptyList(),
+        )
     }
 
     @AfterEach
@@ -104,10 +119,10 @@ class UserControllerTest : MockMvcRestDocsSetup() {
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("users[].id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("users[].email").description("계정"),
                         PayloadDocumentation.fieldWithPath("users[].name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("users[].phone").description("번호"),
-                        PayloadDocumentation.fieldWithPath("users[].birthDate").description("생년월일"),
+                        PayloadDocumentation.fieldWithPath("users[].gender").description("성별"),
+                        PayloadDocumentation.fieldWithPath("users[].birthday").description("생년월일"),
                         PayloadDocumentation.fieldWithPath("users[].createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("page.page").description("현재 페이지"),
                         PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
@@ -122,7 +137,7 @@ class UserControllerTest : MockMvcRestDocsSetup() {
 
     @Test
     fun findUser() {
-        every { userService.findUser(1L) } returns user
+        every { userService.findUserDetail(1L) } returns userDetail
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/users/{id}", 1L)
@@ -140,80 +155,15 @@ class UserControllerTest : MockMvcRestDocsSetup() {
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("email").description("계정"),
                         PayloadDocumentation.fieldWithPath("name").description("회원명"),
                         PayloadDocumentation.fieldWithPath("phone").description("번호"),
-                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
+                        PayloadDocumentation.fieldWithPath("gender").description("성별"),
+                        PayloadDocumentation.fieldWithPath("birthday").description("생년월일"),
+                        PayloadDocumentation.fieldWithPath("credential").description("인증 정보").optional(),
+                        PayloadDocumentation.fieldWithPath("credential.email").description("이메일").optional(),
+                        PayloadDocumentation.fieldWithPath("credential.verifiedAt").description("인증 일시").optional(),
+                        PayloadDocumentation.fieldWithPath("oauths").description("OAuth 목록"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시")
-                    )
-                )
-            )
-    }
-
-    @Test
-    fun updateUser() {
-        every { userService.updateUser(command = any()) } returns user
-
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/users/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer accessToken")
-                .content(
-                    """
-                        {
-                          "password": "$password",
-                          "name": "$name",
-                          "phone": "$phone",
-                          "birthDate": "$birthDate"
-                        }
-                    """.trimIndent()
-                )
-        )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andDo(
-                MockMvcRestDocumentation.document(
-                    "user-update",
-                    HeaderDocumentation.requestHeaders(
-                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
-                    ),
-                    RequestDocumentation.pathParameters(
-                        RequestDocumentation.parameterWithName("id").description("회원 아이디")
-                    ),
-                    PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("password").description("패스워드"),
-                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
-                        PayloadDocumentation.fieldWithPath("phone").description("번호"),
-                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일")
-                    ),
-                    PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("아이디"),
-                        PayloadDocumentation.fieldWithPath("email").description("계정"),
-                        PayloadDocumentation.fieldWithPath("name").description("회원명"),
-                        PayloadDocumentation.fieldWithPath("phone").description("번호"),
-                        PayloadDocumentation.fieldWithPath("birthDate").description("생년월일"),
-                        PayloadDocumentation.fieldWithPath("createdAt").description("생성일시")
-                    )
-                )
-            )
-    }
-
-    @Test
-    fun deleteUser() {
-        every { userService.updateUserStatus(any()) } returns user
-
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.delete("/users/{id}", 1L)
-                .header("Authorization", "Bearer accessToken")
-        )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(
-                MockMvcRestDocumentation.document(
-                    "user-delete",
-                    HeaderDocumentation.requestHeaders(
-                        HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
-                    ),
-                    RequestDocumentation.pathParameters(
-                        RequestDocumentation.parameterWithName("id").description("회원 아이디")
                     )
                 )
             )

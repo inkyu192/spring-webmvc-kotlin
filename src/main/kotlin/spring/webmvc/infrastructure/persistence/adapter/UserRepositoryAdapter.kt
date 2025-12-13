@@ -3,8 +3,6 @@ package spring.webmvc.infrastructure.persistence.adapter
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.User
-import spring.webmvc.domain.model.enums.UserStatus
-import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.infrastructure.extensions.findByIdOrThrow
@@ -23,25 +21,19 @@ class UserRepositoryAdapter(
 
     override fun findAll(
         pageable: Pageable,
-        email: Email?,
         phone: Phone?,
         name: String?,
-        status: UserStatus?,
         createdFrom: Instant,
         createdTo: Instant,
     ) = kotlinJdslRepository.findAll(
         pageable = pageable,
-        email = email,
         phone = phone,
         name = name,
-        status = status,
         createdFrom = createdFrom,
         createdTo = createdTo,
     )
 
-    override fun findByEmail(email: Email) = jpaRepository.findByEmail(email)
-
-    override fun existsByEmail(email: Email) = jpaRepository.existsByEmail(email)
-
     override fun save(user: User) = jpaRepository.save(user)
+
+    override fun existsByPhone(phone: Phone) = jpaRepository.existsByPhone(phone)
 }

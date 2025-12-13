@@ -55,6 +55,7 @@ class PermissionJpaRepositoryTest {
         permissionJpaRepository.deleteById(id)
 
         val deleted = permissionJpaRepository.findById(id)
+
         Assertions.assertThat(deleted).isEmpty()
     }
 }
