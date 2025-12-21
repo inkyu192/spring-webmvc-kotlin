@@ -30,5 +30,7 @@ class OrderProduct protected constructor(
             ).also { product.removeQuantity(quantity = quantity) }
     }
 
-    fun cancel() { product.addQuantity(quantity = quantity) }
+    fun cancel() {
+        product.addQuantity(quantity = quantity)
+    }
 }

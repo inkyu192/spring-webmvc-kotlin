@@ -13,8 +13,9 @@ import spring.webmvc.infrastructure.config.RepositoryTest
 @RepositoryTest
 class ProductQuerydslRepositoryTest(
     @Autowired private val entityManager: EntityManager,
+    @Autowired private val jpaQueryFactory: JPAQueryFactory,
 ) {
-    private val productQuerydslRepository = ProductQuerydslRepository(JPAQueryFactory(entityManager))
+    private val productQuerydslRepository = ProductQuerydslRepository(jpaQueryFactory)
 
     private lateinit var product1: Ticket
     private lateinit var product2: Ticket

@@ -4,22 +4,23 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.infrastructure.config.ControllerTest
 import spring.webmvc.infrastructure.external.S3Service
-import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 
-@WebMvcTest(FileController::class)
-@Import(WebMvcTestConfig::class)
-class FileControllerTest : MockMvcRestDocsSetup() {
+@ControllerTest([FileController::class])
+class FileControllerTest {
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
     @MockkBean
     private lateinit var s3Service: S3Service
     private lateinit var file: MockMultipartFile

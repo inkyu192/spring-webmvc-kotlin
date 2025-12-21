@@ -28,7 +28,7 @@ class SecurityConfig {
         authenticationExceptionHandler: AuthenticationExceptionHandler,
         accessDeniedExceptionHandler: AccessDeniedExceptionHandler,
         jwtAuthenticationFilter: JwtAuthenticationFilter,
-        jwtExceptionHandler: JwtExceptionHandler
+        jwtExceptionHandler: JwtExceptionHandler,
     ): SecurityFilterChain = httpSecurity
         .csrf { it.disable() }
         .anonymous { it.disable() }

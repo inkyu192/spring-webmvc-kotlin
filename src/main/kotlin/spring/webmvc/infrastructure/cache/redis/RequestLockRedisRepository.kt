@@ -22,7 +22,14 @@ class RequestLockRedisRepository(
         return runCatching {
             redisTemplate.opsForValue().setIfAbsent(key, "1", LOCK_TIMEOUT) ?: false
         }.onFailure {
-            logger.error("Failed to acquire request lock for method={}, uri={}, hash={}: {}", method, uri, hash, it.message, it)
+            logger.error(
+                "Failed to acquire request lock for method={}, uri={}, hash={}: {}",
+                method,
+                uri,
+                hash,
+                it.message,
+                it
+            )
         }.getOrElse { false }
     }
 }

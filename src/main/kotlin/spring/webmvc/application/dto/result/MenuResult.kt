@@ -4,5 +4,5 @@ data class MenuResult(
     val id: Long,
     val name: String,
     val path: String?,
-    val children: List<MenuResult>
+    val children: List<MenuResult>,
 )

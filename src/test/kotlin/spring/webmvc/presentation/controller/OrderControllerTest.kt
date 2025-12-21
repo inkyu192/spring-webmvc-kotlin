@@ -5,8 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -16,6 +15,7 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.dto.command.OrderProductCreateCommand
@@ -24,13 +24,14 @@ import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.OrderProduct
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
+import spring.webmvc.infrastructure.config.ControllerTest
 import java.time.Instant
 
-@WebMvcTest(OrderController::class)
-@Import(WebMvcTestConfig::class)
-class OrderControllerTest() : MockMvcRestDocsSetup() {
+@ControllerTest([OrderController::class])
+class OrderControllerTest {
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
     @MockkBean
     private lateinit var orderService: OrderService
     private lateinit var order: Order

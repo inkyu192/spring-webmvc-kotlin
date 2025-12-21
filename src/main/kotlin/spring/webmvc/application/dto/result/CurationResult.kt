@@ -29,6 +29,7 @@ data class CurationProductResult(
         curation = CurationResult(curation),
         productPage = productPage.map { ProductResult(it) },
     )
+
     constructor(curationProduct: CurationProductCache) : this(
         curation = CurationResult(curationProduct.curation),
         productPage = curationProduct.productPage.map { ProductResult(it) },

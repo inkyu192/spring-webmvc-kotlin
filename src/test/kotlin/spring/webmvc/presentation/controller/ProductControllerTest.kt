@@ -4,14 +4,14 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.*
 import spring.webmvc.application.dto.result.AccommodationResult
@@ -26,15 +26,16 @@ import spring.webmvc.domain.model.entity.Flight
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Ticket
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.infrastructure.config.ControllerTest
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
-import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-@WebMvcTest(ProductController::class)
-@Import(WebMvcTestConfig::class)
-class ProductControllerTest() : MockMvcRestDocsSetup() {
+@ControllerTest([ProductController::class])
+class ProductControllerTest {
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
     @MockkBean
     private lateinit var productService: ProductService
     private lateinit var accommodation: Accommodation
@@ -682,7 +683,7 @@ class ProductControllerTest() : MockMvcRestDocsSetup() {
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("ticketId").description("티켓아이디"),
                         PayloadDocumentation.fieldWithPath("place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("performanceTime").description(  "공연 시간"),
+                        PayloadDocumentation.fieldWithPath("performanceTime").description("공연 시간"),
                         PayloadDocumentation.fieldWithPath("duration").description("공연 시간"),
                         PayloadDocumentation.fieldWithPath("ageLimit").description("관람 연령")
                     )

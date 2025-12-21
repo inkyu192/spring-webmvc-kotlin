@@ -20,7 +20,7 @@ data class ProductCache(
             price: Long,
             quantity: Long,
             category: Category,
-            createdAt: Instant
+            createdAt: Instant,
         ) = ProductCache(
             id = id,
             name = name,

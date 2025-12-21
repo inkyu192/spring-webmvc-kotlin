@@ -15,7 +15,7 @@ import spring.webmvc.presentation.dto.response.OrderResponse
 @RestController
 @RequestMapping("/orders")
 class OrderController(
-    private val orderService: OrderService
+    private val orderService: OrderService,
 ) {
     @PostMapping
     @PreAuthorize("isAuthenticated()")

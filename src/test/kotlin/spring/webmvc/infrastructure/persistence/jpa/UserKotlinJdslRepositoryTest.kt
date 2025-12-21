@@ -1,7 +1,6 @@
 package spring.webmvc.infrastructure.persistence.jpa
 
 import com.linecorp.kotlinjdsl.render.jpql.JpqlRenderContext
-import io.mockk.every
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -13,7 +12,6 @@ import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.RepositoryTest
-import spring.webmvc.infrastructure.crypto.CryptoService
 import java.time.Instant
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -22,7 +20,6 @@ import java.time.temporal.ChronoUnit
 class UserKotlinJdslRepositoryTest(
     @Autowired private val entityManager: EntityManager,
     @Autowired private val jpqlRenderContext: JpqlRenderContext,
-    @Autowired private val cryptoService: CryptoService,
 ) {
     private val userKotlinJdslRepository = UserKotlinJdslRepository(entityManager, jpqlRenderContext)
 
@@ -32,8 +29,6 @@ class UserKotlinJdslRepositoryTest(
 
     @BeforeEach
     fun setUp() {
-        every { cryptoService.encrypt(any()) } answers { firstArg() }
-        every { cryptoService.decrypt(any()) } answers { firstArg() }
 
         user1 = User.create(
             name = "홍길동",

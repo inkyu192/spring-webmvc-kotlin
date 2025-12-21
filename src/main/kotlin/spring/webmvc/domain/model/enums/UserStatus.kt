@@ -1,7 +1,7 @@
 package spring.webmvc.domain.model.enums
 
 enum class UserStatus(
-    val description: String
+    val description: String,
 ) {
     PENDING("대기"),
     ACTIVE("활성"),

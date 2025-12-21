@@ -9,7 +9,7 @@ data class CursorPage<T>(
     constructor(
         content: List<T>,
         size: Int,
-        getCursorId: (T) -> Long?
+        getCursorId: (T) -> Long?,
     ) : this(
         content = if (content.size > size) content.dropLast(1) else content,
         size = size,

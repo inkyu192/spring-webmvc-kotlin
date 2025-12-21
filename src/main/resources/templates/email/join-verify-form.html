@@ -154,47 +154,51 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="verifyForm">
-            <h1>이메일 인증</h1>
-            <p class="subtitle">잠시만 기다려주세요...</p>
+<div class="container">
+    <div id="verifyForm">
+        <h1>이메일 인증</h1>
+        <p class="subtitle">잠시만 기다려주세요...</p>
 
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
 
-            <form id="joinVerifyForm" style="display: none;">
-                <input type="hidden" id="token" th:value="${token}">
+        <form id="joinVerifyForm" style="display: none;">
+            <input type="hidden" id="token" th:value="${token}">
 
-                <button type="submit" id="submitButton">
-                    <span id="buttonText">인증 완료</span>
-                    <span id="loading"><span class="spinner"></span>처리 중...</span>
-                </button>
-            </form>
-        </div>
-
+            <button type="submit" id="submitButton">
+                <span id="buttonText">인증 완료</span>
+                <span id="loading"><span class="spinner"></span>처리 중...</span>
+            </button>
+        </form>
     </div>
 
-    <script>
-        // 페이지 로드 시 자동으로 인증 확인 API 호출
-        window.addEventListener('DOMContentLoaded', function() {
-            const token = document.getElementById('token').value;
-            const errorMessage = document.getElementById('errorMessage');
+</div>
 
-            // API 호출
-            fetch('/auth/join/verify/confirm', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    token: token
-                })
+<script>
+    // 페이지 로드 시 자동으로 인증 확인 API 호출
+    window.addEventListener('DOMContentLoaded', function () {
+        const token = document.getElementById('token').value;
+        const errorMessage = document.getElementById('errorMessage');
+
+        // API 호출
+        fetch('/auth/join/verify/confirm', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: token
             })
+        })
             .then(response => {
                 if (response.ok) {
                     window.location.href = '/auth/join/verify/success';
@@ -208,7 +212,7 @@
                 errorMessage.textContent = error.message || '오류가 발생했습니다. 다시 시도해주세요.';
                 errorMessage.style.display = 'block';
             });
-        });
-    </script>
+    });
+</script>
 </body>
 </html>

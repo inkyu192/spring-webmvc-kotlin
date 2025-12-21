@@ -6,4 +6,4 @@ abstract class AbstractHttpException(
     val httpStatus: HttpStatus,
     message: String,
     throwable: Throwable? = null,
-): RuntimeException(message, throwable)
+) : RuntimeException(message, throwable)

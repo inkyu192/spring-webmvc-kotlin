@@ -3,7 +3,7 @@ package spring.webmvc.domain.model.enums
 import com.fasterxml.jackson.annotation.JsonCreator
 
 enum class DeliveryStatus(
-    val description: String
+    val description: String,
 ) {
     READY("준비"),
     CANCEL("취소"),

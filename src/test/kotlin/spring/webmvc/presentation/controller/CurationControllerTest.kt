@@ -5,14 +5,14 @@ import io.mockk.every
 import io.mockk.spyk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.result.CurationProductResult
@@ -21,13 +21,14 @@ import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.Flight
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
+import spring.webmvc.infrastructure.config.ControllerTest
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
-import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
 
-@WebMvcTest(CurationController::class)
-@Import(WebMvcTestConfig::class)
-class CurationControllerTest() : MockMvcRestDocsSetup() {
+@ControllerTest([CurationController::class])
+class CurationControllerTest {
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
     @MockkBean
     private lateinit var curationService: CurationService
     private lateinit var curation1: Curation

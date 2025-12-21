@@ -7,25 +7,26 @@ import io.mockk.runs
 import io.mockk.spyk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.result.TokenResult
 import spring.webmvc.application.service.AuthService
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Phone
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
+import spring.webmvc.infrastructure.config.ControllerTest
 import java.time.LocalDate
 
-@WebMvcTest(AuthController::class)
-@Import(WebMvcTestConfig::class)
-class AuthControllerTest : MockMvcRestDocsSetup() {
+@ControllerTest([AuthController::class])
+class AuthControllerTest {
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
     @MockkBean
     private lateinit var authService: AuthService
     private lateinit var accessToken: String

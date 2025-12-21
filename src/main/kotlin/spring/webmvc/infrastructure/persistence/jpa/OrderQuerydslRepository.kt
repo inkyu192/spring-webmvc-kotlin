@@ -30,7 +30,8 @@ class OrderQuerydslRepository(
             .join(order.user, user).fetchJoin()
             .where(
                 eqUserId(userId = userId),
-                eqOrderStatus(orderStatus = orderStatus))
+                eqOrderStatus(orderStatus = orderStatus)
+            )
             .limit(pageable.pageSize.toLong())
             .offset(pageable.offset)
             .fetch()

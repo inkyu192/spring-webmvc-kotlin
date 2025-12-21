@@ -15,6 +15,7 @@ interface UserRepository {
         createdFrom: Instant,
         createdTo: Instant,
     ): Page<User>
+
     fun save(user: User): User
     fun existsByPhone(phone: Phone): Boolean
 }

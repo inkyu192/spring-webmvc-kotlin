@@ -26,7 +26,7 @@ class HttpLogFilter(
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         if (isLogExclude(request)) {
             filterChain.doFilter(request, response)

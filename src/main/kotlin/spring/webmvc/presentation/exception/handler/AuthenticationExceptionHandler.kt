@@ -18,7 +18,7 @@ class AuthenticationExceptionHandler(
     override fun commence(
         request: HttpServletRequest?,
         response: HttpServletResponse?,
-        exception: AuthenticationException?
+        exception: AuthenticationException?,
     ) {
         val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception?.message).apply {
             type = uriFactory.createApiDocUri(HttpStatus.UNAUTHORIZED)

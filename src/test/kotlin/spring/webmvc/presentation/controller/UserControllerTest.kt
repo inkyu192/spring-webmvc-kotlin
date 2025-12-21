@@ -6,8 +6,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.headers.HeaderDocumentation
@@ -18,6 +17,7 @@ import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.result.UserDetail
 import spring.webmvc.application.service.UserService
@@ -26,15 +26,16 @@ import spring.webmvc.domain.model.entity.UserCredential
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
-import spring.webmvc.infrastructure.config.WebMvcTestConfig
-import spring.webmvc.presentation.controller.support.MockMvcRestDocsSetup
+import spring.webmvc.infrastructure.config.ControllerTest
 import java.time.Instant
 import java.time.LocalDate
 
 
-@WebMvcTest(UserController::class)
-@Import(WebMvcTestConfig::class)
-class UserControllerTest : MockMvcRestDocsSetup() {
+@ControllerTest([UserController::class])
+class UserControllerTest {
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
     @MockkBean
     private lateinit var userService: UserService
     private lateinit var user: User

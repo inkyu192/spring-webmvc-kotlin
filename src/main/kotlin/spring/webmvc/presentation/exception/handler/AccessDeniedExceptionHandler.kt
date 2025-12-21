@@ -18,7 +18,7 @@ class AccessDeniedExceptionHandler(
     override fun handle(
         request: HttpServletRequest?,
         response: HttpServletResponse?,
-        exception: AccessDeniedException?
+        exception: AccessDeniedException?,
     ) {
         val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception?.message).apply {
             type = uriFactory.createApiDocUri(HttpStatus.FORBIDDEN)

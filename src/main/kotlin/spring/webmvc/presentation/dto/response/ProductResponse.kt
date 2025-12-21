@@ -23,7 +23,7 @@ open class ProductResponse(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val createdAt: Instant
+    val createdAt: Instant,
 ) {
     constructor(productResult: ProductResult) : this(
         id = productResult.id,

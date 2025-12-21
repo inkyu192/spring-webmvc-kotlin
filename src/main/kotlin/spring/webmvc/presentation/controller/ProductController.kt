@@ -53,7 +53,7 @@ class ProductController(
     @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
     fun updateProduct(
         @PathVariable id: Long,
-        @RequestBody @Validated productUpdateRequest: ProductUpdateRequest
+        @RequestBody @Validated productUpdateRequest: ProductUpdateRequest,
     ): ProductResponse {
         val command = productUpdateRequest.toCommand()
         val productResult = productService.updateProduct(id = id, productUpdateCommand = command)

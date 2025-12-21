@@ -1,7 +1,7 @@
 package spring.webmvc.domain.model.enums
 
 enum class Category(
-    val description: String
+    val description: String,
 ) {
     FLIGHT("항공권"),
     ACCOMMODATION("숙박"),

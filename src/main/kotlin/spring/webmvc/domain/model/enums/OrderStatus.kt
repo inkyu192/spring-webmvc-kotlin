@@ -3,7 +3,7 @@ package spring.webmvc.domain.model.enums
 import com.fasterxml.jackson.annotation.JsonCreator
 
 enum class OrderStatus(
-    val description: String
+    val description: String,
 ) {
     ORDER("주문"),
     CONFIRM("확정"),

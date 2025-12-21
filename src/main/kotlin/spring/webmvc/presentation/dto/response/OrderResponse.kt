@@ -8,7 +8,7 @@ data class OrderResponse(
     val id: Long,
     val orderedAt: Instant,
     val status: OrderStatus,
-    val products: List<OrderProductResponse>
+    val products: List<OrderProductResponse>,
 ) {
     constructor(order: Order) : this(
         id = checkNotNull(order.id),
