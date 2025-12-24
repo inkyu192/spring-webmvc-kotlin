@@ -11,7 +11,7 @@ class AccommodationResult : ProductResult {
     val checkInTime: Instant
     val checkOutTime: Instant
 
-    constructor(accommodation: Accommodation) : super(product = accommodation) {
+    constructor(accommodation: Accommodation) : super(product = accommodation.product) {
         this.accommodationId = checkNotNull(accommodation.id)
         this.place = accommodation.place
         this.checkInTime = accommodation.checkInTime

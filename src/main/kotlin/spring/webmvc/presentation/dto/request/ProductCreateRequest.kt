@@ -13,8 +13,7 @@ import spring.webmvc.domain.model.enums.Category
     visible = true
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(value = TicketCreateRequest::class, name = "TICKET"),
-    JsonSubTypes.Type(value = FlightCreateRequest::class, name = "FLIGHT"),
+    JsonSubTypes.Type(value = TransportCreateRequest::class, name = "TRANSPORT"),
     JsonSubTypes.Type(value = AccommodationCreateRequest::class, name = "ACCOMMODATION"),
 )
 abstract class ProductCreateRequest(

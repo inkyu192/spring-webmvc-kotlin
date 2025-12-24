@@ -3,16 +3,14 @@ package spring.webmvc.application.dto.command
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
-class FlightUpdateCommand(
+class TransportUpdateCommand(
     category: Category,
     name: String,
     description: String,
     price: Long,
     quantity: Long,
-    val airline: String,
-    val flightNumber: String,
-    val departureAirport: String,
-    val arrivalAirport: String,
+    val departureLocation: String,
+    val arrivalLocation: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
 ) : ProductUpdateCommand(

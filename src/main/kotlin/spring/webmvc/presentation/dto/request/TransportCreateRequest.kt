@@ -1,19 +1,19 @@
 package spring.webmvc.presentation.dto.request
 
-import spring.webmvc.application.dto.command.TicketCreateCommand
+import spring.webmvc.application.dto.command.TransportCreateCommand
 import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
-class TicketCreateRequest(
+class TransportCreateRequest(
     category: Category,
     name: String,
     description: String,
     price: Long,
     quantity: Long,
-    val place: String,
-    val performanceTime: Instant,
-    val duration: String,
-    val ageLimit: String,
+    val departureLocation: String,
+    val arrivalLocation: String,
+    val departureTime: Instant,
+    val arrivalTime: Instant,
 ) : ProductCreateRequest(
     category = category,
     name = name,
@@ -22,15 +22,15 @@ class TicketCreateRequest(
     quantity = quantity,
 ) {
     override fun toCommand() =
-        TicketCreateCommand(
+        TransportCreateCommand(
             category = category,
             name = name,
             description = description,
             price = price,
             quantity = quantity,
-            place = place,
-            performanceTime = performanceTime,
-            duration = duration,
-            ageLimit = ageLimit,
+            departureLocation = departureLocation,
+            arrivalLocation = arrivalLocation,
+            departureTime = departureTime,
+            arrivalTime = arrivalTime,
         )
 }

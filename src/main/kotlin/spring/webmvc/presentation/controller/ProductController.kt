@@ -5,14 +5,16 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.dto.result.AccommodationResult
-import spring.webmvc.application.dto.result.FlightResult
 import spring.webmvc.application.dto.result.ProductResult
-import spring.webmvc.application.dto.result.TicketResult
+import spring.webmvc.application.dto.result.TransportResult
 import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.presentation.dto.request.ProductCreateRequest
 import spring.webmvc.presentation.dto.request.ProductUpdateRequest
-import spring.webmvc.presentation.dto.response.*
+import spring.webmvc.presentation.dto.response.AccommodationResponse
+import spring.webmvc.presentation.dto.response.ProductPageResponse
+import spring.webmvc.presentation.dto.response.ProductResponse
+import spring.webmvc.presentation.dto.response.TransportResponse
 
 @RestController
 @RequestMapping("/products")
@@ -69,8 +71,7 @@ class ProductController(
 
     private fun toProductResponse(productResult: ProductResult): ProductResponse {
         return when (productResult.category) {
-            Category.TICKET -> TicketResponse(productResult as TicketResult)
-            Category.FLIGHT -> FlightResponse(productResult as FlightResult)
+            Category.TRANSPORT -> TransportResponse.from(productResult as TransportResult)
             Category.ACCOMMODATION -> AccommodationResponse(productResult as AccommodationResult)
         }
     }

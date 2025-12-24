@@ -2,18 +2,18 @@ package spring.webmvc.domain.model.cache
 
 import java.time.Instant
 
-data class TicketCache(
+data class TransportCache(
     val id: Long,
     val name: String,
     val description: String,
     val price: Long,
     val quantity: Long,
     val createdAt: Instant,
-    val ticketId: Long,
-    val place: String,
-    val performanceTime: Instant,
-    val duration: String,
-    val ageLimit: String,
+    val transportId: Long,
+    val departureLocation: String,
+    val arrivalLocation: String,
+    val departureTime: Instant,
+    val arrivalTime: Instant,
 ) {
     companion object {
         fun create(
@@ -23,23 +23,23 @@ data class TicketCache(
             price: Long,
             quantity: Long,
             createdAt: Instant,
-            ticketId: Long,
-            place: String,
-            performanceTime: Instant,
-            duration: String,
-            ageLimit: String,
-        ) = TicketCache(
+            transportId: Long,
+            departureLocation: String,
+            arrivalLocation: String,
+            departureTime: Instant,
+            arrivalTime: Instant,
+        ) = TransportCache(
             id = id,
             name = name,
             description = description,
             price = price,
             quantity = quantity,
             createdAt = createdAt,
-            ticketId = ticketId,
-            place = place,
-            performanceTime = performanceTime,
-            duration = duration,
-            ageLimit = ageLimit,
+            transportId = transportId,
+            departureLocation = departureLocation,
+            arrivalLocation = arrivalLocation,
+            departureTime = departureTime,
+            arrivalTime = arrivalTime,
         )
     }
 }

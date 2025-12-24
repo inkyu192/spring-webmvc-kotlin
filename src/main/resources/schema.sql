@@ -4,9 +4,8 @@ DROP TABLE IF EXISTS curation_product;
 DROP TABLE IF EXISTS curation;
 DROP TABLE IF EXISTS order_product;
 DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS ticket;
 DROP TABLE IF EXISTS accommodation;
-DROP TABLE IF EXISTS flight;
+DROP TABLE IF EXISTS transport;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS permission_menu;
 DROP TABLE IF EXISTS role_permission;
@@ -169,16 +168,14 @@ CREATE TABLE product
     updated_at  DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
 
-CREATE TABLE flight
+CREATE TABLE transport
 (
-    id                BIGINT       NOT NULL PRIMARY KEY,
-    airline           VARCHAR(255) NOT NULL,
-    flight_number     VARCHAR(255) NOT NULL,
-    departure_airport VARCHAR(255) NOT NULL,
-    arrival_airport   VARCHAR(255) NOT NULL,
-    departure_time    DATETIME(6)  NOT NULL,
-    arrival_time      DATETIME(6)  NOT NULL,
-    CONSTRAINT fk_flight_product FOREIGN KEY (id) REFERENCES product (id)
+    id                 BIGINT       NOT NULL PRIMARY KEY,
+    departure_location VARCHAR(255) NOT NULL,
+    arrival_location   VARCHAR(255) NOT NULL,
+    departure_time     DATETIME(6)  NOT NULL,
+    arrival_time       DATETIME(6)  NOT NULL,
+    CONSTRAINT fk_transport_product FOREIGN KEY (id) REFERENCES product (id)
 );
 
 CREATE TABLE accommodation
@@ -188,16 +185,6 @@ CREATE TABLE accommodation
     check_in_time  DATETIME(6)  NOT NULL,
     check_out_time DATETIME(6)  NOT NULL,
     CONSTRAINT fk_accommodation_product FOREIGN KEY (id) REFERENCES product (id)
-);
-
-CREATE TABLE ticket
-(
-    id               BIGINT       NOT NULL PRIMARY KEY,
-    place            VARCHAR(255) NOT NULL,
-    performance_time DATETIME(6)  NOT NULL,
-    duration         VARCHAR(255) NOT NULL,
-    age_limit        VARCHAR(255) NOT NULL,
-    CONSTRAINT fk_ticket_product FOREIGN KEY (id) REFERENCES product (id)
 );
 
 CREATE TABLE orders

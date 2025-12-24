@@ -5,16 +5,17 @@ import spring.webmvc.domain.model.enums.Category
 import java.time.Instant
 
 @Entity
-@Table(name = "accommodation")
-class Accommodation(
+@Table(name = "transport")
+class Transport(
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     val product: Product,
 
-    var place: String,
-    var checkInTime: Instant,
-    var checkOutTime: Instant,
+    var departureLocation: String,
+    var arrivalLocation: String,
+    var departureTime: Instant,
+    var arrivalTime: Instant,
 ) {
     @Id
     @Column(name = "product_id")
@@ -27,22 +28,24 @@ class Accommodation(
             description: String,
             price: Long,
             quantity: Long,
-            place: String,
-            checkInTime: Instant,
-            checkOutTime: Instant,
-        ): Accommodation {
+            departureLocation: String,
+            arrivalLocation: String,
+            departureTime: Instant,
+            arrivalTime: Instant,
+        ): Transport {
             val product = Product.create(
-                category = Category.ACCOMMODATION,
+                category = Category.TRANSPORT,
                 name = name,
                 description = description,
                 price = price,
                 quantity = quantity
             )
-            return Accommodation(
+            return Transport(
                 product = product,
-                place = place,
-                checkInTime = checkInTime,
-                checkOutTime = checkOutTime
+                departureLocation = departureLocation,
+                arrivalLocation = arrivalLocation,
+                departureTime = departureTime,
+                arrivalTime = arrivalTime
             )
         }
     }
@@ -52,13 +55,15 @@ class Accommodation(
         description: String,
         price: Long,
         quantity: Long,
-        place: String,
-        checkInTime: Instant,
-        checkOutTime: Instant,
+        departureLocation: String,
+        arrivalLocation: String,
+        departureTime: Instant,
+        arrivalTime: Instant,
     ) {
         product.update(name, description, price, quantity)
-        this.place = place
-        this.checkInTime = checkInTime
-        this.checkOutTime = checkOutTime
+        this.departureLocation = departureLocation
+        this.arrivalLocation = arrivalLocation
+        this.departureTime = departureTime
+        this.arrivalTime = arrivalTime
     }
 }

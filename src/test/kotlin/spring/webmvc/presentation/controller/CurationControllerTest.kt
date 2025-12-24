@@ -20,7 +20,9 @@ import spring.webmvc.application.dto.result.CurationResult
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Curation
-import spring.webmvc.domain.model.entity.Flight
+import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.model.entity.Transport
+import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.ControllerTest
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
@@ -34,7 +36,7 @@ class CurationControllerTest {
     private lateinit var curation1: Curation
     private lateinit var curation2: Curation
     private lateinit var product1: Accommodation
-    private lateinit var product2: Flight
+    private lateinit var product2: Transport
 
     @BeforeEach
     fun setUp() {
@@ -54,28 +56,40 @@ class CurationControllerTest {
             )
         ).apply { every { id } returns 2L }
 
-        product1 = spyk(
-            Accommodation.create(
+        val mockProduct1 = spyk(
+            Product.create(
+                category = Category.ACCOMMODATION,
                 name = "제주도 호텔",
                 description = "제주도 3박4일",
                 price = 100000L,
-                quantity = 10L,
+                quantity = 10L
+            )
+        ).apply { every { id } returns 1L }
+
+        product1 = spyk(
+            Accommodation(
+                product = mockProduct1,
                 place = "제주도",
                 checkInTime = java.time.Instant.now(),
                 checkOutTime = java.time.Instant.now().plusSeconds(3600 * 24 * 4)
             )
         ).apply { every { id } returns 1L }
 
-        product2 = spyk(
-            Flight.create(
-                name = "부산 항공권",
-                description = "부산 왕복 항공권",
+        val mockProduct2 = spyk(
+            Product.create(
+                category = Category.TRANSPORT,
+                name = "부산 교통편",
+                description = "부산 왕복 교통편",
                 price = 200000L,
-                quantity = 5L,
-                airline = "Korean Air",
-                flightNumber = "KE1234",
-                departureAirport = "ICN",
-                arrivalAirport = "PUS",
+                quantity = 5L
+            )
+        ).apply { every { id } returns 2L }
+
+        product2 = spyk(
+            Transport(
+                product = mockProduct2,
+                departureLocation = "Seoul",
+                arrivalLocation = "Busan",
                 departureTime = java.time.Instant.now(),
                 arrivalTime = java.time.Instant.now().plusSeconds(3600 * 2)
             )
@@ -161,7 +175,7 @@ class CurationControllerTest {
         val size = 10
         val cursorId = null
 
-        val cursorPage = CursorPage(listOf(product1, product2), size, false, null)
+        val cursorPage = CursorPage(listOf(product1.product, product2.product), size, false, null)
         val curationProductResult = CurationProductResult(curation1, cursorPage)
 
         every { curationService.findCurationProduct(curationId, cursorId, size) } returns curationProductResult
