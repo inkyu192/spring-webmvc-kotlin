@@ -36,7 +36,8 @@ CREATE TABLE users
 
 CREATE TABLE user_credential
 (
-    user_id     BIGINT PRIMARY KEY,
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id     BIGINT       NOT NULL UNIQUE,
     email       VARCHAR(255) NOT NULL UNIQUE,
     password    VARCHAR(255) NOT NULL,
     verified_at DATETIME(6),
@@ -170,21 +171,23 @@ CREATE TABLE product
 
 CREATE TABLE transport
 (
-    id                 BIGINT       NOT NULL PRIMARY KEY,
+    id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
+    product_id         BIGINT       NOT NULL UNIQUE,
     departure_location VARCHAR(255) NOT NULL,
     arrival_location   VARCHAR(255) NOT NULL,
     departure_time     DATETIME(6)  NOT NULL,
     arrival_time       DATETIME(6)  NOT NULL,
-    CONSTRAINT fk_transport_product FOREIGN KEY (id) REFERENCES product (id)
+    CONSTRAINT fk_transport_product FOREIGN KEY (product_id) REFERENCES product (id)
 );
 
 CREATE TABLE accommodation
 (
-    id             BIGINT       NOT NULL PRIMARY KEY,
+    id             BIGINT PRIMARY KEY AUTO_INCREMENT,
+    product_id     BIGINT       NOT NULL UNIQUE,
     place          VARCHAR(255) NOT NULL,
     check_in_time  DATETIME(6)  NOT NULL,
     check_out_time DATETIME(6)  NOT NULL,
-    CONSTRAINT fk_accommodation_product FOREIGN KEY (id) REFERENCES product (id)
+    CONSTRAINT fk_accommodation_product FOREIGN KEY (product_id) REFERENCES product (id)
 );
 
 CREATE TABLE orders
@@ -213,6 +216,7 @@ CREATE TABLE curation
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     title      VARCHAR(255) NOT NULL,
+    category   VARCHAR(50)  NOT NULL,
     is_exposed BIT(1)       NOT NULL,
     sort_order BIGINT       NOT NULL,
     created_by BIGINT,

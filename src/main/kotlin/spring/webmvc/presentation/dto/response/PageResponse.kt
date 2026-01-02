@@ -11,24 +11,17 @@ data class OffsetPageResponse(
     val hasNext: Boolean,
     val hasPrevious: Boolean,
 ) {
-    constructor(page: Page<*>) : this(
-        page = page.number,
-        size = page.size,
-        totalElements = page.totalElements,
-        totalPages = page.totalPages,
-        hasNext = page.hasNext(),
-        hasPrevious = page.hasPrevious(),
-    )
-
     companion object {
-        fun from(page: Page<*>) = OffsetPageResponse(
-            page = page.number,
-            size = page.size,
-            totalElements = page.totalElements,
-            totalPages = page.totalPages,
-            hasNext = page.hasNext(),
-            hasPrevious = page.hasPrevious(),
-        )
+        fun from(page: Page<*>): OffsetPageResponse {
+            return OffsetPageResponse(
+                page = page.number,
+                size = page.size,
+                totalElements = page.totalElements,
+                totalPages = page.totalPages,
+                hasNext = page.hasNext(),
+                hasPrevious = page.hasPrevious(),
+            )
+        }
     }
 }
 
@@ -37,9 +30,13 @@ data class CursorPageResponse(
     val hasNext: Boolean?,
     val nextCursorId: Long?,
 ) {
-    constructor(page: CursorPage<*>) : this(
-        size = page.size,
-        hasNext = page.hasNext,
-        nextCursorId = page.nextCursorId,
-    )
+    companion object {
+        fun from(page: CursorPage<*>): CursorPageResponse {
+            return CursorPageResponse(
+                size = page.size,
+                hasNext = page.hasNext,
+                nextCursorId = page.nextCursorId,
+            )
+        }
+    }
 }

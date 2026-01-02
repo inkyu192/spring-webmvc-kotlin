@@ -41,15 +41,6 @@ class ProductRedisRepository(
         }.getOrElse { false }
     }
 
-    override fun deleteProductStock(productId: Long): Boolean {
-        val key = PRODUCT_STOCK_KEY.format(productId)
-        return runCatching {
-            redisTemplate.delete(key)
-        }.onFailure {
-            logger.error("Failed to delete product stock for productId={}: {}", productId, it.message, it)
-        }.getOrElse { false }
-    }
-
     override fun incrementProductViewCount(productId: Long, delta: Long): Long? {
         val key = PRODUCT_VIEW_COUNT_KEY.format(productId)
         return runCatching {

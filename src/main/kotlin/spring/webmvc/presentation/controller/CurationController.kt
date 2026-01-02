@@ -5,10 +5,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
+import spring.webmvc.domain.model.enums.CurationCategory
 import spring.webmvc.presentation.dto.request.CurationCreateRequest
-import spring.webmvc.presentation.dto.response.CurationCreateResponse
 import spring.webmvc.presentation.dto.response.CurationListResponse
 import spring.webmvc.presentation.dto.response.CurationProductResponse
+import spring.webmvc.presentation.dto.response.CurationResponse
 
 @RestController
 @RequestMapping("/curations")
@@ -16,28 +17,36 @@ class CurationController(
     private val curationService: CurationService,
 ) {
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('CURATION_WRITE')")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createCuration(@Valid @RequestBody request: CurationCreateRequest) =
-        CurationCreateResponse(
-            id = curationService.createCuration(
-                command = request.toCommand()
-            )
-        )
+    fun createCuration(@Valid @RequestBody request: CurationCreateRequest): CurationResponse {
+        val command = request.toCommand()
+        val result = curationService.createCuration(command = command)
+
+        return CurationResponse.from(result)
+    }
 
     @GetMapping
-    fun findCurations() = CurationListResponse(resultList = curationService.findCurations())
+    @PreAuthorize("hasAuthority('CURATION_READ')")
+    fun findCurations(
+        @RequestParam category: CurationCategory,
+    ): CurationListResponse {
+        val resultList = curationService.findCurations(category)
+
+        return CurationListResponse.from(resultList)
+    }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('CURATION_READ')")
     fun findCuration(
         @PathVariable id: Long,
-        @RequestParam(required = false, defaultValue = "10") size: Int,
         @RequestParam(required = false) cursorId: Long?,
-    ) = CurationProductResponse(
-        result = curationService.findCurationProduct(
+    ): CurationProductResponse {
+        val result = curationService.findCurationProduct(
             curationId = id,
-            size = size,
             cursorId = cursorId,
         )
-    )
+
+        return CurationProductResponse.from(result)
+    }
 }

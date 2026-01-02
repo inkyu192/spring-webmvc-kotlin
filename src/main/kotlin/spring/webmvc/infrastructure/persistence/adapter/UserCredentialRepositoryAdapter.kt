@@ -17,5 +17,5 @@ class UserCredentialRepositoryAdapter(
 
     override fun existsByEmail(email: Email) = jpaRepository.existsByEmailValue(email.value)
 
-    override fun save(userCredential: UserCredential) = jpaRepository.save(userCredential)
+    override fun save(userCredential: UserCredential): UserCredential = jpaRepository.save(userCredential)
 }

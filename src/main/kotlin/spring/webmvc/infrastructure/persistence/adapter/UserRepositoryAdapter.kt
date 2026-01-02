@@ -33,7 +33,7 @@ class UserRepositoryAdapter(
         createdTo = createdTo,
     )
 
-    override fun save(user: User) = jpaRepository.save(user)
+    override fun save(user: User): User = jpaRepository.save(user)
 
     override fun existsByPhone(phone: Phone) = jpaRepository.existsByPhone(phone)
 }

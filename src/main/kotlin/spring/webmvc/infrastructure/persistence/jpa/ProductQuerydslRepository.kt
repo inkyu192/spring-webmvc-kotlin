@@ -18,7 +18,7 @@ class ProductQuerydslRepository(
             .limit(size.toLong() + 1)
             .fetch()
 
-        return CursorPage(content = content, size = size) { it.id }
+        return CursorPage.create(content = content, size = size) { it.id }
     }
 
     private fun loeProductId(cursorId: Long?) = if (cursorId == null) null else product.id.loe(cursorId)

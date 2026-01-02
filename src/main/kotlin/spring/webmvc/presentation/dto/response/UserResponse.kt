@@ -95,7 +95,7 @@ data class UserPageResponse(
 ) {
     companion object {
         fun from(page: Page<User>) = UserPageResponse(
-            page = OffsetPageResponse(page),
+            page = OffsetPageResponse.from(page),
             users = page.content.map { UserListResponse.from(user = it) },
         )
     }

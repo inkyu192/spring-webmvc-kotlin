@@ -7,7 +7,6 @@ import java.time.Instant
 @Entity
 @Table(name = "user_credential")
 class UserCredential protected constructor(
-    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     val user: User,
@@ -18,7 +17,8 @@ class UserCredential protected constructor(
     password: String,
 ) {
     @Id
-    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     var id: Long? = null
         protected set
 

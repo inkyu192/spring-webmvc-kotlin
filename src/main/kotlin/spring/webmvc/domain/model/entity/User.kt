@@ -48,20 +48,6 @@ class User protected constructor(
     val userPermissions: List<UserPermission>
         get() = _userPermissions.toList()
 
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val _userCompanies = mutableListOf<UserCompany>()
-
-    @get:Transient
-    val userCompanies: List<UserCompany>
-        get() = _userCompanies.toList()
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val _deliveryAddresses = mutableListOf<DeliveryAddress>()
-
-    @get:Transient
-    val deliveryAddresses: List<DeliveryAddress>
-        get() = _deliveryAddresses.toList()
-
     companion object {
         fun create(
             name: String,
@@ -76,18 +62,22 @@ class User protected constructor(
         )
     }
 
-    fun addRole(role: Role) {
-        _userRoles.add(UserRole.create(user = this, role = role))
+    fun addUserRole(userRole: UserRole) {
+        _userRoles.add(userRole)
     }
 
-    fun addPermission(permission: Permission) {
-        _userPermissions.add(UserPermission.create(user = this, permission = permission))
+    fun addUserPermission(userPermission: UserPermission) {
+        _userPermissions.add(userPermission)
     }
 
-    fun update(name: String?, phone: Phone?, birthday: LocalDate?, gender: Gender?) {
-        name?.let { this.name = it }
-        phone?.let { this.phone = it }
-        birthday?.let { this.birthday = it }
-        gender?.let { this.gender = it }
+    fun getPermissionNames(): List<String> {
+        val rolePermissions = userRoles
+            .flatMap { it.role.rolePermissions }
+            .map { it.permission.name }
+
+        val directPermissions = userPermissions
+            .map { it.permission.name }
+
+        return (rolePermissions + directPermissions).distinct()
     }
 }

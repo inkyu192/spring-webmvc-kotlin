@@ -29,11 +29,4 @@ class Company protected constructor(
     @Embedded
     var phone = phone
         protected set
-
-    @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val _userCompanies = mutableListOf<UserCompany>()
-
-    @get:Transient
-    val userCompanies: List<UserCompany>
-        get() = _userCompanies.toList()
 }

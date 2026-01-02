@@ -1,6 +1,7 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
 import org.springframework.stereotype.Component
+import spring.webmvc.domain.model.entity.Role
 import spring.webmvc.domain.repository.RoleRepository
 import spring.webmvc.infrastructure.persistence.jpa.RoleJpaRepository
 
@@ -8,5 +9,5 @@ import spring.webmvc.infrastructure.persistence.jpa.RoleJpaRepository
 class RoleRepositoryAdapter(
     private val jpaRepository: RoleJpaRepository,
 ) : RoleRepository {
-    override fun findAllById(ids: Iterable<Long>) = jpaRepository.findAllById(ids)
+    override fun findAllById(ids: Iterable<Long>): List<Role> = jpaRepository.findAllById(ids)
 }

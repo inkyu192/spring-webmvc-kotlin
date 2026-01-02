@@ -7,4 +7,6 @@ interface ProductRepository {
     fun findById(id: Long): Product
     fun findAllById(ids: Iterable<Long>): List<Product>
     fun findWithCursorPage(cursorId: Long?, size: Int, name: String?): CursorPage<Product>
+    fun save(product: Product): Product
+    fun delete(product: Product)
 }

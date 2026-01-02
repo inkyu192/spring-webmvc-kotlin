@@ -19,6 +19,7 @@ import spring.webmvc.domain.repository.UserCredentialRepository
 import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
+import spring.webmvc.domain.service.UserDomainService
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
 import spring.webmvc.infrastructure.security.JwtProvider
 
@@ -34,6 +35,7 @@ class AuthService(
     private val eventPublisher: ApplicationEventPublisher,
     private val roleRepository: RoleRepository,
     private val permissionRepository: PermissionRepository,
+    private val userDomainService: UserDomainService,
 ) {
     @Transactional
     fun signUp(command: SignUpCommand): User {
@@ -45,24 +47,19 @@ class AuthService(
             throw DuplicateEntityException(kClass = User::class, name = command.phone.value)
         }
 
-        val user = User.create(
+        val roles = roleRepository.findAllById(command.roleIds)
+        val permissions = permissionRepository.findAllById(command.permissionIds)
+
+        val (user, userCredential) = userDomainService.createUserWithCredential(
             name = command.name,
             phone = command.phone,
             gender = command.gender,
             birthday = command.birthday,
-        )
-
-        val userCredential = UserCredential.create(
-            user = user,
             email = command.email,
-            password = passwordEncoder.encode(command.password),
+            password = command.password,
+            roles = roles,
+            permissions = permissions,
         )
-
-        val roles = roleRepository.findAllById(command.roleIds)
-        val permissions = permissionRepository.findAllById(command.permissionIds)
-
-        roles.forEach { user.addRole(it) }
-        permissions.forEach { user.addPermission(it) }
 
         userRepository.save(user)
         userCredentialRepository.save(userCredential)
@@ -90,7 +87,7 @@ class AuthService(
 
         val accessToken = jwtProvider.createAccessToken(
             userId = userId,
-            permissions = getPermissions(user)
+            permissions = user.getPermissionNames()
         )
         val refreshToken = jwtProvider.createRefreshToken()
 
@@ -113,7 +110,7 @@ class AuthService(
         return TokenResult(
             accessToken = jwtProvider.createAccessToken(
                 userId = userId,
-                permissions = getPermissions(user),
+                permissions = user.getPermissionNames(),
             ),
             refreshToken = command.refreshToken,
         )
@@ -129,17 +126,6 @@ class AuthService(
             }
 
         return claims["userId"].toString().toLong()
-    }
-
-    private fun getPermissions(user: User): List<String> {
-        val rolePermissions = user.userRoles
-            .flatMap { it.role.rolePermissions }
-            .map { it.permission.name }
-
-        val directPermissions = user.userPermissions
-            .map { it.permission.name }
-
-        return (rolePermissions + directPermissions).distinct()
     }
 
     fun requestJoinVerify(command: JoinVerifyRequestCommand) {

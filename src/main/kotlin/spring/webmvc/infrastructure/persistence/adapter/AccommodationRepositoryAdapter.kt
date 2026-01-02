@@ -12,7 +12,11 @@ class AccommodationRepositoryAdapter(
 ) : AccommodationRepository {
     override fun findById(id: Long): Accommodation = jpaRepository.findByIdOrThrow(id)
 
-    override fun save(accommodation: Accommodation) = jpaRepository.save(accommodation)
+    override fun findByProductId(productId: Long): Accommodation =
+        jpaRepository.findByProductId(productId)
+            ?: throw NoSuchElementException("Accommodation not found with product id: $productId")
+
+    override fun save(accommodation: Accommodation): Accommodation = jpaRepository.save(accommodation)
 
     override fun delete(accommodation: Accommodation) {
         jpaRepository.delete(accommodation)

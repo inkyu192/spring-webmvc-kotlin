@@ -1,10 +1,12 @@
 package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
+import spring.webmvc.domain.model.enums.CurationCategory
 
 @Entity
 class Curation protected constructor(
     title: String,
+    category: CurationCategory,
     isExposed: Boolean,
     sortOrder: Long,
 ) : BaseCreator() {
@@ -14,6 +16,10 @@ class Curation protected constructor(
         protected set
 
     var title = title
+        protected set
+
+    @Enumerated(EnumType.STRING)
+    var category = category
         protected set
 
     var isExposed = isExposed
@@ -30,8 +36,8 @@ class Curation protected constructor(
         get() = _curationProducts.toList()
 
     companion object {
-        fun create(title: String, isExposed: Boolean, sortOrder: Long) =
-            Curation(title = title, isExposed = isExposed, sortOrder = sortOrder)
+        fun create(title: String, category: CurationCategory, isExposed: Boolean, sortOrder: Long) =
+            Curation(title = title, category = category, isExposed = isExposed, sortOrder = sortOrder)
     }
 
     fun addProduct(curationProduct: CurationProduct) {

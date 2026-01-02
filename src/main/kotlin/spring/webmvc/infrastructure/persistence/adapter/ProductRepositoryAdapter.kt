@@ -14,8 +14,12 @@ class ProductRepositoryAdapter(
 ) : ProductRepository {
     override fun findById(id: Long): Product = jpaRepository.findByIdOrThrow(id)
 
-    override fun findAllById(ids: Iterable<Long>) = jpaRepository.findAllById(ids)
+    override fun findAllById(ids: Iterable<Long>): List<Product> = jpaRepository.findAllById(ids)
 
     override fun findWithCursorPage(cursorId: Long?, size: Int, name: String?) =
         querydslRepository.findAll(cursorId = cursorId, size = size, name = name)
+
+    override fun save(product: Product): Product = jpaRepository.save(product)
+
+    override fun delete(product: Product) = jpaRepository.delete(product)
 }

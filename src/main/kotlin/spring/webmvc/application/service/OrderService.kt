@@ -1,21 +1,22 @@
 package spring.webmvc.application.service
 
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import spring.webmvc.application.dto.command.OrderCancelCommand
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.dto.command.OrderProductCreateCommand
+import spring.webmvc.application.dto.query.OrderFindByIdQuery
+import spring.webmvc.application.dto.query.OrderFindQuery
+import spring.webmvc.application.dto.result.OrderResult
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.Product
-import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.domain.repository.OrderRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.infrastructure.exception.EntityNotFoundException
 import spring.webmvc.infrastructure.exception.InsufficientQuantityException
-import spring.webmvc.infrastructure.security.SecurityContextUtil
 
 @Service
 @Transactional(readOnly = true)
@@ -26,18 +27,17 @@ class OrderService(
     private val orderRepository: OrderRepository,
 ) {
     @Transactional
-    fun createOrder(orderCreateCommand: OrderCreateCommand): Order {
-        val userId = SecurityContextUtil.getUserId()
-        val user = userRepository.findById(id = userId)
+    fun createOrder(command: OrderCreateCommand): OrderResult {
+        val user = userRepository.findById(id = command.userId)
 
-        val productMap = productRepository.findAllById(ids = orderCreateCommand.products.map { it.id })
+        val productMap = productRepository.findAllById(ids = command.products.map { it.id })
             .associateBy { it.id }
 
         val order = Order.create(user = user)
         val processedProducts = mutableListOf<OrderProductCreateCommand>()
 
         try {
-            orderCreateCommand.products.forEach { orderProductCreateCommand ->
+            command.products.forEach { orderProductCreateCommand ->
                 val product = productMap[orderProductCreateCommand.id]
                     ?: throw EntityNotFoundException(kClass = Product::class, id = orderProductCreateCommand.id)
 
@@ -75,7 +75,8 @@ class OrderService(
                     .also { processedProducts.add(orderProductCreateCommand) }
             }
 
-            return orderRepository.save(order)
+            val savedOrder = orderRepository.save(order)
+            return OrderResult.from(savedOrder)
         } catch (e: Exception) {
             processedProducts.forEach { orderProductCreateCommand ->
                 productCacheRepository.incrementProductStock(
@@ -88,34 +89,34 @@ class OrderService(
         }
     }
 
-    fun findOrders(pageable: Pageable, orderStatus: OrderStatus?): Page<Order> {
-        val userId = SecurityContextUtil.getUserId()
+    fun findOrders(query: OrderFindQuery): Page<OrderResult> {
+        val user = userRepository.findById(id = query.userId)
 
         return orderRepository.findAll(
-            pageable = pageable,
-            userId = userId,
-            orderStatus = orderStatus
-        )
+            pageable = query.pageable,
+            user = user,
+            orderStatus = query.orderStatus
+        ).map { OrderResult.from(it) }
     }
 
-    fun findOrder(id: Long): Order {
-        val userId = SecurityContextUtil.getUserId()
+    fun findOrder(query: OrderFindByIdQuery): OrderResult {
+        val user = userRepository.findById(id = query.userId)
 
-        val order = orderRepository.findByIdAndUserId(id = id, userId = userId)
-            ?: throw EntityNotFoundException(kClass = Order::class, id = id)
+        val order = orderRepository.findByIdAndUser(id = query.id, user = user)
+            ?: throw EntityNotFoundException(kClass = Order::class, id = query.id)
 
-        return order
+        return OrderResult.from(order)
     }
 
     @Transactional
-    fun cancelOrder(id: Long): Order {
-        val userId = SecurityContextUtil.getUserId()
+    fun cancelOrder(command: OrderCancelCommand): OrderResult {
+        val user = userRepository.findById(id = command.userId)
 
-        val order = orderRepository.findByIdAndUserId(id = id, userId = userId)
-            ?: throw EntityNotFoundException(kClass = Order::class, id = id)
+        val order = orderRepository.findByIdAndUser(id = command.id, user = user)
+            ?: throw EntityNotFoundException(kClass = Order::class, id = command.id)
 
         order.cancel()
 
-        return order
+        return OrderResult.from(order)
     }
 }

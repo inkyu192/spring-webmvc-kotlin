@@ -4,17 +4,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import spring.webmvc.application.dto.result.AccommodationResult
-import spring.webmvc.application.dto.result.ProductResult
-import spring.webmvc.application.dto.result.TransportResult
+import spring.webmvc.application.dto.command.ProductDeleteCommand
 import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.Category
-import spring.webmvc.presentation.dto.request.ProductCreateRequest
-import spring.webmvc.presentation.dto.request.ProductUpdateRequest
-import spring.webmvc.presentation.dto.response.AccommodationResponse
+import spring.webmvc.presentation.dto.request.ProductPutRequest
 import spring.webmvc.presentation.dto.response.ProductPageResponse
 import spring.webmvc.presentation.dto.response.ProductResponse
-import spring.webmvc.presentation.dto.response.TransportResponse
 
 @RestController
 @RequestMapping("/products")
@@ -22,57 +17,64 @@ class ProductController(
     private val productService: ProductService,
 ) {
     @GetMapping
-    @PreAuthorize("hasAuthority('PRODUCT_READER')")
+    @PreAuthorize("hasAuthority('PRODUCT_READ')")
     fun findProducts(
         @RequestParam(required = false, defaultValue = "10") size: Int,
         @RequestParam(required = false) cursorId: Long?,
         @RequestParam(required = false) name: String?,
-    ) = ProductPageResponse(
-        page = productService.findProducts(
+    ): ProductPageResponse {
+        val page = productService.findProducts(
             cursorId = cursorId,
             size = size,
             name = name,
         )
-    )
+
+        return ProductPageResponse.from(page)
+    }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_READER')")
+    @PreAuthorize("hasAuthority('PRODUCT_READ')")
     fun findProduct(
         @PathVariable id: Long,
         @RequestParam category: Category,
-    ) = toProductResponse(productResult = productService.findProduct(category = category, id = id))
+    ): ProductResponse {
+        val result = productService.findProduct(category = category, id = id)
+
+        return ProductResponse.from(result)
+    }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
+    @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createProduct(@RequestBody @Validated productCreateRequest: ProductCreateRequest): ProductResponse {
-        val command = productCreateRequest.toCommand()
+    fun createProduct(
+        @RequestBody @Validated request: ProductPutRequest,
+    ): ProductResponse {
+        val command = request.toCommand()
         val productResult = productService.createProduct(command)
-        return toProductResponse(productResult)
+
+        return ProductResponse.from(productResult)
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
+    @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
     fun updateProduct(
         @PathVariable id: Long,
-        @RequestBody @Validated productUpdateRequest: ProductUpdateRequest,
+        @RequestBody @Validated request: ProductPutRequest,
     ): ProductResponse {
-        val command = productUpdateRequest.toCommand()
-        val productResult = productService.updateProduct(id = id, productUpdateCommand = command)
-        return toProductResponse(productResult)
+        val command = request.toCommand(id = id)
+        val productResult = productService.updateProduct(command)
+
+        return ProductResponse.from(productResult)
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_WRITER')")
+    @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteProduct(@PathVariable id: Long, @RequestParam category: Category) {
-        productService.deleteProduct(category = category, id = id)
-    }
-
-    private fun toProductResponse(productResult: ProductResult): ProductResponse {
-        return when (productResult.category) {
-            Category.TRANSPORT -> TransportResponse.from(productResult as TransportResult)
-            Category.ACCOMMODATION -> AccommodationResponse(productResult as AccommodationResult)
-        }
+    fun deleteProduct(
+        @PathVariable id: Long,
+        @RequestParam category: Category,
+    ) {
+        val command = ProductDeleteCommand(id = id, category = category)
+        productService.deleteProduct(command)
     }
 }

@@ -6,22 +6,37 @@ data class CursorPage<T>(
     val hasNext: Boolean,
     val nextCursorId: Long?,
 ) {
-    constructor(
-        content: List<T>,
-        size: Int,
-        getCursorId: (T) -> Long?,
-    ) : this(
-        content = if (content.size > size) content.dropLast(1) else content,
-        size = size,
-        hasNext = content.size > size,
-        nextCursorId = if (content.size > size) content.last().let(getCursorId) else null
-    )
+    companion object {
+        fun <T> create(
+            content: List<T>,
+            size: Int,
+            getCursorId: (T) -> Long?,
+        ): CursorPage<T> {
+            val actualContent = if (content.size > size) {
+                content.dropLast(1)
+            } else {
+                content
+            }
 
-    fun <U> map(transform: (T) -> U) =
-        CursorPage(
-            content = content.map(transform),
-            size = size,
-            hasNext = hasNext,
-            nextCursorId = nextCursorId
-        )
+            val cursorId = if (content.size > size) {
+                getCursorId(content.last())
+            } else {
+                null
+            }
+
+            return CursorPage(
+                content = actualContent,
+                size = size,
+                hasNext = content.size > size,
+                nextCursorId = cursorId
+            )
+        }
+    }
+
+    fun <U> map(transform: (T) -> U) = CursorPage(
+        content = content.map(transform),
+        size = size,
+        hasNext = hasNext,
+        nextCursorId = nextCursorId,
+    )
 }

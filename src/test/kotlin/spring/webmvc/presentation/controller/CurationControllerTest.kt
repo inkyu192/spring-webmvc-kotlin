@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.result.CurationProductResult
 import spring.webmvc.application.dto.result.CurationResult
+import spring.webmvc.application.dto.result.ProductResult
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Curation
@@ -43,6 +44,7 @@ class CurationControllerTest {
         curation1 = spyk(
             Curation.create(
                 title = "여름 휴가 패키지",
+                category = spring.webmvc.domain.model.enums.CurationCategory.HOME,
                 isExposed = true,
                 sortOrder = 1L
             )
@@ -51,6 +53,7 @@ class CurationControllerTest {
         curation2 = spyk(
             Curation.create(
                 title = "겨울 스키 패키지",
+                category = spring.webmvc.domain.model.enums.CurationCategory.EVENT,
                 isExposed = true,
                 sortOrder = 2L
             )
@@ -98,9 +101,9 @@ class CurationControllerTest {
 
     @Test
     fun createCuration() {
-        val id = 1L
+        val curationResult = CurationResult.from(curation1)
 
-        every { curationService.createCuration(any<CurationCreateCommand>()) } returns id
+        every { curationService.createCuration(any<CurationCreateCommand>()) } returns curationResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/curations")
@@ -109,16 +112,17 @@ class CurationControllerTest {
                     """
 						{
 						  "title": "인기상품",
+						  "category": "HOME",
 						  "isExposed": true,
 						  "sortOrder": 1,
 						  "products": [
 						    {
-						      "id": 1,
+						      "productId": 1,
 						      "sortOrder": 1
 						    }
 						  ]
 						}
-						
+
 						""".trimIndent()
                 )
                 .header("Authorization", "Bearer access-token")
@@ -132,13 +136,16 @@ class CurationControllerTest {
                     ),
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
+                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리"),
                         PayloadDocumentation.fieldWithPath("isExposed").description("노출 여부"),
                         PayloadDocumentation.fieldWithPath("sortOrder").description("정렬 순서"),
-                        PayloadDocumentation.fieldWithPath("products[].id").description("상품 ID"),
+                        PayloadDocumentation.fieldWithPath("products[].productId").description("상품 ID"),
                         PayloadDocumentation.fieldWithPath("products[].sortOrder").description("상품 정렬 순서")
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID")
+                        PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
+                        PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
+                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리")
                     )
                 )
             )
@@ -146,24 +153,29 @@ class CurationControllerTest {
 
     @Test
     fun findCurations() {
-        val curationResult1 = CurationResult(curation1)
-        val curationResult2 = CurationResult(curation2)
+        val category = spring.webmvc.domain.model.enums.CurationCategory.HOME
+        val curationResult1 = CurationResult.from(curation1)
 
-        val result = listOf(curationResult1, curationResult2)
+        val result = listOf(curationResult1)
 
-        every { curationService.findCurations() } returns result
+        every { curationService.findCurations(category) } returns result
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations")
+                .queryParam("category", category.name)
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
                     "curation-list",
+                    RequestDocumentation.queryParameters(
+                        RequestDocumentation.parameterWithName("category").description("큐레이션 카테고리")
+                    ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("count").description("큐레이션 수"),
                         PayloadDocumentation.fieldWithPath("curations[].id").description("큐레이션 ID"),
                         PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목"),
+                        PayloadDocumentation.fieldWithPath("curations[].category").description("큐레이션 카테고리"),
                     )
                 )
             )
@@ -172,17 +184,22 @@ class CurationControllerTest {
     @Test
     fun findCurationProduct() {
         val curationId = 1L
-        val size = 10
         val cursorId = null
 
-        val cursorPage = CursorPage(listOf(product1.product, product2.product), size, false, null)
-        val curationProductResult = CurationProductResult(curation1, cursorPage)
+        val productResults = listOf(
+            ProductResult.from(product1),
+            ProductResult.from(product2)
+        )
+        val cursorPage = CursorPage(productResults, 10, false, null)
+        val curationProductResult = CurationProductResult(
+            curation = CurationResult.from(curation1),
+            productPage = cursorPage
+        )
 
-        every { curationService.findCurationProduct(curationId, cursorId, size) } returns curationProductResult
+        every { curationService.findCurationProduct(curationId, cursorId) } returns curationProductResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations/{id}", curationId)
-                .queryParam("size", size.toString())
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
@@ -192,7 +209,6 @@ class CurationControllerTest {
                         RequestDocumentation.parameterWithName("id").description("큐레이션 ID")
                     ),
                     RequestDocumentation.queryParameters(
-                        RequestDocumentation.parameterWithName("size").description("페이지 크기").optional(),
                         RequestDocumentation.parameterWithName("cursorId").description("커서 ID").optional()
                     ),
                     PayloadDocumentation.responseFields(
@@ -207,7 +223,8 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products[].description").description("상품 설명"),
                         PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격"),
                         PayloadDocumentation.fieldWithPath("products[].quantity").description("상품 수량"),
-                        PayloadDocumentation.fieldWithPath("products[].createdAt").description("상품 생성일시")
+                        PayloadDocumentation.fieldWithPath("products[].createdAt").description("상품 생성일시"),
+                        PayloadDocumentation.subsectionWithPath("products[].detail").description("상품 상세 정보")
                     )
                 )
             )

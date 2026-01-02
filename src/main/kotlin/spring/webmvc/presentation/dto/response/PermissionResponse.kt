@@ -6,8 +6,12 @@ data class PermissionResponse(
     val id: Long,
     val name: String,
 ) {
-    constructor(rolePermission: RolePermission) : this(
-        id = checkNotNull(rolePermission.permission.id),
-        name = rolePermission.permission.name
-    )
+    companion object {
+        fun from(rolePermission: RolePermission): PermissionResponse {
+            return PermissionResponse(
+                id = checkNotNull(rolePermission.permission.id),
+                name = rolePermission.permission.name
+            )
+        }
+    }
 }

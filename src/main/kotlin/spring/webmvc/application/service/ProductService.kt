@@ -1,67 +1,94 @@
 package spring.webmvc.application.service
 
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import spring.webmvc.application.dto.command.ProductCreateCommand
-import spring.webmvc.application.dto.command.ProductUpdateCommand
+import spring.webmvc.application.dto.command.ProductDeleteCommand
+import spring.webmvc.application.dto.command.ProductPutCommand
 import spring.webmvc.application.dto.result.ProductResult
+import spring.webmvc.application.event.ProductViewEvent
 import spring.webmvc.application.strategy.ProductStrategy
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.domain.repository.ProductRepository
-import spring.webmvc.domain.repository.cache.ProductCacheRepository
-import spring.webmvc.infrastructure.exception.StrategyNotImplementedException
 
 @Service
 @Transactional(readOnly = true)
 class ProductService(
-    private val productCacheRepository: ProductCacheRepository,
     private val productRepository: ProductRepository,
     private val productStrategyMap: Map<Category, ProductStrategy>,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     fun findProducts(cursorId: Long?, size: Int, name: String?) =
         productRepository.findWithCursorPage(cursorId = cursorId, size = size, name = name)
 
+    @Cacheable(value = ["product"], key = "'product:' + #id")
     fun findProduct(category: Category, id: Long): ProductResult {
-        val productStrategy = productStrategyMap[category]
-            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
-        val productResult = productStrategy.findByProductId(productId = id)
+        eventPublisher.publishEvent(ProductViewEvent(productId = id))
 
-        productCacheRepository.incrementProductViewCount(productId = id, delta = 1)
+        val strategy = productStrategyMap[category] ?: throw UnsupportedOperationException("$category")
 
-        return productResult
+        return strategy.findByProductId(id)
     }
 
     @Transactional
-    fun createProduct(command: ProductCreateCommand): ProductResult {
-        val productStrategy = productStrategyMap[command.category]
-            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = command.category)
-        val productResult = productStrategy.createProduct(productCreateCommand = command)
-
-        productCacheRepository.deleteProductStock(productId = productResult.id)
-
-        return productResult
-    }
-
-    @Transactional
-    fun updateProduct(id: Long, productUpdateCommand: ProductUpdateCommand): ProductResult {
-        val productStrategy = productStrategyMap[productUpdateCommand.category]
-            ?: throw StrategyNotImplementedException(
-                kClass = ProductStrategy::class,
-                category = productUpdateCommand.category
+    fun createProduct(command: ProductPutCommand): ProductResult {
+        val product = productRepository.save(
+            Product.create(
+                category = command.category,
+                name = command.name,
+                description = command.description,
+                price = command.price,
+                quantity = command.quantity,
             )
-        val productResult = productStrategy.updateProduct(productId = id, productUpdateCommand = productUpdateCommand)
+        )
 
-        productCacheRepository.deleteProductStock(productId = id)
+        val strategy = productStrategyMap[command.category]
+            ?: throw UnsupportedOperationException("${command.category}")
 
-        return productResult
+        return strategy.createProduct(product, command)
     }
 
     @Transactional
-    fun deleteProduct(category: Category, id: Long) {
-        val productStrategy = productStrategyMap[category]
-            ?: throw StrategyNotImplementedException(kClass = ProductStrategy::class, category = category)
-        productStrategy.deleteProduct(productId = id)
+    @Caching(
+        evict = [
+            CacheEvict(value = ["product"], key = "'product:' + #command.id"),
+            CacheEvict(value = ["productStock"], key = "'product:' + #command.id + ':stock'"),
+        ]
+    )
+    fun updateProduct(command: ProductPutCommand): ProductResult {
+        val product = productRepository.findById(checkNotNull(command.id))
 
-        productCacheRepository.deleteProductStock(productId = id)
+        product.update(
+            name = command.name,
+            description = command.description,
+            price = command.price,
+            quantity = command.quantity,
+        )
+
+        val strategy = productStrategyMap[command.category]
+            ?: throw UnsupportedOperationException("${command.category}")
+
+        return strategy.updateProduct(checkNotNull(command.id), command)
+    }
+
+    @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(value = ["product"], key = "'product:' + #command.id"),
+            CacheEvict(value = ["productStock"], key = "'product:' + #command.id + ':stock'"),
+        ]
+    )
+    fun deleteProduct(command: ProductDeleteCommand) {
+        val product = productRepository.findById(command.id)
+        productRepository.delete(product)
+
+        val strategy = productStrategyMap[command.category]
+            ?: throw UnsupportedOperationException("${command.category}")
+
+        strategy.deleteProduct(command.id)
     }
 }

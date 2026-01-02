@@ -24,45 +24,69 @@ class ProductQuerydslRepositoryTest(
 
     @BeforeEach
     fun setUp() {
-        product1 = Accommodation.create(
+        val p1 = spring.webmvc.domain.model.entity.Product.create(
+            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
             name = "product1",
             description = "description",
             price = 1000,
-            quantity = 10,
+            quantity = 10
+        )
+        product1 = Accommodation.create(
+            product = p1,
             place = "place1",
             checkInTime = java.time.Instant.now(),
             checkOutTime = java.time.Instant.now().plusSeconds(86400)
         )
-        product2 = Accommodation.create(
+
+        val p2 = spring.webmvc.domain.model.entity.Product.create(
+            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
             name = "product2",
             description = "description",
             price = 2000,
-            quantity = 20,
+            quantity = 20
+        )
+        product2 = Accommodation.create(
+            product = p2,
             place = "place2",
             checkInTime = java.time.Instant.now(),
             checkOutTime = java.time.Instant.now().plusSeconds(86400)
         )
-        product3 = Accommodation.create(
+
+        val p3 = spring.webmvc.domain.model.entity.Product.create(
+            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
             name = "product3",
-            price = 3000,
-            quantity = 30,
             description = "description",
+            price = 3000,
+            quantity = 30
+        )
+        product3 = Accommodation.create(
+            product = p3,
             place = "place3",
             checkInTime = java.time.Instant.now(),
             checkOutTime = java.time.Instant.now().plusSeconds(86400)
         )
-        product4 = Accommodation.create(
+
+        val p4 = spring.webmvc.domain.model.entity.Product.create(
+            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
             name = "product4",
             description = "description",
             price = 1500,
-            quantity = 30,
+            quantity = 30
+        )
+        product4 = Accommodation.create(
+            product = p4,
             place = "place4",
             checkInTime = java.time.Instant.now(),
             checkOutTime = java.time.Instant.now().plusSeconds(86400)
         )
+
+        entityManager.persist(p1)
         entityManager.persist(product1)
+        entityManager.persist(p2)
         entityManager.persist(product2)
+        entityManager.persist(p3)
         entityManager.persist(product3)
+        entityManager.persist(p4)
         entityManager.persist(product4)
 
         entityManager.flush()

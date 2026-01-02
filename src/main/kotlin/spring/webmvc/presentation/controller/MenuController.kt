@@ -14,5 +14,5 @@ class MenuController(
 ) {
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    fun findMenus() = menuService.findMenus().map { MenuResponse(menuResult = it) }
+    fun findMenus() = menuService.findMenus().map { MenuResponse.from(it) }
 }

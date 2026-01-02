@@ -8,10 +8,14 @@ data class MenuResponse(
     val path: String?,
     val children: List<MenuResponse>,
 ) {
-    constructor(menuResult: MenuResult) : this(
-        id = menuResult.id,
-        name = menuResult.name,
-        path = menuResult.path,
-        children = menuResult.children.map { MenuResponse(menuResult = it) }
-    )
+    companion object {
+        fun from(menuResult: MenuResult): MenuResponse {
+            return MenuResponse(
+                id = menuResult.id,
+                name = menuResult.name,
+                path = menuResult.path,
+                children = menuResult.children.map { from(it) }
+            )
+        }
+    }
 }

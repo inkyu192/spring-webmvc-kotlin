@@ -12,7 +12,11 @@ class TransportRepositoryAdapter(
 ) : TransportRepository {
     override fun findById(id: Long): Transport = jpaRepository.findByIdOrThrow(id)
 
-    override fun save(transport: Transport) = jpaRepository.save(transport)
+    override fun findByProductId(productId: Long): Transport =
+        jpaRepository.findByProductId(productId)
+            ?: throw NoSuchElementException("Transport not found with product id: $productId")
+
+    override fun save(transport: Transport): Transport = jpaRepository.save(transport)
 
     override fun delete(transport: Transport) {
         jpaRepository.delete(transport)

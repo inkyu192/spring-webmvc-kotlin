@@ -1,8 +1,8 @@
-package spring.webmvc.presentation.controller
+package spring.webmvc.presentation.controller.customer
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.mockkObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,30 +17,32 @@ import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import spring.webmvc.application.dto.command.OrderCancelCommand
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.dto.command.OrderProductCreateCommand
+import spring.webmvc.application.dto.query.OrderFindByIdQuery
+import spring.webmvc.application.dto.query.OrderFindQuery
+import spring.webmvc.application.dto.result.OrderProductResult
+import spring.webmvc.application.dto.result.OrderResult
 import spring.webmvc.application.service.OrderService
-import spring.webmvc.domain.model.entity.Order
-import spring.webmvc.domain.model.entity.OrderProduct
-import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.infrastructure.config.ControllerTest
+import spring.webmvc.infrastructure.security.SecurityContextUtil
 import java.time.Instant
 
-@ControllerTest([OrderController::class])
-class OrderControllerTest {
+@ControllerTest([CustomerOrderController::class])
+class CustomerOrderControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @MockkBean
     private lateinit var orderService: OrderService
-    private lateinit var order: Order
-    private lateinit var product: Product
-    private lateinit var orderProduct: OrderProduct
+    private lateinit var orderResult: OrderResult
+    private lateinit var orderProductResult: OrderProductResult
     private lateinit var orderProductCreateCommand: OrderProductCreateCommand
     private lateinit var orderCreateCommand: OrderCreateCommand
     private lateinit var pageable: Pageable
-    private lateinit var page: PageImpl<Order>
+    private lateinit var page: PageImpl<OrderResult>
     private val productId = 1L
     private val quantity = 3L
     private val userId = 1L
@@ -49,32 +51,35 @@ class OrderControllerTest {
 
     @BeforeEach
     fun setUp() {
+        mockkObject(SecurityContextUtil)
+        every { SecurityContextUtil.getUserId() } returns userId
+
         orderProductCreateCommand = OrderProductCreateCommand(id = productId, quantity = quantity)
-        orderCreateCommand = OrderCreateCommand(products = listOf(orderProductCreateCommand))
+        orderCreateCommand = OrderCreateCommand(userId = userId, products = listOf(orderProductCreateCommand))
 
-        order = mockk<Order>()
-        product = mockk<Product>()
-        orderProduct = mockk<OrderProduct>()
+        orderProductResult = OrderProductResult(
+            name = "name",
+            price = 5000,
+            quantity = 3
+        )
 
-        every { order.id } returns orderId
-        every { order.orderedAt } returns Instant.now()
-        every { order.status } returns OrderStatus.ORDER
-        every { order.orderProducts } returns listOf(orderProduct)
-        every { product.name } returns "name"
-        every { orderProduct.quantity } returns 3
-        every { orderProduct.orderPrice } returns 5000
-        every { orderProduct.product } returns product
+        orderResult = OrderResult(
+            id = orderId,
+            orderedAt = Instant.now(),
+            status = OrderStatus.ORDER,
+            products = listOf(orderProductResult)
+        )
 
         pageable = PageRequest.of(0, 10)
-        page = PageImpl(listOf(order), pageable, 1)
+        page = PageImpl(listOf(orderResult), pageable, 1)
     }
 
     @Test
     fun createOrder() {
-        every { orderService.createOrder(orderCreateCommand) } returns order
+        every { orderService.createOrder(command = orderCreateCommand) } returns orderResult
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.post("/orders")
+            RestDocumentationRequestBuilders.post("/customer/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer access-token")
                 .content(
@@ -93,7 +98,7 @@ class OrderControllerTest {
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "order-create",
+                    "customer-order-create",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -115,27 +120,26 @@ class OrderControllerTest {
 
     @Test
     fun findOrders() {
-        every { orderService.findOrders(pageable = pageable, orderStatus = orderStatus) } returns page
+        val query = OrderFindQuery(userId = userId, pageable = pageable, orderStatus = orderStatus)
+        every { orderService.findOrders(query = query) } returns page
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/orders")
+            RestDocumentationRequestBuilders.get("/customer/orders")
                 .header("Authorization", "Bearer access-token")
                 .queryParam("page", pageable.pageNumber.toString())
                 .queryParam("size", pageable.pageSize.toString())
-                .queryParam("userId", userId.toString())
                 .queryParam("orderStatus", orderStatus.toString())
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "order-list",
+                    "customer-order-list",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     RequestDocumentation.queryParameters(
                         RequestDocumentation.parameterWithName("page").description("페이지 번호").optional(),
                         RequestDocumentation.parameterWithName("size").description("페이지 크기").optional(),
-                        RequestDocumentation.parameterWithName("userId").description("회원아아디").optional(),
                         RequestDocumentation.parameterWithName("orderStatus").description("주문상태").optional()
                     ),
                     PayloadDocumentation.responseFields(
@@ -176,16 +180,17 @@ class OrderControllerTest {
 
     @Test
     fun findOrder() {
-        every { orderService.findOrder(id = orderId) } returns order
+        val query = OrderFindByIdQuery(userId = userId, id = orderId)
+        every { orderService.findOrder(query = query) } returns orderResult
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/orders/{id}", orderId)
+            RestDocumentationRequestBuilders.get("/customer/orders/{id}", orderId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "order-detail",
+                    "customer-order-detail",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -206,16 +211,17 @@ class OrderControllerTest {
 
     @Test
     fun cancelOder() {
-        every { orderService.cancelOrder(id = orderId) } returns order
+        val command = OrderCancelCommand(userId = userId, id = orderId)
+        every { orderService.cancelOrder(command = command) } returns orderResult
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/orders/{id}", orderId)
+            RestDocumentationRequestBuilders.patch("/customer/orders/{id}", orderId)
                 .header("Authorization", "Bearer access-token")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "order-cancel",
+                    "customer-order-cancel",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),

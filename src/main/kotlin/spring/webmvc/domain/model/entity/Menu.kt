@@ -28,26 +28,8 @@ class Menu protected constructor(
     var parent = parent
         protected set
 
-    @OneToMany(mappedBy = "parent")
-    private val _children = mutableListOf<Menu>()
-
-    @OneToMany(mappedBy = "menu", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val _permissionMenus = mutableListOf<PermissionMenu>()
-
-    @get:Transient
-    val children: List<Menu>
-        get() = _children.toList()
-
-    @get:Transient
-    val permissionMenus: List<PermissionMenu>
-        get() = _permissionMenus.toList()
-
     companion object {
         fun create(name: String, path: String? = null, parent: Menu? = null, sortOrder: Long? = null) =
             Menu(name = name, path = path, sortOrder = sortOrder, parent = parent)
-    }
-
-    fun addPermission(permission: Permission) {
-        _permissionMenus.add(PermissionMenu.create(menu = this, permission = permission))
     }
 }
