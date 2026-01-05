@@ -62,11 +62,13 @@ class User protected constructor(
         )
     }
 
-    fun addUserRole(userRole: UserRole) {
+    fun addUserRole(role: Role) {
+        val userRole = UserRole.create(user = this, role = role)
         _userRoles.add(userRole)
     }
 
-    fun addUserPermission(userPermission: UserPermission) {
+    fun addUserPermission(permission: Permission) {
+        val userPermission = UserPermission.create(user = this, permission = permission)
         _userPermissions.add(userPermission)
     }
 

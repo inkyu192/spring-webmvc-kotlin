@@ -77,23 +77,24 @@ VALUES (1, '테크 코퍼레이션', '123-45-67890', '서울특별시 강남구 
        (4, '비즈니스 솔루션', '456-78-90123', '서울특별시 마포구 월드컵북로 321', '02-4567-8901', NOW(6), NOW(6)),
        (5, '엔터프라이즈 주식회사', '567-89-01234', '부산광역시 해운대구 센텀중앙로 654', '051-5678-9012', NOW(6), NOW(6));
 
-INSERT INTO product (id, category, name, description, price, quantity, created_by, updated_by, created_at, updated_at)
-VALUES (1, 'TRANSPORT', '인천-도쿄 왕복', '대한항공 직항 이코노미 클래스', 450000, 100, 1, 1, NOW(6), NOW(6)),
-       (2, 'TRANSPORT', '김포-오사카 왕복', '아시아나항공 직항 비즈니스 클래스', 850000, 50, 1, 1, NOW(6), NOW(6)),
-       (3, 'TRANSPORT', '인천-방콕 왕복', '타이항공 직항 이코노미 클래스', 520000, 80, 1, 1, NOW(6), NOW(6)),
-       (4, 'TRANSPORT', '인천-싱가포르 왕복', '싱가포르항공 직항 프리미엄 이코노미', 780000, 60, 1, 1, NOW(6), NOW(6)),
-       (5, 'TRANSPORT', '인천-하노이 왕복', '베트남항공 직항 이코노미 클래스', 380000, 120, 1, 1, NOW(6), NOW(6)),
-       (6, 'TRANSPORT', '인천-홍콩 왕복', '캐세이퍼시픽 직항 비즈니스 클래스', 920000, 40, 1, 1, NOW(6), NOW(6)),
-       (7, 'TRANSPORT', '인천-LA 왕복', '대한항공 직항 이코노미 클래스', 1250000, 70, 1, 1, NOW(6), NOW(6)),
-       (8, 'TRANSPORT', '인천-파리 왕복', '에어프랑스 직항 비즈니스 클래스', 3200000, 30, 1, 1, NOW(6), NOW(6)),
-       (9, 'ACCOMMODATION', '신라호텔 서울', '명동 5성급 호텔 디럭스룸 1박', 350000, 30, 1, 1, NOW(6), NOW(6)),
-       (10, 'ACCOMMODATION', '제주 신라호텔', '제주 5성급 호텔 오션뷰 2박', 680000, 20, 1, 1, NOW(6), NOW(6)),
-       (11, 'ACCOMMODATION', '롯데호텔 부산', '해운대 5성급 호텔 스위트룸 1박', 420000, 25, 1, 1, NOW(6), NOW(6)),
-       (12, 'ACCOMMODATION', '파라다이스시티 인천', '인천 복합리조트 디럭스룸 1박', 280000, 50, 1, 1, NOW(6), NOW(6)),
-       (13, 'ACCOMMODATION', '한화리조트 설악', '설악산 리조트 패밀리룸 2박', 320000, 40, 1, 1, NOW(6), NOW(6)),
-       (14, 'ACCOMMODATION', '그랜드하얏트 서울', '남산뷰 5성급 호텔 클럽룸 1박', 480000, 20, 1, 1, NOW(6), NOW(6)),
-       (15, 'ACCOMMODATION', '웨스틴조선 부산', '광안리뷰 5성급 호텔 프리미어룸 1박', 380000, 35, 1, 1, NOW(6), NOW(6)),
-       (16, 'ACCOMMODATION', '반얀트리 클럽 앤 스파 서울', '남산 럭셔리 스파 호텔 스위트 1박', 750000, 15, 1, 1, NOW(6), NOW(6));
+INSERT INTO product (id, category, status, name, description, price, quantity, created_by, updated_by, created_at,
+                     updated_at)
+VALUES (1, 'TRANSPORT', 'SELLING', '인천-도쿄 왕복', '대한항공 직항 이코노미 클래스', 450000, 100, 1, 1, NOW(6), NOW(6)),
+       (2, 'TRANSPORT', 'SELLING', '김포-오사카 왕복', '아시아나항공 직항 비즈니스 클래스', 850000, 50, 1, 1, NOW(6), NOW(6)),
+       (3, 'TRANSPORT', 'SELLING', '인천-방콕 왕복', '타이항공 직항 이코노미 클래스', 520000, 80, 1, 1, NOW(6), NOW(6)),
+       (4, 'TRANSPORT', 'SELLING', '인천-싱가포르 왕복', '싱가포르항공 직항 프리미엄 이코노미', 780000, 60, 1, 1, NOW(6), NOW(6)),
+       (5, 'TRANSPORT', 'SELLING', '인천-하노이 왕복', '베트남항공 직항 이코노미 클래스', 380000, 120, 1, 1, NOW(6), NOW(6)),
+       (6, 'TRANSPORT', 'SELLING', '인천-홍콩 왕복', '캐세이퍼시픽 직항 비즈니스 클래스', 920000, 40, 1, 1, NOW(6), NOW(6)),
+       (7, 'TRANSPORT', 'SELLING', '인천-LA 왕복', '대한항공 직항 이코노미 클래스', 1250000, 70, 1, 1, NOW(6), NOW(6)),
+       (8, 'TRANSPORT', 'DISCONTINUED', '인천-파리 왕복', '에어프랑스 직항 비즈니스 클래스', 3200000, 30, 1, 1, NOW(6), NOW(6)),
+       (9, 'ACCOMMODATION', 'SELLING', '신라호텔 서울', '명동 5성급 호텔 디럭스룸 1박', 350000, 30, 1, 1, NOW(6), NOW(6)),
+       (10, 'ACCOMMODATION', 'SELLING', '제주 신라호텔', '제주 5성급 호텔 오션뷰 2박', 680000, 20, 1, 1, NOW(6), NOW(6)),
+       (11, 'ACCOMMODATION', 'SELLING', '롯데호텔 부산', '해운대 5성급 호텔 스위트룸 1박', 420000, 25, 1, 1, NOW(6), NOW(6)),
+       (12, 'ACCOMMODATION', 'SELLING', '파라다이스시티 인천', '인천 복합리조트 디럭스룸 1박', 280000, 50, 1, 1, NOW(6), NOW(6)),
+       (13, 'ACCOMMODATION', 'SELLING', '한화리조트 설악', '설악산 리조트 패밀리룸 2박', 320000, 40, 1, 1, NOW(6), NOW(6)),
+       (14, 'ACCOMMODATION', 'PENDING', '그랜드하얏트 서울', '남산뷰 5성급 호텔 클럽룸 1박', 480000, 20, 1, 1, NOW(6), NOW(6)),
+       (15, 'ACCOMMODATION', 'SELLING', '웨스틴조선 부산', '광안리뷰 5성급 호텔 프리미어룸 1박', 380000, 35, 1, 1, NOW(6), NOW(6)),
+       (16, 'ACCOMMODATION', 'SELLING', '반얀트리 클럽 앤 스파 서울', '남산 럭셔리 스파 호텔 스위트 1박', 750000, 15, 1, 1, NOW(6), NOW(6));
 
 INSERT INTO transport (product_id, departure_location, arrival_location, departure_time, arrival_time)
 VALUES (1, '인천국제공항', '나리타국제공항', '2025-03-01 10:00:00', '2025-03-01 12:30:00'),

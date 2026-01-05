@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.enums.CurationCategory
 import spring.webmvc.presentation.dto.request.CurationCreateRequest
+import spring.webmvc.presentation.dto.response.CurationCursorPageResponse
+import spring.webmvc.presentation.dto.response.CurationDetailResponse
 import spring.webmvc.presentation.dto.response.CurationListResponse
-import spring.webmvc.presentation.dto.response.CurationProductResponse
-import spring.webmvc.presentation.dto.response.CurationResponse
 
 @RestController
 @RequestMapping("/curations")
@@ -19,11 +19,11 @@ class CurationController(
     @PostMapping
     @PreAuthorize("hasAuthority('CURATION_WRITE')")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createCuration(@Valid @RequestBody request: CurationCreateRequest): CurationResponse {
+    fun createCuration(@Valid @RequestBody request: CurationCreateRequest): CurationDetailResponse {
         val command = request.toCommand()
         val result = curationService.createCuration(command = command)
 
-        return CurationResponse.from(result)
+        return CurationDetailResponse.from(result)
     }
 
     @GetMapping
@@ -33,7 +33,10 @@ class CurationController(
     ): CurationListResponse {
         val resultList = curationService.findCurations(category)
 
-        return CurationListResponse.from(resultList)
+        return CurationListResponse.from(
+            category = category,
+            resultList = resultList,
+        )
     }
 
     @GetMapping("/{id}")
@@ -41,12 +44,12 @@ class CurationController(
     fun findCuration(
         @PathVariable id: Long,
         @RequestParam(required = false) cursorId: Long?,
-    ): CurationProductResponse {
-        val result = curationService.findCurationProduct(
+    ): CurationCursorPageResponse {
+        val page = curationService.findCurationProduct(
             curationId = id,
             cursorId = cursorId,
         )
 
-        return CurationProductResponse.from(result)
+        return CurationCursorPageResponse.from(page)
     }
 }

@@ -58,13 +58,13 @@ class UserKotlinJdslRepositoryTest(
     }
 
     @Test
-    @DisplayName("findAll: 전화번호 조건으로 회원을 조회한다")
-    fun findAllByPhone() {
+    @DisplayName("findAllWithOffsetPage: 전화번호 조건으로 회원을 조회한다")
+    fun findAllWithOffsetPageByPhone() {
         val pageable = PageRequest.of(0, 10)
         val createdFrom = Instant.now().minus(1, ChronoUnit.DAYS)
         val createdTo = Instant.now().plus(1, ChronoUnit.DAYS)
 
-        val result = userKotlinJdslRepository.findAll(
+        val result = userKotlinJdslRepository.findAllWithOffsetPage(
             pageable = pageable,
             phone = Phone.create("010-1111-1111"),
             name = null,
@@ -78,13 +78,13 @@ class UserKotlinJdslRepositoryTest(
     }
 
     @Test
-    @DisplayName("findAll: 조건 없이 전체 회원을 페이징 조회한다")
-    fun findAllWithoutCondition() {
+    @DisplayName("findAllWithOffsetPage: 조건 없이 전체 회원을 페이징 조회한다")
+    fun findAllWithOffsetPageWithoutCondition() {
         val pageable = PageRequest.of(0, 2)
         val createdFrom = Instant.now().minus(1, ChronoUnit.DAYS)
         val createdTo = Instant.now().plus(1, ChronoUnit.DAYS)
 
-        val result = userKotlinJdslRepository.findAll(
+        val result = userKotlinJdslRepository.findAllWithOffsetPage(
             pageable = pageable,
             phone = null,
             name = null,

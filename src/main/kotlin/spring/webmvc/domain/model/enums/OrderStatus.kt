@@ -12,6 +12,7 @@ enum class OrderStatus(
 
     companion object {
         @JsonCreator
+        @JvmStatic
         fun of(name: String) = entries.find { it.name == name }
     }
 }

@@ -19,7 +19,7 @@ class MenuService(
             return listOf()
         }
 
-        val allMenus = getParentMenus(menuRepository.findByPermissions(permissions))
+        val allMenus = getParentMenus(menuRepository.findAllByPermissions(permissions))
         val rootMenus = allMenus.filter { it.parent == null }
 
         return rootMenus.map { mapToResult(menu = it, allMenus = allMenus) }

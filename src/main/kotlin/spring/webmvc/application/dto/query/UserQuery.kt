@@ -4,7 +4,7 @@ import org.springframework.data.domain.Pageable
 import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 
-data class UserSearchQuery(
+data class UserQuery(
     val pageable: Pageable,
     val phone: Phone?,
     val name: String?,
@@ -18,7 +18,7 @@ data class UserSearchQuery(
             name: String?,
             createdFrom: Instant,
             createdTo: Instant,
-        ) = UserSearchQuery(
+        ) = UserQuery(
             pageable = pageable,
             phone = phone?.let { Phone.create(it) },
             name = name,

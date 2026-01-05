@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import spring.webmvc.application.dto.query.UserSearchQuery
+import spring.webmvc.application.dto.query.UserQuery
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserCredential
 import spring.webmvc.domain.model.enums.Gender
@@ -55,7 +55,7 @@ class UserServiceTest {
         val pageable = PageRequest.of(0, 10)
         val createdFrom = Instant.now()
         val createdTo = Instant.now()
-        val query = UserSearchQuery(
+        val query = UserQuery(
             pageable = pageable,
             phone = phone,
             name = "홍길동",
@@ -64,7 +64,7 @@ class UserServiceTest {
         )
         val page = PageImpl(listOf(user))
 
-        every { userRepository.findAll(pageable, phone, "홍길동", createdFrom, createdTo) } returns page
+        every { userRepository.findAllWithOffsetPage(pageable, phone, "홍길동", createdFrom, createdTo) } returns page
 
         val result = userService.findUsers(query)
 
@@ -77,7 +77,7 @@ class UserServiceTest {
         val userId = 1L
 
         every { userRepository.findById(userId) } returns user
-        every { userCredentialRepository.findByUser(user) } returns userCredential
+        every { userCredentialRepository.findByUserId(userId) } returns userCredential
 
         val result = userService.findUserDetail(userId)
 

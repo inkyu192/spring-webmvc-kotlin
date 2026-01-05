@@ -2,14 +2,20 @@ package spring.webmvc.application.dto.query
 
 import org.springframework.data.domain.Pageable
 import spring.webmvc.domain.model.enums.OrderStatus
+import java.time.Instant
 
-data class OrderFindQuery(
-    val userId: Long,
+data class OrderOffsetPageQuery(
     val pageable: Pageable,
+    val userId: Long?,
     val orderStatus: OrderStatus?,
+    val orderedFrom: Instant?,
+    val orderedTo: Instant?,
 )
 
-data class OrderFindByIdQuery(
-    val userId: Long,
-    val id: Long,
+data class OrderCursorPageQuery(
+    val cursorId: Long?,
+    val userId: Long?,
+    val orderStatus: OrderStatus?,
+    val orderedFrom: Instant?,
+    val orderedTo: Instant?,
 )

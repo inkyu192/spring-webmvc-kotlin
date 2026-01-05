@@ -6,7 +6,5 @@ import spring.webmvc.domain.model.enums.CurationCategory
 
 interface CurationJpaRepository : JpaRepository<Curation, Long> {
 
-    fun findByIsExposedIsTrueOrderBySortOrder(): List<Curation>
-
     fun findByCategoryAndIsExposedIsTrueOrderBySortOrder(category: CurationCategory): List<Curation>
 }

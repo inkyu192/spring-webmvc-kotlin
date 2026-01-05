@@ -159,6 +159,7 @@ CREATE TABLE product
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     category    VARCHAR(255) NOT NULL,
+    status      VARCHAR(255) NOT NULL,
     name        VARCHAR(255) NOT NULL,
     description TEXT         NOT NULL,
     price       BIGINT       NOT NULL,

@@ -3,18 +3,13 @@ package spring.webmvc.infrastructure.persistence.adapter
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Transport
 import spring.webmvc.domain.repository.TransportRepository
-import spring.webmvc.infrastructure.extensions.findByIdOrThrow
 import spring.webmvc.infrastructure.persistence.jpa.TransportJpaRepository
 
 @Component
 class TransportRepositoryAdapter(
     private val jpaRepository: TransportJpaRepository,
 ) : TransportRepository {
-    override fun findById(id: Long): Transport = jpaRepository.findByIdOrThrow(id)
-
-    override fun findByProductId(productId: Long): Transport =
-        jpaRepository.findByProductId(productId)
-            ?: throw NoSuchElementException("Transport not found with product id: $productId")
+    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
 
     override fun save(transport: Transport): Transport = jpaRepository.save(transport)
 

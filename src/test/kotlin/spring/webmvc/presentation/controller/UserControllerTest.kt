@@ -19,7 +19,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spring.webmvc.application.dto.result.UserDetail
+import spring.webmvc.application.dto.result.UserCredentialResult
 import spring.webmvc.application.service.UserService
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserCredential
@@ -40,7 +40,7 @@ class UserControllerTest {
     private lateinit var userService: UserService
     private lateinit var user: User
     private lateinit var userCredential: UserCredential
-    private lateinit var userDetail: UserDetail
+    private lateinit var userDetail: UserCredentialResult
     private lateinit var email: String
     private lateinit var name: String
     private lateinit var phone: String
@@ -78,7 +78,7 @@ class UserControllerTest {
         every { userCredential.email } returns Email.create(email)
         every { userCredential.verifiedAt } returns Instant.now()
 
-        userDetail = UserDetail(
+        userDetail = UserCredentialResult(
             user = user,
             credential = userCredential,
             oauths = emptyList(),

@@ -10,12 +10,11 @@ import spring.webmvc.domain.model.entity.QPermissionMenu.permissionMenu
 class MenuQuerydslRepository(
     private val jpaQueryFactory: JPAQueryFactory,
 ) {
-    fun findByPermissions(permissions: Iterable<String>): List<Menu> {
-        return jpaQueryFactory
+    fun findAllByPermissions(permissions: Iterable<String>): List<Menu> =
+        jpaQueryFactory
             .select(permissionMenu.menu)
             .from(permissionMenu)
             .join(permissionMenu.permission, permission)
             .where(permission.name.`in`(permissions.toList()))
             .fetch()
-    }
 }

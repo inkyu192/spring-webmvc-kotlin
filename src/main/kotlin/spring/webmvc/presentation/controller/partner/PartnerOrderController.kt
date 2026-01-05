@@ -1,15 +1,17 @@
 package spring.webmvc.presentation.controller.partner
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import spring.webmvc.application.dto.query.OrderFindByIdQuery
-import spring.webmvc.application.dto.query.OrderFindQuery
+import spring.webmvc.application.aspect.RequestLock
+import spring.webmvc.application.dto.query.OrderOffsetPageQuery
 import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.presentation.dto.response.OrderResponse
+import spring.webmvc.presentation.dto.request.OrderStatusUpdateRequest
+import spring.webmvc.presentation.dto.response.OrderDetailResponse
+import spring.webmvc.presentation.dto.response.OrderOffsetPageResponse
+import java.time.Instant
 
 @RestController
 @RequestMapping("/partner/orders")
@@ -19,21 +21,46 @@ class PartnerOrderController(
     @GetMapping
     @PreAuthorize("hasAuthority('ORDER_READ')")
     fun findOrders(
-        @RequestParam userId: Long,
         @PageableDefault pageable: Pageable,
+        @RequestParam(required = false) userId: Long?,
         @RequestParam(required = false) orderStatus: OrderStatus?,
-    ): Page<OrderResponse> {
-        val query = OrderFindQuery(userId = userId, pageable = pageable, orderStatus = orderStatus)
-        return orderService.findOrders(query = query).map { OrderResponse.from(it) }
+        @RequestParam(required = false) orderedFrom: Instant?,
+        @RequestParam(required = false) orderedTo: Instant?,
+    ): OrderOffsetPageResponse {
+        val query = OrderOffsetPageQuery(
+            pageable = pageable,
+            userId = userId,
+            orderStatus = orderStatus,
+            orderedFrom = orderedFrom,
+            orderedTo = orderedTo,
+        )
+
+        val page = orderService.findOrdersWithOffsetPage(query = query)
+
+        return OrderOffsetPageResponse.from(page)
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ORDER_READ')")
     fun findOrder(
-        @RequestParam userId: Long,
-        @PathVariable id: Long
-    ): OrderResponse {
-        val query = OrderFindByIdQuery(userId = userId, id = id)
-        return OrderResponse.from(orderService.findOrder(query = query))
+        @PathVariable id: Long,
+    ): OrderDetailResponse {
+        val orderResult = orderService.findOrder(id = id)
+
+        return OrderDetailResponse.from(orderResult)
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ORDER_WRITE')")
+    @RequestLock
+    fun updateOrderStatus(
+        @PathVariable id: Long,
+        @RequestBody request: OrderStatusUpdateRequest,
+    ): OrderDetailResponse {
+        val command = request.toCommand(id)
+
+        val orderResult = orderService.updateOrderStatus(command = command)
+
+        return OrderDetailResponse.from(orderResult)
     }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.infrastructure.config.RepositoryTest
 
@@ -94,17 +95,18 @@ class ProductQuerydslRepositoryTest(
     }
 
     @Test
-    @DisplayName("findAll: Product 조건 조회 후 반환한다")
-    fun findAll() {
-        val nextCursorId = null
-        val size = 3
-        val name = null
+    @DisplayName("findAllWithCursorPage: Product 조건 조회 후 반환한다")
+    fun findAllWithCursorPage() {
+        val query = ProductCursorPageQuery(
+            cursorId = null,
+            name = null,
+            status = null,
+        )
 
-        val result = productQuerydslRepository.findAll(cursorId = nextCursorId, size = size, name = name)
+        val result = productQuerydslRepository.findAllWithCursorPage(query = query)
 
-        Assertions.assertThat(result.content.size).isEqualTo(size)
-        Assertions.assertThat(result.size).isEqualTo(size)
-        Assertions.assertThat(result.hasNext).isTrue
-        Assertions.assertThat(result.nextCursorId).isEqualTo(product1.id)
+        Assertions.assertThat(result.content.size).isEqualTo(4)
+        Assertions.assertThat(result.hasNext).isFalse
+        Assertions.assertThat(result.nextCursorId).isNull()
     }
 }

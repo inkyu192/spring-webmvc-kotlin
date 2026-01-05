@@ -9,7 +9,19 @@ import spring.webmvc.domain.model.enums.OAuthProvider
 import java.time.Instant
 import java.time.LocalDate
 
-data class UserListResponse(
+data class UserPageResponse(
+    val page: OffsetPageResponse,
+    val users: List<UserSummaryResponse>,
+) {
+    companion object {
+        fun from(page: Page<User>) = UserPageResponse(
+            page = OffsetPageResponse.from(page),
+            users = page.content.map { UserSummaryResponse.from(user = it) },
+        )
+    }
+}
+
+data class UserSummaryResponse(
     val id: Long,
     val name: String,
     val phone: String,
@@ -18,8 +30,8 @@ data class UserListResponse(
     val createdAt: Instant,
 ) {
     companion object {
-        fun from(user: User): UserListResponse {
-            return UserListResponse(
+        fun from(user: User): UserSummaryResponse {
+            return UserSummaryResponse(
                 id = checkNotNull(user.id),
                 name = user.name,
                 phone = user.phone.value,
@@ -86,17 +98,5 @@ data class UserOAuthResponse(
                 oauthUserId = oauth.oauthUserId,
             )
         }
-    }
-}
-
-data class UserPageResponse(
-    val page: OffsetPageResponse,
-    val users: List<UserListResponse>,
-) {
-    companion object {
-        fun from(page: Page<User>) = UserPageResponse(
-            page = OffsetPageResponse.from(page),
-            users = page.content.map { UserListResponse.from(user = it) },
-        )
     }
 }

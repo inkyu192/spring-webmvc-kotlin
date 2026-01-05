@@ -40,7 +40,13 @@ class Curation protected constructor(
             Curation(title = title, category = category, isExposed = isExposed, sortOrder = sortOrder)
     }
 
-    fun addProduct(curationProduct: CurationProduct) {
+    fun addProduct(product: Product, sortOrder: Long) {
+        val curationProduct = CurationProduct.create(
+            curation = this,
+            product = product,
+            sortOrder = sortOrder,
+        )
+
         _curationProducts.add(curationProduct)
     }
 }

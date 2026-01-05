@@ -19,7 +19,6 @@ import spring.webmvc.domain.repository.UserCredentialRepository
 import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
-import spring.webmvc.domain.service.UserDomainService
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
 import spring.webmvc.infrastructure.security.JwtProvider
 
@@ -35,7 +34,6 @@ class AuthService(
     private val eventPublisher: ApplicationEventPublisher,
     private val roleRepository: RoleRepository,
     private val permissionRepository: PermissionRepository,
-    private val userDomainService: UserDomainService,
 ) {
     @Transactional
     fun signUp(command: SignUpCommand): User {
@@ -47,24 +45,27 @@ class AuthService(
             throw DuplicateEntityException(kClass = User::class, name = command.phone.value)
         }
 
-        val roles = roleRepository.findAllById(command.roleIds)
-        val permissions = permissionRepository.findAllById(command.permissionIds)
-
-        val (user, userCredential) = userDomainService.createUserWithCredential(
+        val user = User.create(
             name = command.name,
             phone = command.phone,
             gender = command.gender,
             birthday = command.birthday,
-            email = command.email,
-            password = command.password,
-            roles = roles,
-            permissions = permissions,
         )
 
+        roleRepository.findAllById(command.roleIds).forEach { user.addUserRole(it) }
+        permissionRepository.findAllById(command.permissionIds).forEach { user.addUserPermission(it) }
+
         userRepository.save(user)
+
+        val userCredential = UserCredential.create(
+            user = user,
+            email = command.email,
+            password = passwordEncoder.encode(command.password),
+        )
+
         userCredentialRepository.save(userCredential)
 
-        eventPublisher.publishEvent(SendVerifyEmailEvent(email = command.email))
+        SendVerifyEmailEvent(email = command.email).let { eventPublisher.publishEvent(it) }
 
         return user
     }
@@ -129,7 +130,7 @@ class AuthService(
     }
 
     fun requestJoinVerify(command: JoinVerifyRequestCommand) {
-        eventPublisher.publishEvent(SendVerifyEmailEvent(email = command.email))
+        SendVerifyEmailEvent(email = command.email).let { eventPublisher.publishEvent(it) }
     }
 
     @Transactional
@@ -149,7 +150,7 @@ class AuthService(
         userCredentialRepository.findByEmail(command.email)
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
-        eventPublisher.publishEvent(SendPasswordResetEmailEvent(email = command.email))
+        SendPasswordResetEmailEvent(email = command.email).let { eventPublisher.publishEvent(it) }
     }
 
     @Transactional

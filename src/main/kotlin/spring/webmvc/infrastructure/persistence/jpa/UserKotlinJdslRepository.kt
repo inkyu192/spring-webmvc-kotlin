@@ -2,7 +2,6 @@ package spring.webmvc.infrastructure.persistence.jpa
 
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.dsl.jpql.jpql
-import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.render.jpql.JpqlRenderContext
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.extension.createQuery
 import jakarta.persistence.EntityManager
@@ -19,7 +18,7 @@ class UserKotlinJdslRepository(
     private val entityManager: EntityManager,
     private val context: JpqlRenderContext,
 ) {
-    fun findAll(
+    fun findAllWithOffsetPage(
         pageable: Pageable,
         phone: Phone?,
         name: String?,
@@ -57,12 +56,9 @@ class UserKotlinJdslRepository(
         return PageImpl(content, pageable, total)
     }
 
-    private fun Jpql.eqPhone(phone: Phone?): Predicate? =
-        phone?.let { path(User::phone).eq(it) }
+    private fun Jpql.eqPhone(phone: Phone?) = phone?.let { path(User::phone).eq(it) }
 
-    private fun Jpql.eqName(name: String?): Predicate? =
-        name?.let { path(User::name).eq(it) }
+    private fun Jpql.eqName(name: String?) = name?.let { path(User::name).eq(it) }
 
-    private fun Jpql.betweenCreatedAt(from: Instant, to: Instant): Predicate =
-        path(User::createdAt).between(from, to)
+    private fun Jpql.betweenCreatedAt(from: Instant, to: Instant) = path(User::createdAt).between(from, to)
 }

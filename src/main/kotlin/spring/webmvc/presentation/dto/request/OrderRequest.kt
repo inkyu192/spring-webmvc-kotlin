@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.Size
 import spring.webmvc.application.dto.command.OrderCreateCommand
 import spring.webmvc.application.dto.command.OrderProductCreateCommand
+import spring.webmvc.application.dto.command.OrderStatusUpdateCommand
+import spring.webmvc.domain.model.enums.OrderStatus
 
 data class OrderCreateRequest(
     @field:Size(min = 1)
@@ -11,8 +13,7 @@ data class OrderCreateRequest(
 ) {
     fun toCommand(userId: Long) = OrderCreateCommand(
         userId = userId,
-        products = products.map { it.toCommand() }
-            .toList()
+        products = products.map { it.toCommand() }.toList(),
     )
 }
 
@@ -24,5 +25,14 @@ data class OrderProductCreateRequest(
     fun toCommand() = OrderProductCreateCommand(
         id = id,
         quantity = quantity,
+    )
+}
+
+data class OrderStatusUpdateRequest(
+    val orderStatus: OrderStatus,
+) {
+    fun toCommand(id: Long) = OrderStatusUpdateCommand(
+        id = id,
+        orderStatus = orderStatus,
     )
 }

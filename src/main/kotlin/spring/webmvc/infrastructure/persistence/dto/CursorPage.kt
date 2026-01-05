@@ -2,14 +2,14 @@ package spring.webmvc.infrastructure.persistence.dto
 
 data class CursorPage<T>(
     val content: List<T>,
-    val size: Int,
+    val size: Long,
     val hasNext: Boolean,
     val nextCursorId: Long?,
 ) {
     companion object {
         fun <T> create(
             content: List<T>,
-            size: Int,
+            size: Long,
             getCursorId: (T) -> Long?,
         ): CursorPage<T> {
             val actualContent = if (content.size > size) {
@@ -28,7 +28,7 @@ data class CursorPage<T>(
                 content = actualContent,
                 size = size,
                 hasNext = content.size > size,
-                nextCursorId = cursorId
+                nextCursorId = cursorId,
             )
         }
     }

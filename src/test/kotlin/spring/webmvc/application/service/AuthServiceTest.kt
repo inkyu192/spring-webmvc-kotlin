@@ -24,7 +24,6 @@ import spring.webmvc.domain.repository.UserCredentialRepository
 import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
-import spring.webmvc.domain.service.UserDomainService
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
 import spring.webmvc.infrastructure.security.JwtProvider
 import java.time.LocalDate
@@ -39,7 +38,6 @@ class AuthServiceTest {
     private val eventPublisher = mockk<ApplicationEventPublisher>()
     private val roleRepository = mockk<RoleRepository>()
     private val permissionRepository = mockk<PermissionRepository>()
-    private val userDomainService = mockk<UserDomainService>()
     private val authService = AuthService(
         jwtProvider = jwtProvider,
         tokenCacheRepository = tokenCacheRepository,
@@ -50,7 +48,6 @@ class AuthServiceTest {
         eventPublisher = eventPublisher,
         roleRepository = roleRepository,
         permissionRepository = permissionRepository,
-        userDomainService = userDomainService,
     )
 
     private lateinit var user: User
@@ -101,18 +98,7 @@ class AuthServiceTest {
         every { userRepository.existsByPhone(any()) } returns false
         every { roleRepository.findAllById(emptyList()) } returns emptyList()
         every { permissionRepository.findAllById(emptyList()) } returns emptyList()
-        every {
-            userDomainService.createUserWithCredential(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
-            )
-        } returns (user to userCredential)
+        every { passwordEncoder.encode(any()) } returns "encodedPassword"
         every { userRepository.save(any()) } returns user
         every { userCredentialRepository.save(any()) } returns userCredential
         every { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) } just runs
@@ -122,7 +108,6 @@ class AuthServiceTest {
         Assertions.assertThat(result).isNotNull
         verify { userCredentialRepository.existsByEmail(email) }
         verify { userRepository.existsByPhone(any()) }
-        verify { userDomainService.createUserWithCredential(any(), any(), any(), any(), any(), any(), any(), any()) }
         verify { userRepository.save(any()) }
         verify { userCredentialRepository.save(any()) }
         verify { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) }

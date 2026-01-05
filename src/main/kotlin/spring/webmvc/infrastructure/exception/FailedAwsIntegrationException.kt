@@ -2,7 +2,7 @@ package spring.webmvc.infrastructure.exception
 
 import org.springframework.http.HttpStatus
 
-class AwsIntegrationException(
+class FailedAwsIntegrationException(
     serviceName: String,
     throwable: Throwable,
 ) : AbstractHttpException(

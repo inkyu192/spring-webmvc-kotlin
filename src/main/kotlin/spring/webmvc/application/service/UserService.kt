@@ -2,8 +2,8 @@ package spring.webmvc.application.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import spring.webmvc.application.dto.query.UserSearchQuery
-import spring.webmvc.application.dto.result.UserDetail
+import spring.webmvc.application.dto.query.UserQuery
+import spring.webmvc.application.dto.result.UserCredentialResult
 import spring.webmvc.domain.repository.UserCredentialRepository
 import spring.webmvc.domain.repository.UserRepository
 
@@ -13,7 +13,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val userCredentialRepository: UserCredentialRepository,
 ) {
-    fun findUsers(query: UserSearchQuery) = userRepository.findAll(
+    fun findUsers(query: UserQuery) = userRepository.findAllWithOffsetPage(
         pageable = query.pageable,
         phone = query.phone,
         name = query.name,
@@ -21,11 +21,11 @@ class UserService(
         createdTo = query.createdTo,
     )
 
-    fun findUserDetail(userId: Long): UserDetail {
-        val user = userRepository.findById(userId)
-        val credential = userCredentialRepository.findByUser(user)
+    fun findUserDetail(id: Long): UserCredentialResult {
+        val user = userRepository.findById(id)
+        val credential = userCredentialRepository.findByUserId(id)
 
-        return UserDetail(
+        return UserCredentialResult(
             user = user,
             credential = credential,
             oauths = emptyList(),

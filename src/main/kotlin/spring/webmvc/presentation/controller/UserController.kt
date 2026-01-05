@@ -4,7 +4,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import spring.webmvc.application.dto.query.UserSearchQuery
+import spring.webmvc.application.dto.query.UserQuery
 import spring.webmvc.application.service.UserService
 import spring.webmvc.presentation.dto.response.UserDetailResponse
 import spring.webmvc.presentation.dto.response.UserPageResponse
@@ -24,13 +24,14 @@ class UserController(
         @RequestParam createdFrom: Instant,
         @RequestParam createdTo: Instant,
     ): UserPageResponse {
-        val query = UserSearchQuery.create(
+        val query = UserQuery.create(
             pageable = pageable,
             phone = phone,
             name = name,
             createdFrom = createdFrom,
             createdTo = createdTo
         )
+
         val page = userService.findUsers(query)
 
         return UserPageResponse.from(page)

@@ -8,7 +8,7 @@ import java.time.Instant
 
 interface UserRepository {
     fun findById(id: Long): User
-    fun findAll(
+    fun findAllWithOffsetPage(
         pageable: Pageable,
         phone: Phone?,
         name: String?,

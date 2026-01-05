@@ -19,13 +19,13 @@ class UserRepositoryAdapter(
 ) : UserRepository {
     override fun findById(id: Long): User = jpaRepository.findByIdOrThrow(id)
 
-    override fun findAll(
+    override fun findAllWithOffsetPage(
         pageable: Pageable,
         phone: Phone?,
         name: String?,
         createdFrom: Instant,
         createdTo: Instant,
-    ) = kotlinJdslRepository.findAll(
+    ) = kotlinJdslRepository.findAllWithOffsetPage(
         pageable = pageable,
         phone = phone,
         name = name,

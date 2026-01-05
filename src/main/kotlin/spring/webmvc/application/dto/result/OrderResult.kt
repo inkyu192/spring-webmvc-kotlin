@@ -5,18 +5,32 @@ import spring.webmvc.domain.model.entity.OrderProduct
 import spring.webmvc.domain.model.enums.OrderStatus
 import java.time.Instant
 
-data class OrderResult(
+data class OrderSummaryResult(
+    val id: Long,
+    val orderedAt: Instant,
+    val status: OrderStatus,
+) {
+    companion object {
+        fun from(order: Order) = OrderSummaryResult(
+            id = checkNotNull(order.id),
+            orderedAt = order.orderedAt,
+            status = order.status,
+        )
+    }
+}
+
+data class OrderDetailResult(
     val id: Long,
     val orderedAt: Instant,
     val status: OrderStatus,
     val products: List<OrderProductResult>,
 ) {
     companion object {
-        fun from(order: Order) = OrderResult(
+        fun from(order: Order) = OrderDetailResult(
             id = checkNotNull(order.id),
             orderedAt = order.orderedAt,
             status = order.status,
-            products = order.orderProducts.map { OrderProductResult.from(it) },
+            products = order.orderProducts.map { OrderProductResult.from(orderProduct = it) },
         )
     }
 }

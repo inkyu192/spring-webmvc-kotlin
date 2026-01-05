@@ -26,7 +26,7 @@ data class OffsetPageResponse(
 }
 
 data class CursorPageResponse(
-    val size: Int,
+    val size: Long,
     val hasNext: Boolean?,
     val nextCursorId: Long?,
 ) {

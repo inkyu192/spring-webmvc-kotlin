@@ -15,9 +15,9 @@ import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.CurationCreateCommand
+import spring.webmvc.application.dto.result.CurationDetailResult
 import spring.webmvc.application.dto.result.CurationProductResult
-import spring.webmvc.application.dto.result.CurationResult
-import spring.webmvc.application.dto.result.ProductResult
+import spring.webmvc.application.dto.result.CurationSummaryResult
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Curation
@@ -101,7 +101,7 @@ class CurationControllerTest {
 
     @Test
     fun createCuration() {
-        val curationResult = CurationResult.from(curation1)
+        val curationResult = CurationDetailResult.from(curation1)
 
         every { curationService.createCuration(any<CurationCreateCommand>()) } returns curationResult
 
@@ -145,7 +145,7 @@ class CurationControllerTest {
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
                         PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
-                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리")
+                        PayloadDocumentation.fieldWithPath("products").description("큐레이션 상품 목록")
                     )
                 )
             )
@@ -154,7 +154,7 @@ class CurationControllerTest {
     @Test
     fun findCurations() {
         val category = spring.webmvc.domain.model.enums.CurationCategory.HOME
-        val curationResult1 = CurationResult.from(curation1)
+        val curationResult1 = CurationSummaryResult.from(curation1)
 
         val result = listOf(curationResult1)
 
@@ -172,10 +172,10 @@ class CurationControllerTest {
                         RequestDocumentation.parameterWithName("category").description("큐레이션 카테고리")
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("count").description("큐레이션 수"),
+                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리"),
+                        PayloadDocumentation.fieldWithPath("size").description("큐레이션 수"),
                         PayloadDocumentation.fieldWithPath("curations[].id").description("큐레이션 ID"),
-                        PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목"),
-                        PayloadDocumentation.fieldWithPath("curations[].category").description("큐레이션 카테고리"),
+                        PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목")
                     )
                 )
             )
@@ -186,17 +186,23 @@ class CurationControllerTest {
         val curationId = 1L
         val cursorId = null
 
-        val productResults = listOf(
-            ProductResult.from(product1),
-            ProductResult.from(product2)
+        val curationProductResults = listOf(
+            CurationProductResult(
+                category = product1.product.category,
+                name = product1.product.name,
+                description = product1.product.description,
+                price = product1.product.price
+            ),
+            CurationProductResult(
+                category = product2.product.category,
+                name = product2.product.name,
+                description = product2.product.description,
+                price = product2.product.price
+            )
         )
-        val cursorPage = CursorPage(productResults, 10, false, null)
-        val curationProductResult = CurationProductResult(
-            curation = CurationResult.from(curation1),
-            productPage = cursorPage
-        )
+        val cursorPage = CursorPage(curationProductResults, 10, false, null)
 
-        every { curationService.findCurationProduct(curationId, cursorId) } returns curationProductResult
+        every { curationService.findCurationProduct(curationId, cursorId) } returns cursorPage
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/curations/{id}", curationId)
@@ -212,19 +218,13 @@ class CurationControllerTest {
                         RequestDocumentation.parameterWithName("cursorId").description("커서 ID").optional()
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
-                        PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
                         PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
                         PayloadDocumentation.fieldWithPath("page.hasNext").description("다음 페이지 존재 여부"),
                         PayloadDocumentation.fieldWithPath("page.nextCursorId").description("다음 커서 ID"),
-                        PayloadDocumentation.fieldWithPath("products[].id").description("상품 ID"),
                         PayloadDocumentation.fieldWithPath("products[].category").description("상품 카테고리"),
                         PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
                         PayloadDocumentation.fieldWithPath("products[].description").description("상품 설명"),
-                        PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격"),
-                        PayloadDocumentation.fieldWithPath("products[].quantity").description("상품 수량"),
-                        PayloadDocumentation.fieldWithPath("products[].createdAt").description("상품 생성일시"),
-                        PayloadDocumentation.subsectionWithPath("products[].detail").description("상품 상세 정보")
+                        PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격")
                     )
                 )
             )

@@ -14,7 +14,7 @@ import java.time.Instant
 class UserQuerydslRepository(
     private val jpaQueryFactory: JPAQueryFactory,
 ) {
-    fun findAll(
+    fun findAllWithOffsetPage(
         pageable: Pageable,
         phone: Phone?,
         name: String?,

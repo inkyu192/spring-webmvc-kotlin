@@ -9,13 +9,12 @@ data class MenuResponse(
     val children: List<MenuResponse>,
 ) {
     companion object {
-        fun from(menuResult: MenuResult): MenuResponse {
-            return MenuResponse(
+        fun from(menuResult: MenuResult): MenuResponse =
+            MenuResponse(
                 id = menuResult.id,
                 name = menuResult.name,
                 path = menuResult.path,
-                children = menuResult.children.map { from(it) }
+                children = menuResult.children.map { from(menuResult = it) }
             )
-        }
     }
 }

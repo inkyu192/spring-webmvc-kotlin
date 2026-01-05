@@ -9,3 +9,8 @@ data class CurationCreateCommand(
     val sortOrder: Long,
     val products: List<CurationProductCreateCommand>,
 )
+
+data class CurationProductCreateCommand(
+    val productId: Long,
+    val sortOrder: Long,
+)

@@ -19,7 +19,7 @@ class ApplicationExceptionHandler(
     private val uriFactory: UriFactory,
 ) {
     @ExceptionHandler(AbstractHttpException::class)
-    fun handleBusinessException(e: AbstractHttpException) =
+    fun handleBusinessException(e: AbstractHttpException): ProblemDetail =
         ProblemDetail.forStatusAndDetail(e.httpStatus, e.message).apply {
             type = uriFactory.createApiDocUri(status)
         }
@@ -29,20 +29,20 @@ class ApplicationExceptionHandler(
         HttpRequestMethodNotSupportedException::class,
         ServletRequestBindingException::class,
     )
-    fun handleResourceNotFound(errorResponse: ErrorResponse) =
+    fun handleResourceNotFound(errorResponse: ErrorResponse): ProblemDetail =
         errorResponse.body.apply { type = uriFactory.createApiDocUri(status) }
 
     @ExceptionHandler(
         HttpMessageNotReadableException::class,
         MethodArgumentTypeMismatchException::class,
     )
-    fun handleInvalidRequestBody(exception: Exception) =
+    fun handleInvalidRequestBody(exception: Exception): ProblemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.message).apply {
             type = uriFactory.createApiDocUri(HttpStatus.BAD_REQUEST)
         }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationException(exception: MethodArgumentNotValidException) =
+    fun handleValidationException(exception: MethodArgumentNotValidException): ProblemDetail =
         exception.body.apply {
             type = uriFactory.createApiDocUri(status)
             setProperty("fields", exception.bindingResult.fieldErrors.associate { it.field to it.defaultMessage })
