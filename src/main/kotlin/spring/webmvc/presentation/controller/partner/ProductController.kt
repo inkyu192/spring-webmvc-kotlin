@@ -14,9 +14,9 @@ import spring.webmvc.presentation.dto.request.ProductUpdateRequest
 import spring.webmvc.presentation.dto.response.ProductDetailResponse
 import spring.webmvc.presentation.dto.response.ProductOffsetPageResponse
 
-@RestController
+@RestController("partnerProductController")
 @RequestMapping("/partner/products")
-class PartnerProductController(
+class ProductController(
     private val productService: ProductService,
 ) {
     @GetMapping

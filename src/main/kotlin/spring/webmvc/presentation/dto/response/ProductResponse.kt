@@ -110,14 +110,12 @@ data class TransportResponse(
 }
 
 data class AccommodationResponse(
-    val accommodationId: Long,
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
 ) : ProductAttributeResponse {
     companion object {
         fun from(result: AccommodationResult) = AccommodationResponse(
-            accommodationId = result.accommodationId,
             place = result.place,
             checkInTime = result.checkInTime,
             checkOutTime = result.checkOutTime,

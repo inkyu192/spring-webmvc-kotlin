@@ -14,9 +14,9 @@ import spring.webmvc.presentation.dto.response.OrderCursorPageResponse
 import spring.webmvc.presentation.dto.response.OrderDetailResponse
 import java.time.Instant
 
-@RestController
+@RestController("customerOrderController")
 @RequestMapping("/customer/orders")
-class CustomerOrderController(
+class OrderController(
     private val orderService: OrderService,
 ) {
     @PostMapping

@@ -35,6 +35,10 @@ class ProductService(
             .map { ProductSummaryResult.from(product = it) }
 
     @Cacheable(value = ["product"], key = "'product:' + #id")
+    fun findProductCached(id: Long): ProductDetailResult {
+        return findProduct(id)
+    }
+
     fun findProduct(id: Long): ProductDetailResult {
         val product = productRepository.findById(id)
         val strategy = productAttributeStrategyMap[product.category]
@@ -42,9 +46,11 @@ class ProductService(
 
         val attributeResult = strategy.findByProductId(productId = id)
 
-        ProductViewEvent(productId = id).let { eventPublisher.publishEvent(it) }
-
         return ProductDetailResult.from(product = product, attributeResult = attributeResult)
+    }
+
+    fun incrementProductViewCount(id: Long) {
+        ProductViewEvent(productId = id).let { eventPublisher.publishEvent(it) }
     }
 
     @Transactional
@@ -102,12 +108,10 @@ class ProductService(
     )
     fun deleteProduct(id: Long) {
         val product = productRepository.findById(id)
-
-        productRepository.delete(product)
-
         val strategy = productAttributeStrategyMap[product.category]
             ?: throw UnsupportedOperationException("${product.category}")
 
         strategy.deleteProduct(productId = id)
+        productRepository.delete(product)
     }
 }

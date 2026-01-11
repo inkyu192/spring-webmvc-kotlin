@@ -1,7 +1,9 @@
 package spring.webmvc.presentation.controller.customer
 
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.spyk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,8 +27,8 @@ import spring.webmvc.infrastructure.config.ControllerTest
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import java.time.Instant
 
-@ControllerTest([CustomerProductController::class])
-class CustomerProductControllerTest {
+@ControllerTest([ProductController::class])
+class ProductControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -168,7 +170,8 @@ class CustomerProductControllerTest {
 
     @Test
     fun findTransport() {
-        every { productService.findProduct(id = productId) } returns transportResult
+        every { productService.findProductCached(id = productId) } returns transportResult
+        every { productService.incrementProductViewCount(id = productId) } just Runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/customer/products/{id}", productId)
@@ -207,7 +210,8 @@ class CustomerProductControllerTest {
     fun findAccommodation() {
         val productId = 1L
 
-        every { productService.findProduct(id = productId) } returns accommodationResult
+        every { productService.findProductCached(id = productId) } returns accommodationResult
+        every { productService.incrementProductViewCount(id = productId) } just Runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/customer/products/{id}", productId)
@@ -233,7 +237,6 @@ class CustomerProductControllerTest {
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("attribute.accommodationId").description("숙소아이디"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
                         PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")

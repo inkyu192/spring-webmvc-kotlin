@@ -1,6 +1,8 @@
 package spring.webmvc.application.service
 
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.command.CurationCreateCommand
@@ -48,14 +50,32 @@ class CurationService(
     }
 
     @Cacheable(value = ["curations"], key = "'curations:' + #category")
+    fun findCurationsCached(category: CurationCategory) = findCurations(category)
+
     fun findCurations(category: CurationCategory) = curationRepository.findAllByCategory(category)
         .map { CurationSummaryResult.from(curation = it) }
 
     @Cacheable(value = ["curationProducts"], key = "'curations:' + #curationId + ':' + #cursorId")
-    fun findCurationProduct(curationId: Long, cursorId: Long?) =
+    fun findCurationProductWithCursorPageCached(curationId: Long, cursorId: Long?) =
+        findCurationProductWithCursorPage(curationId, cursorId)
+
+    fun findCurationProductWithCursorPage(curationId: Long, cursorId: Long?) =
         curationProductRepository.findAllWithCursorPage(
             curationId = curationId,
             cursorId = cursorId,
+        ).map {
+            CurationProductResult(
+                category = it.product.category,
+                name = it.product.name,
+                description = it.product.description,
+                price = it.product.price,
+            )
+        }
+
+    fun findCurationProductWithOffsetPage(curationId: Long, pageable: Pageable): Page<CurationProductResult> =
+        curationProductRepository.findAllWithOffsetPage(
+            curationId = curationId,
+            pageable = pageable,
         ).map {
             CurationProductResult(
                 category = it.product.category,

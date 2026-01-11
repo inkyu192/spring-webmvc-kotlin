@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.domain.model.entity.Accommodation
+import spring.webmvc.domain.model.enums.Category
 import spring.webmvc.infrastructure.config.RepositoryTest
 
 @RepositoryTest
@@ -26,7 +27,7 @@ class ProductQuerydslRepositoryTest(
     @BeforeEach
     fun setUp() {
         val p1 = spring.webmvc.domain.model.entity.Product.create(
-            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
+            category = Category.ACCOMMODATION,
             name = "product1",
             description = "description",
             price = 1000,
@@ -40,7 +41,7 @@ class ProductQuerydslRepositoryTest(
         )
 
         val p2 = spring.webmvc.domain.model.entity.Product.create(
-            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
+            category = Category.ACCOMMODATION,
             name = "product2",
             description = "description",
             price = 2000,
@@ -54,7 +55,7 @@ class ProductQuerydslRepositoryTest(
         )
 
         val p3 = spring.webmvc.domain.model.entity.Product.create(
-            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
+            category = Category.ACCOMMODATION,
             name = "product3",
             description = "description",
             price = 3000,
@@ -68,7 +69,7 @@ class ProductQuerydslRepositoryTest(
         )
 
         val p4 = spring.webmvc.domain.model.entity.Product.create(
-            category = spring.webmvc.domain.model.enums.Category.ACCOMMODATION,
+            category = Category.ACCOMMODATION,
             name = "product4",
             description = "description",
             price = 1500,

@@ -62,6 +62,18 @@ data class CurationCursorPageResponse(
     }
 }
 
+data class CurationOffsetPageResponse(
+    val page: OffsetPageResponse,
+    val products: List<CurationProductResponse>,
+) {
+    companion object {
+        fun from(page: org.springframework.data.domain.Page<CurationProductResult>) = CurationOffsetPageResponse(
+            page = OffsetPageResponse.from(page),
+            products = page.content.map { CurationProductResponse.from(result = it) },
+        )
+    }
+}
+
 data class CurationProductResponse(
     val category: Category,
     val name: String,

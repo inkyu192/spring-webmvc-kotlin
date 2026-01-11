@@ -27,11 +27,12 @@ import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
 import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.model.enums.ProductStatus
 import spring.webmvc.infrastructure.config.ControllerTest
 import java.time.Instant
 
-@ControllerTest([PartnerProductController::class])
-class PartnerProductControllerTest {
+@ControllerTest([ProductController::class])
+class ProductControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -66,7 +67,7 @@ class PartnerProductControllerTest {
             every { id } returns 1L
             every { product.id } returns 1L
             every { product.category } returns Category.ACCOMMODATION
-            every { product.status } returns spring.webmvc.domain.model.enums.ProductStatus.SELLING
+            every { product.status } returns ProductStatus.SELLING
             every { product.name } returns "name1"
             every { product.description } returns "description"
             every { product.price } returns 1000
@@ -93,7 +94,7 @@ class PartnerProductControllerTest {
             every { id } returns 2L
             every { product.id } returns 2L
             every { product.category } returns Category.TRANSPORT
-            every { product.status } returns spring.webmvc.domain.model.enums.ProductStatus.SELLING
+            every { product.status } returns ProductStatus.SELLING
             every { product.name } returns "name2"
             every { product.description } returns "description"
             every { product.price } returns 2000
@@ -240,7 +241,6 @@ class PartnerProductControllerTest {
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("attribute.accommodationId").description("숙소아이디"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
                         PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
@@ -391,7 +391,6 @@ class PartnerProductControllerTest {
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("attribute.accommodationId").description("숙소아이디"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
                         PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
@@ -403,7 +402,7 @@ class PartnerProductControllerTest {
     @Test
     fun updateTransport() {
         val productId = 1L
-        val status = spring.webmvc.domain.model.enums.ProductStatus.SELLING
+        val status = ProductStatus.SELLING
         val name = "name"
         val description = "description"
         val price = 1000L
@@ -485,7 +484,7 @@ class PartnerProductControllerTest {
     @Test
     fun updateAccommodation() {
         val productId = 1L
-        val status = spring.webmvc.domain.model.enums.ProductStatus.SELLING
+        val status = ProductStatus.SELLING
         val name = "name"
         val description = "description"
         val price = 1000L
@@ -552,7 +551,6 @@ class PartnerProductControllerTest {
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("attribute.accommodationId").description("숙소아이디"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
                         PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")

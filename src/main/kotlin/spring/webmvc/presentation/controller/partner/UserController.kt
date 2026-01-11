@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.controller
+package spring.webmvc.presentation.controller.partner
 
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -10,8 +10,8 @@ import spring.webmvc.presentation.dto.response.UserDetailResponse
 import spring.webmvc.presentation.dto.response.UserPageResponse
 import java.time.Instant
 
-@RestController
-@RequestMapping("/users")
+@RestController("partnerUserController")
+@RequestMapping("/partner/users")
 class UserController(
     private val userService: UserService,
 ) {

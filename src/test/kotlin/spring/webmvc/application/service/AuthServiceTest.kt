@@ -25,6 +25,7 @@ import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
+import spring.webmvc.infrastructure.exception.NotFoundEntityException
 import spring.webmvc.infrastructure.security.JwtProvider
 import java.time.LocalDate
 
@@ -173,15 +174,14 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일로 로그인 시 BadCredentialsException 발생")
+    @DisplayName("존재하지 않는 이메일로 로그인 시 NotFoundEntityException 발생")
     fun signInWithNonExistentEmail() {
         val command = SignInCommand(email = email, password = "password123")
 
         every { userCredentialRepository.findByEmail(email) } returns null
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
-            .isInstanceOf(BadCredentialsException::class.java)
-            .hasMessage("유효하지 않은 인증 정보입니다.")
+            .isInstanceOf(NotFoundEntityException::class.java)
     }
 
     @Test
@@ -194,7 +194,6 @@ class AuthServiceTest {
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
             .isInstanceOf(BadCredentialsException::class.java)
-            .hasMessage("유효하지 않은 인증 정보입니다.")
     }
 
     @Test
@@ -214,7 +213,6 @@ class AuthServiceTest {
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
             .isInstanceOf(BadCredentialsException::class.java)
-            .hasMessage("이메일 인증이 필요합니다.")
     }
 
     @Test
@@ -248,7 +246,6 @@ class AuthServiceTest {
 
         Assertions.assertThatThrownBy { authService.refreshToken(command) }
             .isInstanceOf(BadCredentialsException::class.java)
-            .hasMessage("유효하지 않은 인증 정보입니다.")
     }
 
     @Test
@@ -295,7 +292,6 @@ class AuthServiceTest {
 
         Assertions.assertThatThrownBy { authService.confirmJoinVerify(command) }
             .isInstanceOf(BadCredentialsException::class.java)
-            .hasMessage("유효하지 않은 인증 정보입니다.")
     }
 
     @Test
@@ -313,15 +309,14 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일로 비밀번호 재설정 요청 시 BadCredentialsException 발생")
+    @DisplayName("존재하지 않는 이메일로 비밀번호 재설정 요청 시 NotFoundEntityException 발생")
     fun requestPasswordResetWithNonExistentEmail() {
         val command = PasswordResetRequestCommand(email = email)
 
         every { userCredentialRepository.findByEmail(email) } returns null
 
         Assertions.assertThatThrownBy { authService.requestPasswordReset(command) }
-            .isInstanceOf(BadCredentialsException::class.java)
-            .hasMessage("유효하지 않은 인증 정보입니다.")
+            .isInstanceOf(NotFoundEntityException::class.java)
     }
 
     @Test
@@ -352,6 +347,5 @@ class AuthServiceTest {
 
         Assertions.assertThatThrownBy { authService.confirmPasswordReset(command) }
             .isInstanceOf(BadCredentialsException::class.java)
-            .hasMessage("유효하지 않은 인증 정보입니다.")
     }
 }

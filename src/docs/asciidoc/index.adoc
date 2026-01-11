@@ -93,6 +93,7 @@ include::{snippets}/sign-in/response-fields.adoc[]
 | Code | Name
 | 200 | <<OK>>
 | 401 | <<UNAUTHORIZED>>
+| 404 | <<NOT_FOUND>>
 |===
 
 === 토큰 재발행
@@ -166,6 +167,7 @@ include::{snippets}/join-verify-confirm/http-response.adoc[]
 | Code | Name
 | 204 | <<NO_CONTENT>>
 | 401 | <<UNAUTHORIZED>>
+| 404 | <<NOT_FOUND>>
 |===
 
 === 비밀번호 재설정 요청
@@ -188,7 +190,7 @@ include::{snippets}/password-reset-request/http-response.adoc[]
 |===
 | Code | Name
 | 204 | <<NO_CONTENT>>
-| 401 | <<UNAUTHORIZED>>
+| 404 | <<NOT_FOUND>>
 |===
 
 === 비밀번호 재설정 확인
@@ -212,6 +214,7 @@ include::{snippets}/password-reset-confirm/http-response.adoc[]
 | Code | Name
 | 204 | <<NO_CONTENT>>
 | 401 | <<UNAUTHORIZED>>
+| 404 | <<NOT_FOUND>>
 |===
 
 == 메뉴
@@ -245,23 +248,29 @@ include::{snippets}/menu-list/response-fields.adoc[]
 
 == 사용자
 
-=== 목록 조회
+=== 제휴사
+
+==== 목록 조회
 
 **HTTP Request**
 
-include::{snippets}/user-list/http-request.adoc[]
+include::{snippets}/partner-user-list/http-request.adoc[]
 
 **Request Headers**
 
-include::{snippets}/user-list/request-headers.adoc[]
+include::{snippets}/partner-user-list/request-headers.adoc[]
+
+**Query Parameters**
+
+include::{snippets}/partner-user-list/query-parameters.adoc[]
 
 **HTTP Response**
 
-include::{snippets}/user-list/http-response.adoc[]
+include::{snippets}/partner-user-list/http-response.adoc[]
 
 **Response Fields**
 
-include::{snippets}/user-list/response-fields.adoc[]
+include::{snippets}/partner-user-list/response-fields.adoc[]
 
 **HTTP Status Codes**
 
@@ -273,23 +282,27 @@ include::{snippets}/user-list/response-fields.adoc[]
 | 403 | <<FORBIDDEN>>
 |===
 
-=== 상세 조회
+==== 상세 조회
 
 **HTTP Request**
 
-include::{snippets}/user-detail/http-request.adoc[]
+include::{snippets}/partner-user-detail/http-request.adoc[]
 
 **Request Headers**
 
-include::{snippets}/user-detail/request-headers.adoc[]
+include::{snippets}/partner-user-detail/request-headers.adoc[]
+
+**Path Parameters**
+
+include::{snippets}/partner-user-detail/path-parameters.adoc[]
 
 **HTTP Response**
 
-include::{snippets}/user-detail/http-response.adoc[]
+include::{snippets}/partner-user-detail/http-response.adoc[]
 
 **Response Fields**
 
-include::{snippets}/user-detail/response-fields.adoc[]
+include::{snippets}/partner-user-detail/response-fields.adoc[]
 
 **HTTP Status Codes**
 
@@ -304,7 +317,7 @@ include::{snippets}/user-detail/response-fields.adoc[]
 
 == 상품
 
-=== 고객용
+=== 고객
 
 ==== 목록 조회
 
@@ -381,7 +394,7 @@ include::{snippets}/customer-accommodation-detail/response-fields.adoc[]
 | 404 | <<NOT_FOUND>>
 |===
 
-=== 파트너용
+=== 제휴사
 
 ==== 목록 조회
 
@@ -660,49 +673,25 @@ include::{snippets}/partner-accommodation-delete/http-response.adoc[]
 
 == 큐레이션
 
-=== 목록 조회
+=== 고객
+
+==== 목록 조회
 
 **HTTP Request**
 
-include::{snippets}/curation-list/http-request.adoc[]
-
-**HTTP Response**
-
-include::{snippets}/curation-list/http-response.adoc[]
-
-**Response Fields**
-
-include::{snippets}/curation-list/response-fields.adoc[]
-
-**HTTP Status Codes**
-
-[cols="1,3",options="header"]
-|===
-| Code | Name
-| 200 | <<OK>>
-|===
-
-=== 상품 조회
-
-**HTTP Request**
-
-include::{snippets}/curation-product/http-request.adoc[]
-
-**Path Parameters**
-
-include::{snippets}/curation-product/path-parameters.adoc[]
+include::{snippets}/customer-curation-list/http-request.adoc[]
 
 **Query Parameters**
 
-include::{snippets}/curation-product/query-parameters.adoc[]
+include::{snippets}/customer-curation-list/query-parameters.adoc[]
 
 **HTTP Response**
 
-include::{snippets}/curation-product/http-response.adoc[]
+include::{snippets}/customer-curation-list/http-response.adoc[]
 
 **Response Fields**
 
-include::{snippets}/curation-product/response-fields.adoc[]
+include::{snippets}/customer-curation-list/response-fields.adoc[]
 
 **HTTP Status Codes**
 
@@ -712,27 +701,59 @@ include::{snippets}/curation-product/response-fields.adoc[]
 | 200 | <<OK>>
 |===
 
-=== 생성
+==== 상품 조회
 
 **HTTP Request**
 
-include::{snippets}/curation-create/http-request.adoc[]
+include::{snippets}/customer-curation-product/http-request.adoc[]
 
-**Request Headers**
+**Path Parameters**
 
-include::{snippets}/curation-create/request-headers.adoc[]
+include::{snippets}/customer-curation-product/path-parameters.adoc[]
 
-**Request Fields**
+**Query Parameters**
 
-include::{snippets}/curation-create/request-fields.adoc[]
+include::{snippets}/customer-curation-product/query-parameters.adoc[]
 
 **HTTP Response**
 
-include::{snippets}/curation-create/http-response.adoc[]
+include::{snippets}/customer-curation-product/http-response.adoc[]
 
 **Response Fields**
 
-include::{snippets}/curation-create/response-fields.adoc[]
+include::{snippets}/customer-curation-product/response-fields.adoc[]
+
+**HTTP Status Codes**
+
+[cols="1,3",options="header"]
+|===
+| Code | Name
+| 200 | <<OK>>
+|===
+
+=== 제휴사
+
+==== 생성
+
+**HTTP Request**
+
+include::{snippets}/partner-curation-create/http-request.adoc[]
+
+**Request Headers**
+
+include::{snippets}/partner-curation-create/request-headers.adoc[]
+
+**Request Fields**
+
+include::{snippets}/partner-curation-create/request-fields.adoc[]
+
+**HTTP Response**
+
+include::{snippets}/partner-curation-create/http-response.adoc[]
+
+**Response Fields**
+
+include::{snippets}/partner-curation-create/response-fields.adoc[]
 
 **HTTP Status Codes**
 
@@ -740,11 +761,81 @@ include::{snippets}/curation-create/response-fields.adoc[]
 |===
 | Code | Name
 | 201 | <<CREATED>>
+| 401 | <<UNAUTHORIZED>>
+| 403 | <<FORBIDDEN>>
+|===
+
+==== 목록 조회
+
+**HTTP Request**
+
+include::{snippets}/partner-curation-list/http-request.adoc[]
+
+**Request Headers**
+
+include::{snippets}/partner-curation-list/request-headers.adoc[]
+
+**Query Parameters**
+
+include::{snippets}/partner-curation-list/query-parameters.adoc[]
+
+**HTTP Response**
+
+include::{snippets}/partner-curation-list/http-response.adoc[]
+
+**Response Fields**
+
+include::{snippets}/partner-curation-list/response-fields.adoc[]
+
+**HTTP Status Codes**
+
+[cols="1,3",options="header"]
+|===
+| Code | Name
+| 200 | <<OK>>
+| 401 | <<UNAUTHORIZED>>
+| 403 | <<FORBIDDEN>>
+|===
+
+==== 상품 조회
+
+**HTTP Request**
+
+include::{snippets}/partner-curation-product/http-request.adoc[]
+
+**Request Headers**
+
+include::{snippets}/partner-curation-product/request-headers.adoc[]
+
+**Path Parameters**
+
+include::{snippets}/partner-curation-product/path-parameters.adoc[]
+
+**Query Parameters**
+
+include::{snippets}/partner-curation-product/query-parameters.adoc[]
+
+**HTTP Response**
+
+include::{snippets}/partner-curation-product/http-response.adoc[]
+
+**Response Fields**
+
+include::{snippets}/partner-curation-product/response-fields.adoc[]
+
+**HTTP Status Codes**
+
+[cols="1,3",options="header"]
+|===
+| Code | Name
+| 200 | <<OK>>
+| 401 | <<UNAUTHORIZED>>
+| 403 | <<FORBIDDEN>>
 |===
 
 == 주문
 
-=== 고객용
+=== 고객
 
 ==== 목록 조회
 
@@ -876,7 +967,7 @@ include::{snippets}/customer-order-cancel/response-fields.adoc[]
 | 422 | <<UNPROCESSABLE_ENTITY>>
 |===
 
-=== 파트너용
+=== 제휴사
 
 ==== 목록 조회
 

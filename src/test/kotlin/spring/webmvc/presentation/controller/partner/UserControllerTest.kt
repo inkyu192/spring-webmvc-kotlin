@@ -1,4 +1,4 @@
-package spring.webmvc.presentation.controller
+package spring.webmvc.presentation.controller.partner
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -96,7 +96,7 @@ class UserControllerTest {
         every { userService.findUsers(any()) } returns page
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/users")
+            RestDocumentationRequestBuilders.get("/partner/users")
                 .header("Authorization", "Bearer accessToken")
                 .param("createdFrom", "2024-01-01T00:00:00Z")
                 .param("createdTo", "2024-12-31T23:59:59Z")
@@ -104,7 +104,7 @@ class UserControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "user-list",
+                    "partner-user-list",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
@@ -141,13 +141,13 @@ class UserControllerTest {
         every { userService.findUserDetail(1L) } returns userDetail
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/users/{id}", 1L)
+            RestDocumentationRequestBuilders.get("/partner/users/{id}", 1L)
                 .header("Authorization", "Bearer accessToken")
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "user-detail",
+                    "partner-user-detail",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),

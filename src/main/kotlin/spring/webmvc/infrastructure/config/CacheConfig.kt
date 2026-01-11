@@ -1,5 +1,10 @@
 package spring.webmvc.infrastructure.config
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -18,6 +23,18 @@ class CacheConfig {
 
     @Bean
     fun cacheManager(connectionFactory: RedisConnectionFactory): CacheManager {
+        val objectMapper = ObjectMapper().apply {
+            registerKotlinModule()
+            registerModule(JavaTimeModule())
+            activateDefaultTyping(
+                BasicPolymorphicTypeValidator.builder().allowIfBaseType(Any::class.java).build(),
+                ObjectMapper.DefaultTyping.EVERYTHING,
+                JsonTypeInfo.As.PROPERTY
+            )
+        }
+
+        val serializer = GenericJackson2JsonRedisSerializer(objectMapper)
+
         val defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
             .disableKeyPrefix()
             .entryTtl(Duration.ofHours(1))
@@ -25,7 +42,7 @@ class CacheConfig {
                 RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
             )
             .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer())
+                RedisSerializationContext.SerializationPair.fromSerializer(serializer)
             )
 
         val cacheConfigurations = mapOf(

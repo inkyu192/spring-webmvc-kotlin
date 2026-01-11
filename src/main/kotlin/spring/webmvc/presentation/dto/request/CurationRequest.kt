@@ -3,6 +3,7 @@ package spring.webmvc.presentation.dto.request
 import jakarta.validation.constraints.Size
 import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.command.CurationProductCreateCommand
+import spring.webmvc.domain.model.enums.CurationCategory
 
 data class CurationCreateRequest(
     val title: String,
@@ -14,7 +15,7 @@ data class CurationCreateRequest(
 ) {
     fun toCommand() = CurationCreateCommand(
         title = title,
-        category = spring.webmvc.domain.model.enums.CurationCategory.valueOf(category),
+        category = CurationCategory.valueOf(category),
         isExposed = isExposed,
         sortOrder = sortOrder,
         products = products.map { it.toCommand() }.toList()

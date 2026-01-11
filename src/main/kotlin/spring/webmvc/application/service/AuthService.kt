@@ -20,6 +20,7 @@ import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
+import spring.webmvc.infrastructure.exception.NotFoundEntityException
 import spring.webmvc.infrastructure.security.JwtProvider
 
 @Service
@@ -73,7 +74,7 @@ class AuthService(
     @Transactional
     fun signIn(command: SignInCommand): TokenResult {
         val userCredential = userCredentialRepository.findByEmail(command.email)
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            ?: throw NotFoundEntityException(kClass = UserCredential::class, id = command.email.value)
 
         if (!passwordEncoder.matches(command.password, userCredential.password)) {
             throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
@@ -139,7 +140,7 @@ class AuthService(
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
         val userCredential = userCredentialRepository.findByEmail(Email.create(email))
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            ?: throw NotFoundEntityException(kClass = UserCredential::class, id = email)
 
         userCredential.verify()
 
@@ -148,7 +149,7 @@ class AuthService(
 
     fun requestPasswordReset(command: PasswordResetRequestCommand) {
         userCredentialRepository.findByEmail(command.email)
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            ?: throw NotFoundEntityException(kClass = UserCredential::class, id = command.email.value)
 
         SendPasswordResetEmailEvent(email = command.email).let { eventPublisher.publishEvent(it) }
     }
@@ -159,7 +160,7 @@ class AuthService(
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
         val userCredential = userCredentialRepository.findByEmail(Email.create(email))
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            ?: throw NotFoundEntityException(kClass = UserCredential::class, id = email)
 
         userCredential.updatePassword(passwordEncoder.encode(command.password))
 

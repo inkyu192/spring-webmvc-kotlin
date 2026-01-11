@@ -13,9 +13,9 @@ import spring.webmvc.presentation.dto.response.OrderDetailResponse
 import spring.webmvc.presentation.dto.response.OrderOffsetPageResponse
 import java.time.Instant
 
-@RestController
+@RestController("partnerOrderController")
 @RequestMapping("/partner/orders")
-class PartnerOrderController(
+class OrderController(
     private val orderService: OrderService,
 ) {
     @GetMapping

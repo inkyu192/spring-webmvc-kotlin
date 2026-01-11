@@ -7,9 +7,9 @@ import spring.webmvc.domain.model.enums.ProductStatus
 import spring.webmvc.presentation.dto.response.ProductCursorPageResponse
 import spring.webmvc.presentation.dto.response.ProductDetailResponse
 
-@RestController
+@RestController("customerProductController")
 @RequestMapping("/customer/products")
-class CustomerProductController(
+class ProductController(
     private val productService: ProductService,
 ) {
     @GetMapping
@@ -32,7 +32,9 @@ class CustomerProductController(
     fun findProduct(
         @PathVariable id: Long,
     ): ProductDetailResponse {
-        val result = productService.findProduct(id)
+        val result = productService.findProductCached(id)
+
+        productService.incrementProductViewCount(id)
 
         return ProductDetailResponse.from(result)
     }
