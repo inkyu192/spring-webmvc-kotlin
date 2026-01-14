@@ -10,8 +10,9 @@ import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.infrastructure.security.SecurityContextUtil
 import spring.webmvc.presentation.dto.request.OrderCreateRequest
-import spring.webmvc.presentation.dto.response.OrderCursorPageResponse
+import spring.webmvc.presentation.dto.response.CursorPageResponse
 import spring.webmvc.presentation.dto.response.OrderDetailResponse
+import spring.webmvc.presentation.dto.response.OrderSummaryResponse
 import java.time.Instant
 
 @RestController("customerOrderController")
@@ -42,7 +43,7 @@ class OrderController(
         @RequestParam(required = false) orderStatus: OrderStatus?,
         @RequestParam(required = false) orderedFrom: Instant?,
         @RequestParam(required = false) orderedTo: Instant?,
-    ): OrderCursorPageResponse {
+    ): CursorPageResponse<OrderSummaryResponse> {
         val query = OrderCursorPageQuery(
             cursorId = cursorId,
             userId = SecurityContextUtil.getUserId(),
@@ -53,7 +54,7 @@ class OrderController(
 
         val page = orderService.findOrdersWithCursorPage(query = query)
 
-        return OrderCursorPageResponse.from(page)
+        return CursorPageResponse.from(page) { OrderSummaryResponse.from(result = it) }
     }
 
     @GetMapping("/{id}")

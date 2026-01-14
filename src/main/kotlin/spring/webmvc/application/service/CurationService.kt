@@ -1,13 +1,13 @@
 package spring.webmvc.application.service
 
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.command.CurationCreateCommand
+import spring.webmvc.application.dto.result.CurationCursorPageResult
 import spring.webmvc.application.dto.result.CurationDetailResult
-import spring.webmvc.application.dto.result.CurationProductResult
+import spring.webmvc.application.dto.result.CurationOffsetPageResult
 import spring.webmvc.application.dto.result.CurationSummaryResult
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.enums.CurationCategory
@@ -55,33 +55,24 @@ class CurationService(
     fun findCurations(category: CurationCategory) = curationRepository.findAllByCategory(category)
         .map { CurationSummaryResult.from(curation = it) }
 
-    @Cacheable(value = ["curationProducts"], key = "'curations:' + #curationId + ':' + #cursorId")
-    fun findCurationProductWithCursorPageCached(curationId: Long, cursorId: Long?) =
-        findCurationProductWithCursorPage(curationId, cursorId)
-
-    fun findCurationProductWithCursorPage(curationId: Long, cursorId: Long?) =
-        curationProductRepository.findAllWithCursorPage(
-            curationId = curationId,
+    @Cacheable(value = ["curationProducts"], key = "'curations:' + #id + ':' + #cursorId")
+    fun findCurationProductWithCursorPageCached(id: Long, cursorId: Long?): CurationCursorPageResult {
+        val curation = curationRepository.findById(id)
+        val page = curationProductRepository.findAllWithCursorPage(
+            curationId = id,
             cursorId = cursorId,
-        ).map {
-            CurationProductResult(
-                category = it.product.category,
-                name = it.product.name,
-                description = it.product.description,
-                price = it.product.price,
-            )
-        }
+        )
 
-    fun findCurationProductWithOffsetPage(curationId: Long, pageable: Pageable): Page<CurationProductResult> =
-        curationProductRepository.findAllWithOffsetPage(
-            curationId = curationId,
+        return CurationCursorPageResult.from(curation = curation, page = page)
+    }
+
+    fun findCurationProductWithOffsetPage(id: Long, pageable: Pageable): CurationOffsetPageResult {
+        val curation = curationRepository.findById(id)
+        val page = curationProductRepository.findAllWithOffsetPage(
+            curationId = id,
             pageable = pageable,
-        ).map {
-            CurationProductResult(
-                category = it.product.category,
-                name = it.product.name,
-                description = it.product.description,
-                price = it.product.price,
-            )
-        }
+        )
+
+        return CurationOffsetPageResult.from(curation = curation, page = page)
+    }
 }

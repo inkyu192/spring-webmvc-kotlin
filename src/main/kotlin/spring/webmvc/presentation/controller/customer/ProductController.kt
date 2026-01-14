@@ -4,8 +4,9 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.presentation.dto.response.ProductCursorPageResponse
+import spring.webmvc.presentation.dto.response.CursorPageResponse
 import spring.webmvc.presentation.dto.response.ProductDetailResponse
+import spring.webmvc.presentation.dto.response.ProductSummaryResponse
 
 @RestController("customerProductController")
 @RequestMapping("/customer/products")
@@ -16,7 +17,7 @@ class ProductController(
     fun findProducts(
         @RequestParam(required = false) cursorId: Long?,
         @RequestParam(required = false) name: String?,
-    ): ProductCursorPageResponse {
+    ): CursorPageResponse<ProductSummaryResponse> {
         val query = ProductCursorPageQuery(
             cursorId = cursorId,
             name = name,
@@ -25,7 +26,7 @@ class ProductController(
 
         val page = productService.findProductsWithCursorPage(query = query)
 
-        return ProductCursorPageResponse.from(page)
+        return CursorPageResponse.from(page) { ProductSummaryResponse.from(result = it) }
     }
 
     @GetMapping("/{id}")

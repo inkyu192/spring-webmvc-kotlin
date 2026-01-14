@@ -1,55 +1,33 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
+import spring.webmvc.domain.model.vo.ProductExposureProperty
 import java.time.Instant
 
-data class ProductCreateCommand(
-    val category: Category,
-    val name: String,
-    val description: String,
-    val price: Long,
-    val quantity: Long,
-    val attribute: ProductAttributeCreateCommand,
-)
-
-sealed interface ProductAttributeCreateCommand
-
-data class TransportCreateCommand(
-    val departureLocation: String,
-    val arrivalLocation: String,
-    val departureTime: Instant,
-    val arrivalTime: Instant,
-) : ProductAttributeCreateCommand
-
-data class AccommodationCreateCommand(
-    val place: String,
-    val checkInTime: Instant,
-    val checkOutTime: Instant,
-) : ProductAttributeCreateCommand
-
-
-data class ProductUpdateCommand(
-    val id: Long,
+data class ProductPutCommand(
+    val id: Long?,
     val status: ProductStatus,
+    val category: ProductCategory,
     val name: String,
     val description: String,
     val price: Long,
     val quantity: Long,
-    val attribute: ProductAttributeUpdateCommand,
+    val property: ProductPropertyPutCommand,
+    val exposureProperty: ProductExposureProperty,
 )
 
-sealed interface ProductAttributeUpdateCommand
+sealed interface ProductPropertyPutCommand
 
-data class TransportUpdateCommand(
+data class TransportPutCommand(
     val departureLocation: String,
     val arrivalLocation: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
-) : ProductAttributeUpdateCommand
+) : ProductPropertyPutCommand
 
-data class AccommodationUpdateCommand(
+data class AccommodationPutCommand(
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
-) : ProductAttributeUpdateCommand
+) : ProductPropertyPutCommand

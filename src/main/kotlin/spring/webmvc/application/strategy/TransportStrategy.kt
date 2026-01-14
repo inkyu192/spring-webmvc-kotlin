@@ -1,31 +1,29 @@
 package spring.webmvc.application.strategy
 
 import org.springframework.stereotype.Component
-import spring.webmvc.application.dto.command.ProductAttributeCreateCommand
-import spring.webmvc.application.dto.command.ProductAttributeUpdateCommand
-import spring.webmvc.application.dto.command.TransportCreateCommand
-import spring.webmvc.application.dto.command.TransportUpdateCommand
-import spring.webmvc.application.dto.result.ProductAttributeResult
+import spring.webmvc.application.dto.command.ProductPropertyPutCommand
+import spring.webmvc.application.dto.command.TransportPutCommand
+import spring.webmvc.application.dto.result.ProductPropertyResult
 import spring.webmvc.application.dto.result.TransportResult
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
-import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.repository.TransportRepository
 
 @Component
 class TransportStrategy(
     private val transportRepository: TransportRepository,
-) : ProductAttributeStrategy {
-    override fun category() = Category.TRANSPORT
+) : ProductPropertyStrategy {
+    override fun category() = ProductCategory.TRANSPORT
 
-    override fun findByProductId(productId: Long): ProductAttributeResult {
+    override fun findByProductId(productId: Long): ProductPropertyResult {
         val transport = transportRepository.findByProductId(productId)
 
         return TransportResult.from(transport)
     }
 
-    override fun createProduct(product: Product, command: ProductAttributeCreateCommand): ProductAttributeResult {
-        val transportCommand = command as TransportCreateCommand
+    override fun create(product: Product, command: ProductPropertyPutCommand): ProductPropertyResult {
+        val transportCommand = command as TransportPutCommand
 
         val transport = Transport.create(
             product = product,
@@ -40,8 +38,8 @@ class TransportStrategy(
         return TransportResult.from(transport)
     }
 
-    override fun updateProduct(productId: Long, command: ProductAttributeUpdateCommand): ProductAttributeResult {
-        val transportCommand = command as TransportUpdateCommand
+    override fun replace(productId: Long, command: ProductPropertyPutCommand): ProductPropertyResult {
+        val transportCommand = command as TransportPutCommand
 
         val transport = transportRepository.findByProductId(productId)
 

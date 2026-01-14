@@ -1,6 +1,5 @@
 package spring.webmvc.presentation.dto.response
 
-import org.springframework.data.domain.Page
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserCredential
 import spring.webmvc.domain.model.entity.UserOAuth
@@ -8,18 +7,6 @@ import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.enums.OAuthProvider
 import java.time.Instant
 import java.time.LocalDate
-
-data class UserPageResponse(
-    val page: OffsetPageResponse,
-    val users: List<UserSummaryResponse>,
-) {
-    companion object {
-        fun from(page: Page<User>) = UserPageResponse(
-            page = OffsetPageResponse.from(page),
-            users = page.content.map { UserSummaryResponse.from(user = it) },
-        )
-    }
-}
 
 data class UserSummaryResponse(
     val id: Long,
@@ -30,16 +17,14 @@ data class UserSummaryResponse(
     val createdAt: Instant,
 ) {
     companion object {
-        fun from(user: User): UserSummaryResponse {
-            return UserSummaryResponse(
-                id = checkNotNull(user.id),
-                name = user.name,
-                phone = user.phone.value,
-                gender = user.gender,
-                birthday = user.birthday,
-                createdAt = user.createdAt,
-            )
-        }
+        fun from(user: User) = UserSummaryResponse(
+            id = checkNotNull(user.id),
+            name = user.name,
+            phone = user.phone.value,
+            gender = user.gender,
+            birthday = user.birthday,
+            createdAt = user.createdAt,
+        )
     }
 }
 
@@ -58,18 +43,16 @@ data class UserDetailResponse(
             user: User,
             credential: UserCredential?,
             oauths: List<UserOAuth>,
-        ): UserDetailResponse {
-            return UserDetailResponse(
-                id = checkNotNull(user.id),
-                name = user.name,
-                phone = user.phone.value,
-                gender = user.gender,
-                birthday = user.birthday,
-                credential = credential?.let { UserCredentialResponse.from(it) },
-                oauths = oauths.map { UserOAuthResponse.from(it) },
-                createdAt = user.createdAt,
-            )
-        }
+        ) = UserDetailResponse(
+            id = checkNotNull(user.id),
+            name = user.name,
+            phone = user.phone.value,
+            gender = user.gender,
+            birthday = user.birthday,
+            credential = credential?.let { UserCredentialResponse.from(it) },
+            oauths = oauths.map { UserOAuthResponse.from(it) },
+            createdAt = user.createdAt,
+        )
     }
 }
 
@@ -92,11 +75,9 @@ data class UserOAuthResponse(
     val oauthUserId: String,
 ) {
     companion object {
-        fun from(oauth: UserOAuth): UserOAuthResponse {
-            return UserOAuthResponse(
-                provider = oauth.oauthProvider,
-                oauthUserId = oauth.oauthUserId,
-            )
-        }
+        fun from(oauth: UserOAuth) = UserOAuthResponse(
+            provider = oauth.oauthProvider,
+            oauthUserId = oauth.oauthUserId,
+        )
     }
 }

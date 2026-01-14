@@ -95,16 +95,15 @@ class OrderControllerTest {
                         RequestDocumentation.parameterWithName("orderStatus").description("주문상태").optional()
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("orders[].id").description("주문아이디"),
-                        PayloadDocumentation.fieldWithPath("orders[].orderedAt").description("주문일시"),
-                        PayloadDocumentation.fieldWithPath("orders[].status").description("주문상태"),
-
-                        PayloadDocumentation.fieldWithPath("page.page").description("현재 페이지 번호"),
-                        PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
-                        PayloadDocumentation.fieldWithPath("page.totalElements").description("전체 아이템 수"),
-                        PayloadDocumentation.fieldWithPath("page.totalPages").description("전체 페이지 수"),
-                        PayloadDocumentation.fieldWithPath("page.hasNext").description("다음 페이지 존재 여부"),
-                        PayloadDocumentation.fieldWithPath("page.hasPrevious").description("이전 페이지 존재 여부")
+                        PayloadDocumentation.fieldWithPath("page").description("현재 페이지 번호"),
+                        PayloadDocumentation.fieldWithPath("size").description("페이지 크기"),
+                        PayloadDocumentation.fieldWithPath("totalElements").description("전체 아이템 수"),
+                        PayloadDocumentation.fieldWithPath("totalPages").description("전체 페이지 수"),
+                        PayloadDocumentation.fieldWithPath("hasNext").description("다음 페이지 존재 여부"),
+                        PayloadDocumentation.fieldWithPath("hasPrevious").description("이전 페이지 존재 여부"),
+                        PayloadDocumentation.fieldWithPath("content[].id").description("주문아이디"),
+                        PayloadDocumentation.fieldWithPath("content[].orderedAt").description("주문일시"),
+                        PayloadDocumentation.fieldWithPath("content[].status").description("주문상태")
                     )
                 )
             )

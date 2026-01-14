@@ -18,15 +18,14 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.command.CurationCreateCommand
 import spring.webmvc.application.dto.result.CurationDetailResult
+import spring.webmvc.application.dto.result.CurationOffsetPageResult
 import spring.webmvc.application.dto.result.CurationProductResult
 import spring.webmvc.application.dto.result.CurationSummaryResult
 import spring.webmvc.application.service.CurationService
-import spring.webmvc.domain.model.entity.Accommodation
-import spring.webmvc.domain.model.entity.Curation
-import spring.webmvc.domain.model.entity.Product
-import spring.webmvc.domain.model.entity.Transport
-import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.model.entity.*
 import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.enums.ProductCategory
+import spring.webmvc.domain.model.vo.ProductExposureProperty
 import spring.webmvc.infrastructure.config.ControllerTest
 
 @ControllerTest([CurationController::class])
@@ -53,11 +52,17 @@ class CurationControllerTest {
 
         val mockProduct1 = spyk(
             Product.create(
-                category = Category.ACCOMMODATION,
+                category = ProductCategory.ACCOMMODATION,
                 name = "제주도 호텔",
                 description = "제주도 3박4일",
                 price = 100000L,
-                quantity = 10L
+                quantity = 10L,
+                exposureProperty = ProductExposureProperty(
+                    isPromotional = false,
+                    isNewArrival = false,
+                    isFeatured = false,
+                    isLowStock = false
+                )
             )
         ).apply { every { id } returns 1L }
 
@@ -72,11 +77,17 @@ class CurationControllerTest {
 
         val mockProduct2 = spyk(
             Product.create(
-                category = Category.TRANSPORT,
+                category = ProductCategory.TRANSPORT,
                 name = "부산 교통편",
                 description = "부산 왕복 교통편",
                 price = 200000L,
-                quantity = 5L
+                quantity = 5L,
+                exposureProperty = ProductExposureProperty(
+                    isPromotional = false,
+                    isNewArrival = false,
+                    isFeatured = false,
+                    isLowStock = false
+                )
             )
         ).apply { every { id } returns 2L }
 
@@ -93,7 +104,19 @@ class CurationControllerTest {
 
     @Test
     fun createCuration() {
-        val curationResult = CurationDetailResult.from(curation1)
+        val productResult = CurationProductResult(
+            id = 1L,
+            name = product1.product.name,
+            description = product1.product.description,
+            price = product1.product.price
+        )
+
+        val curationResult = CurationDetailResult(
+            id = 1L,
+            title = "인기상품",
+            category = CurationCategory.HOME,
+            products = listOf(productResult)
+        )
 
         every { curationService.createCuration(any<CurationCreateCommand>()) } returns curationResult
 
@@ -137,7 +160,11 @@ class CurationControllerTest {
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
                         PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
-                        PayloadDocumentation.fieldWithPath("products").description("큐레이션 상품 목록")
+                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리"),
+                        PayloadDocumentation.fieldWithPath("products[].id").description("상품 ID"),
+                        PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("products[].description").description("상품 설명"),
+                        PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격")
                     )
                 )
             )
@@ -168,10 +195,10 @@ class CurationControllerTest {
                         RequestDocumentation.parameterWithName("category").description("큐레이션 카테고리")
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리"),
                         PayloadDocumentation.fieldWithPath("size").description("큐레이션 수"),
                         PayloadDocumentation.fieldWithPath("curations[].id").description("큐레이션 ID"),
-                        PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목")
+                        PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목"),
+                        PayloadDocumentation.fieldWithPath("curations[].category").description("큐레이션 카테고리")
                     )
                 )
             )
@@ -182,23 +209,28 @@ class CurationControllerTest {
         val curationId = 1L
         val pageable = PageRequest.of(0, 10)
 
-        val curationProductResults = listOf(
-            CurationProductResult(
-                category = product1.product.category,
-                name = product1.product.name,
-                description = product1.product.description,
-                price = product1.product.price
-            ),
-            CurationProductResult(
-                category = product2.product.category,
-                name = product2.product.name,
-                description = product2.product.description,
-                price = product2.product.price
+        val curationProduct1 = spyk(
+            CurationProduct.create(
+                curation = curation1,
+                product = product1.product,
+                sortOrder = 1L
             )
-        )
-        val page = PageImpl(curationProductResults, pageable, curationProductResults.size.toLong())
+        ).apply { every { id } returns 1L }
 
-        every { curationService.findCurationProductWithOffsetPage(curationId, pageable) } returns page
+        val curationProduct2 = spyk(
+            CurationProduct.create(
+                curation = curation1,
+                product = product2.product,
+                sortOrder = 2L
+            )
+        ).apply { every { id } returns 2L }
+
+        val curationProducts = listOf(curationProduct1, curationProduct2)
+        val page = PageImpl(curationProducts, pageable, curationProducts.size.toLong())
+
+        val result = CurationOffsetPageResult.from(curation = curation1, page = page)
+
+        every { curationService.findCurationProductWithOffsetPage(curationId, pageable) } returns result
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/partner/curations/{id}", curationId)
@@ -221,17 +253,19 @@ class CurationControllerTest {
                         RequestDocumentation.parameterWithName("size").description("페이지 크기").optional()
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("products[].category").description("상품 카테고리"),
-                        PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
-                        PayloadDocumentation.fieldWithPath("products[].description").description("상품 설명"),
-                        PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격"),
-
-                        PayloadDocumentation.fieldWithPath("page.page").description("현재 페이지 번호"),
-                        PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
-                        PayloadDocumentation.fieldWithPath("page.totalElements").description("전체 요소 수"),
-                        PayloadDocumentation.fieldWithPath("page.totalPages").description("전체 페이지 수"),
-                        PayloadDocumentation.fieldWithPath("page.hasNext").description("다음 페이지 존재 여부"),
-                        PayloadDocumentation.fieldWithPath("page.hasPrevious").description("이전 페이지 존재 여부")
+                        PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
+                        PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
+                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리"),
+                        PayloadDocumentation.fieldWithPath("products.page").description("현재 페이지 번호"),
+                        PayloadDocumentation.fieldWithPath("products.size").description("페이지 크기"),
+                        PayloadDocumentation.fieldWithPath("products.totalElements").description("전체 요소 수"),
+                        PayloadDocumentation.fieldWithPath("products.totalPages").description("전체 페이지 수"),
+                        PayloadDocumentation.fieldWithPath("products.hasNext").description("다음 페이지 존재 여부"),
+                        PayloadDocumentation.fieldWithPath("products.hasPrevious").description("이전 페이지 존재 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].id").description("상품 ID"),
+                        PayloadDocumentation.fieldWithPath("products.content[].name").description("상품명"),
+                        PayloadDocumentation.fieldWithPath("products.content[].description").description("상품 설명"),
+                        PayloadDocumentation.fieldWithPath("products.content[].price").description("상품 가격")
                     )
                 )
             )

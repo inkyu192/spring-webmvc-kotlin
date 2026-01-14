@@ -154,12 +154,12 @@ class OrderControllerTest {
                         RequestDocumentation.parameterWithName("orderStatus").description("주문상태").optional()
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("orders[].id").description("주문아이디"),
-                        PayloadDocumentation.fieldWithPath("orders[].orderedAt").description("주문일시"),
-                        PayloadDocumentation.fieldWithPath("orders[].status").description("주문상태"),
-                        PayloadDocumentation.fieldWithPath("page.size").description("페이지 크기"),
-                        PayloadDocumentation.fieldWithPath("page.hasNext").description("다음 페이지 존재 여부"),
-                        PayloadDocumentation.fieldWithPath("page.nextCursorId").description("다음 커서 ID")
+                        PayloadDocumentation.fieldWithPath("size").description("페이지 크기"),
+                        PayloadDocumentation.fieldWithPath("hasNext").description("다음 페이지 존재 여부"),
+                        PayloadDocumentation.fieldWithPath("nextCursorId").description("다음 커서 ID"),
+                        PayloadDocumentation.fieldWithPath("content[].id").description("주문아이디"),
+                        PayloadDocumentation.fieldWithPath("content[].orderedAt").description("주문일시"),
+                        PayloadDocumentation.fieldWithPath("content[].status").description("주문상태")
                     )
                 )
             )

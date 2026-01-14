@@ -1,47 +1,23 @@
 package spring.webmvc.presentation.dto.response
 
-import org.springframework.data.domain.Page
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.ProductDetailResult
 import spring.webmvc.application.dto.result.ProductSummaryResult
 import spring.webmvc.application.dto.result.TransportResult
-import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
+import spring.webmvc.domain.model.vo.ProductExposureProperty
 import java.time.Instant
-
-data class ProductCursorPageResponse(
-    val page: CursorPageResponse,
-    val products: List<ProductSummaryResponse>,
-) {
-    companion object {
-        fun from(page: CursorPage<ProductSummaryResult>) = ProductCursorPageResponse(
-            page = CursorPageResponse.from(page),
-            products = page.content.map { ProductSummaryResponse.from(it) }
-        )
-    }
-}
-
-data class ProductOffsetPageResponse(
-    val page: OffsetPageResponse,
-    val products: List<ProductSummaryResponse>,
-) {
-    companion object {
-        fun from(page: Page<ProductSummaryResult>) = ProductOffsetPageResponse(
-            page = OffsetPageResponse.from(page),
-            products = page.content.map { ProductSummaryResponse.from(it) }
-        )
-    }
-}
 
 data class ProductSummaryResponse(
     val id: Long,
-    val category: Category,
+    val category: ProductCategory,
     val status: ProductStatus,
     val name: String,
     val description: String,
     val price: Long,
     val quantity: Long,
+    val exposureProperty: ProductExposureProperty,
     val createdAt: Instant,
 ) {
     companion object {
@@ -53,6 +29,7 @@ data class ProductSummaryResponse(
             description = result.description,
             price = result.price,
             quantity = result.quantity,
+            exposureProperty = result.exposureProperty,
             createdAt = result.createdAt,
         )
     }
@@ -60,20 +37,21 @@ data class ProductSummaryResponse(
 
 data class ProductDetailResponse(
     val id: Long,
-    val category: Category,
+    val category: ProductCategory,
     val status: ProductStatus,
     val name: String,
     val description: String,
     val price: Long,
     val quantity: Long,
+    val exposureProperty: ProductExposureProperty,
     val createdAt: Instant,
-    val attribute: ProductAttributeResponse,
+    val property: ProductPropertyResponse,
 ) {
     companion object {
         fun from(result: ProductDetailResult): ProductDetailResponse {
-            val responseDetail = when (result.attribute) {
-                is TransportResult -> TransportResponse.from(result.attribute)
-                is AccommodationResult -> AccommodationResponse.from(result.attribute)
+            val responseDetail = when (result.property) {
+                is TransportResult -> TransportResponse.from(result.property)
+                is AccommodationResult -> AccommodationResponse.from(result.property)
             }
 
             return ProductDetailResponse(
@@ -84,21 +62,22 @@ data class ProductDetailResponse(
                 description = result.description,
                 price = result.price,
                 quantity = result.quantity,
+                exposureProperty = result.exposureProperty,
                 createdAt = result.createdAt,
-                attribute = responseDetail,
+                property = responseDetail,
             )
         }
     }
 }
 
-sealed interface ProductAttributeResponse
+sealed interface ProductPropertyResponse
 
 data class TransportResponse(
     val departureLocation: String,
     val arrivalLocation: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
-) : ProductAttributeResponse {
+) : ProductPropertyResponse {
     companion object {
         fun from(result: TransportResult) = TransportResponse(
             departureLocation = result.departureLocation,
@@ -113,7 +92,7 @@ data class AccommodationResponse(
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
-) : ProductAttributeResponse {
+) : ProductPropertyResponse {
     companion object {
         fun from(result: AccommodationResult) = AccommodationResponse(
             place = result.place,

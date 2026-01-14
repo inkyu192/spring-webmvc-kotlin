@@ -2,7 +2,7 @@ package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.infrastructure.exception.InvalidOrderStatusException
+import spring.webmvc.infrastructure.exception.InvalidEntityStatusException
 import java.time.Instant
 
 @Entity
@@ -46,10 +46,11 @@ class Order protected constructor(
 
     fun cancel() {
         if (status == OrderStatus.CONFIRM) {
-            throw InvalidOrderStatusException(
-                orderId = checkNotNull(this.id),
-                currentStatus = status,
-                targetStatus = OrderStatus.CANCEL,
+            throw InvalidEntityStatusException(
+                kClass = Order::class,
+                id = checkNotNull(id),
+                fromStatus = status.description,
+                toStatus = OrderStatus.CANCEL.description,
             )
         }
 
@@ -58,18 +59,19 @@ class Order protected constructor(
         _orderProducts.forEach { it.cancel() }
     }
 
-    fun updateStatus(newStatus: OrderStatus) {
-        if (status == OrderStatus.CONFIRM) {
-            throw InvalidOrderStatusException(
-                orderId = checkNotNull(this.id),
-                currentStatus = status,
-                targetStatus = newStatus,
+    fun updateStatus(status: OrderStatus) {
+        if (this.status == OrderStatus.CONFIRM) {
+            throw InvalidEntityStatusException(
+                kClass = Order::class,
+                id = checkNotNull(id),
+                fromStatus = this.status.description,
+                toStatus = status.description,
             )
         }
 
-        status = newStatus
+        this.status = status
 
-        if (newStatus == OrderStatus.CANCEL) {
+        if (status == OrderStatus.CANCEL) {
             _orderProducts.forEach { it.cancel() }
         }
     }

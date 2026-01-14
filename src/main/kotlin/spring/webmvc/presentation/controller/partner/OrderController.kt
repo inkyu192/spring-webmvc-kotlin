@@ -9,8 +9,9 @@ import spring.webmvc.application.dto.query.OrderOffsetPageQuery
 import spring.webmvc.application.service.OrderService
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.presentation.dto.request.OrderStatusUpdateRequest
+import spring.webmvc.presentation.dto.response.OffsetPageResponse
 import spring.webmvc.presentation.dto.response.OrderDetailResponse
-import spring.webmvc.presentation.dto.response.OrderOffsetPageResponse
+import spring.webmvc.presentation.dto.response.OrderSummaryResponse
 import java.time.Instant
 
 @RestController("partnerOrderController")
@@ -26,7 +27,7 @@ class OrderController(
         @RequestParam(required = false) orderStatus: OrderStatus?,
         @RequestParam(required = false) orderedFrom: Instant?,
         @RequestParam(required = false) orderedTo: Instant?,
-    ): OrderOffsetPageResponse {
+    ): OffsetPageResponse<OrderSummaryResponse> {
         val query = OrderOffsetPageQuery(
             pageable = pageable,
             userId = userId,
@@ -37,7 +38,7 @@ class OrderController(
 
         val page = orderService.findOrdersWithOffsetPage(query = query)
 
-        return OrderOffsetPageResponse.from(page)
+        return OffsetPageResponse.from(page) { OrderSummaryResponse.from(result = it) }
     }
 
     @GetMapping("/{id}")

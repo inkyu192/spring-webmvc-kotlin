@@ -7,23 +7,22 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import spring.webmvc.application.dto.command.ProductCreateCommand
-import spring.webmvc.application.dto.command.ProductUpdateCommand
+import spring.webmvc.application.dto.command.ProductPutCommand
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.application.dto.result.ProductDetailResult
 import spring.webmvc.application.dto.result.ProductSummaryResult
 import spring.webmvc.application.event.ProductViewEvent
-import spring.webmvc.application.strategy.ProductAttributeStrategy
+import spring.webmvc.application.strategy.ProductPropertyStrategy
 import spring.webmvc.domain.model.entity.Product
-import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.repository.ProductRepository
 
 @Service
 @Transactional(readOnly = true)
 class ProductService(
     private val productRepository: ProductRepository,
-    private val productAttributeStrategyMap: Map<Category, ProductAttributeStrategy>,
+    private val productPropertyStrategyMap: Map<ProductCategory, ProductPropertyStrategy>,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     fun findProductsWithCursorPage(query: ProductCursorPageQuery) =
@@ -41,12 +40,12 @@ class ProductService(
 
     fun findProduct(id: Long): ProductDetailResult {
         val product = productRepository.findById(id)
-        val strategy = productAttributeStrategyMap[product.category]
+        val strategy = productPropertyStrategyMap[product.category]
             ?: throw UnsupportedOperationException("${product.category}")
 
-        val attributeResult = strategy.findByProductId(productId = id)
+        val propertyResult = strategy.findByProductId(productId = id)
 
-        return ProductDetailResult.from(product = product, attributeResult = attributeResult)
+        return ProductDetailResult.from(product = product, propertyResult = propertyResult)
     }
 
     fun incrementProductViewCount(id: Long) {
@@ -54,23 +53,24 @@ class ProductService(
     }
 
     @Transactional
-    fun createProduct(command: ProductCreateCommand): ProductDetailResult {
+    fun createProduct(command: ProductPutCommand): ProductDetailResult {
         val product = Product.create(
             category = command.category,
             name = command.name,
             description = command.description,
             price = command.price,
             quantity = command.quantity,
+            exposureProperty = command.exposureProperty,
         )
 
         productRepository.save(product)
 
-        val strategy = productAttributeStrategyMap[command.category]
+        val strategy = productPropertyStrategyMap[command.category]
             ?: throw UnsupportedOperationException("${command.category}")
 
-        val attributeResult = strategy.createProduct(product = product, command = command.attribute)
+        val propertyResult = strategy.create(product = product, command = command.property)
 
-        return ProductDetailResult.from(product = product, attributeResult = attributeResult)
+        return ProductDetailResult.from(product = product, propertyResult = propertyResult)
     }
 
     @Transactional
@@ -80,23 +80,26 @@ class ProductService(
             CacheEvict(value = ["productStock"], key = "'product:' + #command.id + ':stock'"),
         ]
     )
-    fun updateProduct(command: ProductUpdateCommand): ProductDetailResult {
-        val product = productRepository.findById(command.id)
+    fun replaceProduct(command: ProductPutCommand): ProductDetailResult {
+        val id = requireNotNull(command.id)
 
-        product.update(
+        val product = productRepository.findById(id)
+
+        product.replace(
             status = command.status,
             name = command.name,
             description = command.description,
             price = command.price,
             quantity = command.quantity,
+            exposureProperty = command.exposureProperty,
         )
 
-        val strategy = productAttributeStrategyMap[product.category]
+        val strategy = productPropertyStrategyMap[product.category]
             ?: throw UnsupportedOperationException("${product.category}")
 
-        val attributeResult = strategy.updateProduct(productId = command.id, command = command.attribute)
+        val propertyResult = strategy.replace(productId = command.id, command = command.property)
 
-        return ProductDetailResult.from(product = product, attributeResult = attributeResult)
+        return ProductDetailResult.from(product = product, propertyResult = propertyResult)
     }
 
     @Transactional
@@ -108,7 +111,7 @@ class ProductService(
     )
     fun deleteProduct(id: Long) {
         val product = productRepository.findById(id)
-        val strategy = productAttributeStrategyMap[product.category]
+        val strategy = productPropertyStrategyMap[product.category]
             ?: throw UnsupportedOperationException("${product.category}")
 
         strategy.deleteProduct(productId = id)

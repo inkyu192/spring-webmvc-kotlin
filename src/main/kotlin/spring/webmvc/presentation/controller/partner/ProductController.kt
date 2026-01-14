@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.presentation.dto.request.ProductCreateRequest
-import spring.webmvc.presentation.dto.request.ProductUpdateRequest
+import spring.webmvc.presentation.dto.request.ProductPutRequest
+import spring.webmvc.presentation.dto.response.OffsetPageResponse
 import spring.webmvc.presentation.dto.response.ProductDetailResponse
-import spring.webmvc.presentation.dto.response.ProductOffsetPageResponse
+import spring.webmvc.presentation.dto.response.ProductSummaryResponse
 
 @RestController("partnerProductController")
 @RequestMapping("/partner/products")
@@ -25,7 +25,7 @@ class ProductController(
         @PageableDefault pageable: Pageable,
         @RequestParam(required = false) name: String?,
         @RequestParam(required = false) status: ProductStatus?,
-    ): ProductOffsetPageResponse {
+    ): OffsetPageResponse<ProductSummaryResponse> {
         val query = ProductOffsetPageQuery(
             pageable = pageable,
             name = name,
@@ -34,7 +34,7 @@ class ProductController(
 
         val page = productService.findProductsWithOffsetPage(query = query)
 
-        return ProductOffsetPageResponse.from(page)
+        return OffsetPageResponse.from(page) { ProductSummaryResponse.from(result = it) }
     }
 
     @GetMapping("/{id}")
@@ -51,7 +51,7 @@ class ProductController(
     @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
     @ResponseStatus(HttpStatus.CREATED)
     fun createProduct(
-        @RequestBody @Validated request: ProductCreateRequest,
+        @RequestBody @Validated request: ProductPutRequest,
     ): ProductDetailResponse {
         val command = request.toCommand()
         val productResult = productService.createProduct(command)
@@ -59,14 +59,14 @@ class ProductController(
         return ProductDetailResponse.from(productResult)
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
-    fun updateProduct(
+    fun replaceProduct(
         @PathVariable id: Long,
-        @RequestBody @Validated request: ProductUpdateRequest,
+        @RequestBody @Validated request: ProductPutRequest,
     ): ProductDetailResponse {
         val command = request.toCommand(id)
-        val productResult = productService.updateProduct(command)
+        val productResult = productService.replaceProduct(command)
 
         return ProductDetailResponse.from(productResult)
     }

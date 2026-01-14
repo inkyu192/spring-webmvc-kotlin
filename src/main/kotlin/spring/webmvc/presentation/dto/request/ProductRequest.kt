@@ -4,130 +4,82 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
-import spring.webmvc.application.dto.command.*
-import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.application.dto.command.AccommodationPutCommand
+import spring.webmvc.application.dto.command.ProductPutCommand
+import spring.webmvc.application.dto.command.TransportPutCommand
+import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
+import spring.webmvc.domain.model.vo.ProductExposureProperty
 import java.time.Instant
 
-data class ProductCreateRequest(
-    val category: Category,
+data class ProductPutRequest(
+    val status: ProductStatus,
+    val category: ProductCategory,
     val name: String,
     val description: String,
+
     @field:Min(100)
     val price: Long,
+
     @field:Max(9999)
     val quantity: Long,
-    val attribute: ProductAttributeCreateRequest,
+
+    @field:JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+        property = "category",
+    )
+    @field:JsonSubTypes(
+        JsonSubTypes.Type(name = "TRANSPORT", value = TransportPutRequest::class),
+        JsonSubTypes.Type(name = "ACCOMMODATION", value = AccommodationPutRequest::class),
+    )
+    val property: ProductPropertyPutRequest,
+
+    val exposureProperty: ProductExposureProperty,
 ) {
-    fun toCommand(): ProductCreateCommand {
-        val commandAttribute = when (attribute) {
-            is TransportCreateRequest -> TransportCreateCommand(
-                departureLocation = attribute.departureLocation,
-                arrivalLocation = attribute.arrivalLocation,
-                departureTime = attribute.departureTime,
-                arrivalTime = attribute.arrivalTime,
+    fun toCommand(
+        id: Long? = null,
+    ): ProductPutCommand {
+        val commandProperty = when (property) {
+            is TransportPutRequest -> TransportPutCommand(
+                departureLocation = property.departureLocation,
+                arrivalLocation = property.arrivalLocation,
+                departureTime = property.departureTime,
+                arrivalTime = property.arrivalTime,
             )
 
-            is AccommodationCreateRequest -> AccommodationCreateCommand(
-                place = attribute.place,
-                checkInTime = attribute.checkInTime,
-                checkOutTime = attribute.checkOutTime,
+            is AccommodationPutRequest -> AccommodationPutCommand(
+                place = property.place,
+                checkInTime = property.checkInTime,
+                checkOutTime = property.checkOutTime,
             )
         }
 
-        return ProductCreateCommand(
+        return ProductPutCommand(
+            id = id,
+            status = status,
             category = category,
             name = name,
             description = description,
             price = price,
             quantity = quantity,
-            attribute = commandAttribute,
+            property = commandProperty,
+            exposureProperty = exposureProperty,
         )
     }
 }
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    property = "type",
-    visible = false
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(value = TransportCreateRequest::class, name = "TRANSPORT"),
-    JsonSubTypes.Type(value = AccommodationCreateRequest::class, name = "ACCOMMODATION"),
-)
-sealed interface ProductAttributeCreateRequest
+sealed interface ProductPropertyPutRequest
 
-data class TransportCreateRequest(
+data class TransportPutRequest(
     val departureLocation: String,
     val arrivalLocation: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
-) : ProductAttributeCreateRequest
+) : ProductPropertyPutRequest
 
-data class AccommodationCreateRequest(
+data class AccommodationPutRequest(
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
-) : ProductAttributeCreateRequest
-
-data class ProductUpdateRequest(
-    val status: ProductStatus,
-    val name: String,
-    val description: String,
-    @field:Min(100)
-    val price: Long,
-    @field:Max(9999)
-    val quantity: Long,
-    val attribute: ProductAttributeUpdateRequest,
-) {
-    fun toCommand(id: Long): ProductUpdateCommand {
-        val commandAttribute = when (attribute) {
-            is TransportUpdateRequest -> TransportUpdateCommand(
-                departureLocation = attribute.departureLocation,
-                arrivalLocation = attribute.arrivalLocation,
-                departureTime = attribute.departureTime,
-                arrivalTime = attribute.arrivalTime,
-            )
-
-            is AccommodationUpdateRequest -> AccommodationUpdateCommand(
-                place = attribute.place,
-                checkInTime = attribute.checkInTime,
-                checkOutTime = attribute.checkOutTime,
-            )
-        }
-
-        return ProductUpdateCommand(
-            id = id,
-            status = status,
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            attribute = commandAttribute,
-        )
-    }
-}
-
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    property = "type",
-    visible = false
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(value = TransportUpdateRequest::class, name = "TRANSPORT"),
-    JsonSubTypes.Type(value = AccommodationUpdateRequest::class, name = "ACCOMMODATION"),
-)
-sealed interface ProductAttributeUpdateRequest
-
-data class TransportUpdateRequest(
-    val departureLocation: String,
-    val arrivalLocation: String,
-    val departureTime: Instant,
-    val arrivalTime: Instant,
-) : ProductAttributeUpdateRequest
-
-data class AccommodationUpdateRequest(
-    val place: String,
-    val checkInTime: Instant,
-    val checkOutTime: Instant,
-) : ProductAttributeUpdateRequest
+) : ProductPropertyPutRequest

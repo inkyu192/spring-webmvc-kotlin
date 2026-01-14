@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.domain.model.entity.Accommodation
-import spring.webmvc.domain.model.enums.Category
+import spring.webmvc.domain.model.enums.ProductCategory
+import spring.webmvc.domain.model.vo.ProductExposureProperty
 import spring.webmvc.infrastructure.config.RepositoryTest
 
 @RepositoryTest
@@ -27,11 +28,17 @@ class ProductQuerydslRepositoryTest(
     @BeforeEach
     fun setUp() {
         val p1 = spring.webmvc.domain.model.entity.Product.create(
-            category = Category.ACCOMMODATION,
+            category = ProductCategory.ACCOMMODATION,
             name = "product1",
             description = "description",
             price = 1000,
-            quantity = 10
+            quantity = 10,
+            exposureProperty = ProductExposureProperty(
+                isPromotional = false,
+                isNewArrival = false,
+                isFeatured = false,
+                isLowStock = false
+            )
         )
         product1 = Accommodation.create(
             product = p1,
@@ -41,11 +48,17 @@ class ProductQuerydslRepositoryTest(
         )
 
         val p2 = spring.webmvc.domain.model.entity.Product.create(
-            category = Category.ACCOMMODATION,
+            category = ProductCategory.ACCOMMODATION,
             name = "product2",
             description = "description",
             price = 2000,
-            quantity = 20
+            quantity = 20,
+            exposureProperty = ProductExposureProperty(
+                isPromotional = false,
+                isNewArrival = false,
+                isFeatured = false,
+                isLowStock = false
+            )
         )
         product2 = Accommodation.create(
             product = p2,
@@ -55,11 +68,17 @@ class ProductQuerydslRepositoryTest(
         )
 
         val p3 = spring.webmvc.domain.model.entity.Product.create(
-            category = Category.ACCOMMODATION,
+            category = ProductCategory.ACCOMMODATION,
             name = "product3",
             description = "description",
             price = 3000,
-            quantity = 30
+            quantity = 30,
+            exposureProperty = ProductExposureProperty(
+                isPromotional = false,
+                isNewArrival = false,
+                isFeatured = false,
+                isLowStock = false
+            )
         )
         product3 = Accommodation.create(
             product = p3,
@@ -69,11 +88,17 @@ class ProductQuerydslRepositoryTest(
         )
 
         val p4 = spring.webmvc.domain.model.entity.Product.create(
-            category = Category.ACCOMMODATION,
+            category = ProductCategory.ACCOMMODATION,
             name = "product4",
             description = "description",
             price = 1500,
-            quantity = 30
+            quantity = 30,
+            exposureProperty = ProductExposureProperty(
+                isPromotional = false,
+                isNewArrival = false,
+                isFeatured = false,
+                isLowStock = false
+            )
         )
         product4 = Accommodation.create(
             product = p4,

@@ -157,17 +157,18 @@ CREATE TABLE permission_menu
 
 CREATE TABLE product
 (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    category    VARCHAR(255) NOT NULL,
-    status      VARCHAR(255) NOT NULL,
-    name        VARCHAR(255) NOT NULL,
-    description TEXT         NOT NULL,
-    price       BIGINT       NOT NULL,
-    quantity    BIGINT       NOT NULL,
-    created_by  BIGINT,
-    updated_by  BIGINT,
-    created_at  DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    updated_at  DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+    category          VARCHAR(255) NOT NULL,
+    status            VARCHAR(255) NOT NULL,
+    name              VARCHAR(255) NOT NULL,
+    description       TEXT         NOT NULL,
+    price             BIGINT       NOT NULL,
+    quantity          BIGINT       NOT NULL,
+    exposure_property JSON,
+    created_by        BIGINT,
+    updated_by        BIGINT,
+    created_at        DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at        DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
 
 CREATE TABLE transport

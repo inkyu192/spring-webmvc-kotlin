@@ -125,7 +125,7 @@ class OrderService(
     fun updateOrderStatus(command: OrderStatusUpdateCommand): OrderDetailResult {
         val order = orderRepository.findById(id = command.id)
 
-        order.updateStatus(newStatus = command.orderStatus)
+        order.updateStatus(status = command.orderStatus)
 
         return OrderDetailResult.from(order)
     }

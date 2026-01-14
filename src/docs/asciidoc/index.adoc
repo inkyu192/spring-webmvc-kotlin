@@ -35,8 +35,9 @@ include::{snippets}/file-upload/response-fields.adoc[]
 [cols="1,3",options="header"]
 |===
 | Code | Name
-| 201 | <<CREATED>>
+| 200 | <<OK>>
 | 401 | <<UNAUTHORIZED>>
+| 502 | <<BAD_GATEWAY>>
 |===
 
 == 인증
@@ -343,7 +344,6 @@ include::{snippets}/customer-product-list/response-fields.adoc[]
 |===
 | Code | Name
 | 200 | <<OK>>
-| 401 | <<UNAUTHORIZED>>
 |===
 
 ==== 상세 조회
@@ -390,7 +390,6 @@ include::{snippets}/customer-accommodation-detail/response-fields.adoc[]
 |===
 | Code | Name
 | 200 | <<OK>>
-| 401 | <<UNAUTHORIZED>>
 | 404 | <<NOT_FOUND>>
 |===
 
@@ -509,16 +508,6 @@ include::{snippets}/partner-transport-create/http-response.adoc[]
 
 include::{snippets}/partner-transport-create/response-fields.adoc[]
 
-**HTTP Status Codes**
-
-[cols="1,3",options="header"]
-|===
-| Code | Name
-| 201 | <<CREATED>>
-| 401 | <<UNAUTHORIZED>>
-| 403 | <<FORBIDDEN>>
-|===
-
 ===== 숙박
 
 **HTTP Request**
@@ -557,56 +546,45 @@ include::{snippets}/partner-accommodation-create/response-fields.adoc[]
 
 **HTTP Request**
 
-include::{snippets}/partner-transport-update/http-request.adoc[]
+include::{snippets}/partner-transport-replace/http-request.adoc[]
 
 **Request Headers**
 
-include::{snippets}/partner-transport-update/request-headers.adoc[]
+include::{snippets}/partner-transport-replace/request-headers.adoc[]
 
 **Request Fields**
 
-include::{snippets}/partner-transport-update/request-fields.adoc[]
+include::{snippets}/partner-transport-replace/request-fields.adoc[]
 
 **HTTP Response**
 
-include::{snippets}/partner-transport-update/http-response.adoc[]
+include::{snippets}/partner-transport-replace/http-response.adoc[]
 
 **Response Fields**
 
-include::{snippets}/partner-transport-update/response-fields.adoc[]
-
-**HTTP Status Codes**
-
-[cols="1,3",options="header"]
-|===
-| Code | Name
-| 200 | <<OK>>
-| 201 | <<CREATED>>
-| 401 | <<UNAUTHORIZED>>
-| 403 | <<FORBIDDEN>>
-|===
+include::{snippets}/partner-transport-replace/response-fields.adoc[]
 
 ===== 숙박
 
 **HTTP Request**
 
-include::{snippets}/partner-accommodation-update/http-request.adoc[]
+include::{snippets}/partner-accommodation-replace/http-request.adoc[]
 
 **Request Headers**
 
-include::{snippets}/partner-accommodation-update/request-headers.adoc[]
+include::{snippets}/partner-accommodation-replace/request-headers.adoc[]
 
 **Request Fields**
 
-include::{snippets}/partner-accommodation-update/request-fields.adoc[]
+include::{snippets}/partner-accommodation-replace/request-fields.adoc[]
 
 **HTTP Response**
 
-include::{snippets}/partner-accommodation-update/http-response.adoc[]
+include::{snippets}/partner-accommodation-replace/http-response.adoc[]
 
 **Response Fields**
 
-include::{snippets}/partner-accommodation-update/response-fields.adoc[]
+include::{snippets}/partner-accommodation-replace/response-fields.adoc[]
 
 **HTTP Status Codes**
 
@@ -614,9 +592,10 @@ include::{snippets}/partner-accommodation-update/response-fields.adoc[]
 |===
 | Code | Name
 | 200 | <<OK>>
-| 201 | <<CREATED>>
 | 401 | <<UNAUTHORIZED>>
 | 403 | <<FORBIDDEN>>
+| 404 | <<NOT_FOUND>>
+| 422 | <<UNPROCESSABLE_ENTITY>>
 |===
 
 ==== 삭제
@@ -634,17 +613,6 @@ include::{snippets}/partner-transport-delete/request-headers.adoc[]
 **HTTP Response**
 
 include::{snippets}/partner-transport-delete/http-response.adoc[]
-
-**HTTP Status Codes**
-
-[cols="1,3",options="header"]
-|===
-| Code | Name
-| 204 | <<NO_CONTENT>>
-| 401 | <<UNAUTHORIZED>>
-| 403 | <<FORBIDDEN>>
-| 404 | <<NOT_FOUND>>
-|===
 
 ===== 숙박
 
@@ -701,7 +669,7 @@ include::{snippets}/customer-curation-list/response-fields.adoc[]
 | 200 | <<OK>>
 |===
 
-==== 상품 조회
+==== 상세 조회
 
 **HTTP Request**
 
@@ -797,7 +765,7 @@ include::{snippets}/partner-curation-list/response-fields.adoc[]
 | 403 | <<FORBIDDEN>>
 |===
 
-==== 상품 조회
+==== 상세 조회
 
 **HTTP Request**
 
@@ -1069,6 +1037,7 @@ include::{snippets}/partner-order-update-status/response-fields.adoc[]
 | 401 | <<UNAUTHORIZED>>
 | 403 | <<FORBIDDEN>>
 | 404 | <<NOT_FOUND>>
+| 422 | <<UNPROCESSABLE_ENTITY>>
 |===
 
 == 공통 예외 응답
@@ -1114,4 +1083,5 @@ include::{snippets}/partner-order-update-status/response-fields.adoc[]
 | [[UNPROCESSABLE_ENTITY]] 422 | UNPROCESSABLE_ENTITY | 요청은 문법적으로는 맞지만, 비즈니스 로직상 처리가 불가능한 상태에서 발생합니다.
 | [[TOO_MANY_REQUESTS]] 429 | TOO_MANY_REQUESTS | 클라이언트가 일정 시간 내에 너무 많은 요청을 보낸 경우 발생합니다.
 | [[INTERNAL_SERVER_ERROR]] 500 | INTERNAL_SERVER_ERROR | 서버 내부 오류. 예기치 못한 오류가 발생했을 때 사용됩니다.
+| [[BAD_GATEWAY]] 502 | BAD_GATEWAY | 외부 서비스와의 통신 오류로 인해 요청을 처리하지 못한 경우 발생합니다.
 |===

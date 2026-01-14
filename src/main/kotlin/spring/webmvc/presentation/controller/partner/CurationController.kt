@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.enums.CurationCategory
 import spring.webmvc.presentation.dto.request.CurationCreateRequest
+import spring.webmvc.presentation.dto.response.CurationDetailOffsetPageResponse
 import spring.webmvc.presentation.dto.response.CurationDetailResponse
 import spring.webmvc.presentation.dto.response.CurationListResponse
-import spring.webmvc.presentation.dto.response.CurationOffsetPageResponse
 
 @RestController("partnerCurationController")
 @RequestMapping("/partner/curations")
@@ -37,10 +37,7 @@ class CurationController(
     ): CurationListResponse {
         val resultList = curationService.findCurations(category)
 
-        return CurationListResponse.from(
-            category = category,
-            resultList = resultList,
-        )
+        return CurationListResponse.from(resultList = resultList)
     }
 
     @GetMapping("/{id}")
@@ -48,12 +45,12 @@ class CurationController(
     fun findCuration(
         @PathVariable id: Long,
         @PageableDefault pageable: Pageable,
-    ): CurationOffsetPageResponse {
-        val page = curationService.findCurationProductWithOffsetPage(
-            curationId = id,
+    ): CurationDetailOffsetPageResponse {
+        val result = curationService.findCurationProductWithOffsetPage(
+            id = id,
             pageable = pageable,
         )
 
-        return CurationOffsetPageResponse.from(page)
+        return CurationDetailOffsetPageResponse.from(result)
     }
 }

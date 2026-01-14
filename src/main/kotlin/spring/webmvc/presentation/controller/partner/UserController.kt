@@ -6,8 +6,9 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.dto.query.UserQuery
 import spring.webmvc.application.service.UserService
+import spring.webmvc.presentation.dto.response.OffsetPageResponse
 import spring.webmvc.presentation.dto.response.UserDetailResponse
-import spring.webmvc.presentation.dto.response.UserPageResponse
+import spring.webmvc.presentation.dto.response.UserSummaryResponse
 import java.time.Instant
 
 @RestController("partnerUserController")
@@ -23,7 +24,7 @@ class UserController(
         @RequestParam(required = false) name: String?,
         @RequestParam createdFrom: Instant,
         @RequestParam createdTo: Instant,
-    ): UserPageResponse {
+    ): OffsetPageResponse<UserSummaryResponse> {
         val query = UserQuery.create(
             pageable = pageable,
             phone = phone,
@@ -34,7 +35,7 @@ class UserController(
 
         val page = userService.findUsers(query)
 
-        return UserPageResponse.from(page)
+        return OffsetPageResponse.from(page) { UserSummaryResponse.from(user = it) }
     }
 
     @GetMapping("/{id}")
