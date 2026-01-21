@@ -18,6 +18,7 @@ data class SignUpRequest(
     @field:Pattern(regexp = "^010-\\d{3,4}-\\d{4}$")
     val phone: String,
     val birthday: LocalDate,
+    val profileImageKey: String?,
     val roleIds: List<Long> = emptyList(),
     val permissionIds: List<Long> = emptyList(),
 ) {
@@ -28,6 +29,7 @@ data class SignUpRequest(
         phone = Phone.create(phone),
         gender = gender,
         birthday = birthday,
+        profileImageKey = profileImageKey,
         roleIds = roleIds,
         permissionIds = permissionIds,
     )

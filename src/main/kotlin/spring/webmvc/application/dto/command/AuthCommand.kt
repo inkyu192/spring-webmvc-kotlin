@@ -12,6 +12,7 @@ data class SignUpCommand(
     val phone: Phone,
     val gender: Gender,
     val birthday: LocalDate,
+    val profileImageKey: String?,
     val roleIds: List<Long>,
     val permissionIds: List<Long>,
 )

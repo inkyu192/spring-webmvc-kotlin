@@ -7,7 +7,7 @@ data class PermissionResponse(
     val name: String,
 ) {
     companion object {
-        fun from(rolePermission: RolePermission): PermissionResponse {
+        fun of(rolePermission: RolePermission): PermissionResponse {
             return PermissionResponse(
                 id = checkNotNull(rolePermission.permission.id),
                 name = rolePermission.permission.name

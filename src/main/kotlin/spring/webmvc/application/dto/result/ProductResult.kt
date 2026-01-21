@@ -5,7 +5,7 @@ import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.domain.model.vo.ProductExposureProperty
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import java.time.Instant
 
 data class ProductSummaryResult(
@@ -16,11 +16,11 @@ data class ProductSummaryResult(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureProperty: ProductExposureProperty,
+    val exposureAttribute: ProductExposureAttribute,
     val createdAt: Instant,
 ) {
     companion object {
-        fun from(product: Product) = ProductSummaryResult(
+        fun of(product: Product) = ProductSummaryResult(
             id = checkNotNull(product.id),
             category = product.category,
             status = product.status,
@@ -28,7 +28,7 @@ data class ProductSummaryResult(
             description = product.description,
             price = product.price,
             quantity = product.quantity,
-            exposureProperty = product.exposureProperty,
+            exposureAttribute = product.exposureAttribute,
             createdAt = product.createdAt,
         )
     }
@@ -42,14 +42,14 @@ data class ProductDetailResult(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureProperty: ProductExposureProperty,
+    val exposureAttribute: ProductExposureAttribute,
     val createdAt: Instant,
-    val property: ProductPropertyResult,
+    val attribute: ProductAttributeResult,
 ) {
     companion object {
-        fun from(
+        fun of(
             product: Product,
-            propertyResult: ProductPropertyResult,
+            attributeResult: ProductAttributeResult,
         ) = ProductDetailResult(
             id = checkNotNull(product.id),
             category = product.category,
@@ -58,14 +58,14 @@ data class ProductDetailResult(
             description = product.description,
             price = product.price,
             quantity = product.quantity,
-            exposureProperty = product.exposureProperty,
+            exposureAttribute = product.exposureAttribute,
             createdAt = product.createdAt,
-            property = propertyResult,
+            attribute = attributeResult,
         )
     }
 }
 
-sealed interface ProductPropertyResult
+sealed interface ProductAttributeResult
 
 data class TransportResult(
     val transportId: Long,
@@ -73,9 +73,9 @@ data class TransportResult(
     val arrivalLocation: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
-) : ProductPropertyResult {
+) : ProductAttributeResult {
     companion object {
-        fun from(transport: Transport) = TransportResult(
+        fun of(transport: Transport) = TransportResult(
             transportId = checkNotNull(transport.id),
             departureLocation = transport.departureLocation,
             arrivalLocation = transport.arrivalLocation,
@@ -90,9 +90,9 @@ data class AccommodationResult(
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
-) : ProductPropertyResult {
+) : ProductAttributeResult {
     companion object {
-        fun from(accommodation: Accommodation) = AccommodationResult(
+        fun of(accommodation: Accommodation) = AccommodationResult(
             accommodationId = checkNotNull(accommodation.id),
             place = accommodation.place,
             checkInTime = accommodation.checkInTime,

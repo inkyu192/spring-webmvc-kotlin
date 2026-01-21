@@ -1,5 +1,6 @@
 package spring.webmvc.presentation.controller
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,6 +14,8 @@ import spring.webmvc.presentation.dto.response.FileResponse
 @RequestMapping("/files")
 class FileController(
     private val s3Service: S3Service,
+    @Value("\${aws.cloudfront.domain}")
+    private val cloudfrontDomain: String,
 ) {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
@@ -21,6 +24,6 @@ class FileController(
     ): FileResponse {
         val key = s3Service.putObject(file)
 
-        return FileResponse(key = key)
+        return FileResponse.of(key = key, cloudfrontDomain = cloudfrontDomain)
     }
 }

@@ -101,10 +101,11 @@ class S3ServiceTest {
         val sourceKey = s3Service.putObject(file = multipartFile)
         val id = 123L
 
-        s3Service.copyObject(sourceKey = sourceKey, fileType = FileType.PROFILE, id = id)
+        val destinationKey = s3Service.copyObject(sourceKey = sourceKey, fileType = FileType.PROFILE, id = id)
 
         val fileName = sourceKey.substringAfterLast('/')
-        val destinationKey = "data/${FileType.PROFILE.path}/$id/$fileName"
+        val expectedDestinationKey = "data/${FileType.PROFILE.path}/$id/$fileName"
+        Assertions.assertThat(destinationKey).isEqualTo(expectedDestinationKey)
 
         val response = s3Client.getObject(
             GetObjectRequest.builder()

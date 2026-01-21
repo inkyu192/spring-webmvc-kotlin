@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.presentation.dto.request.ProductPutRequest
+import spring.webmvc.presentation.dto.request.ProductCreateRequest
+import spring.webmvc.presentation.dto.request.ProductUpdateRequest
 import spring.webmvc.presentation.dto.response.OffsetPageResponse
 import spring.webmvc.presentation.dto.response.ProductDetailResponse
 import spring.webmvc.presentation.dto.response.ProductSummaryResponse
@@ -34,7 +35,7 @@ class ProductController(
 
         val page = productService.findProductsWithOffsetPage(query = query)
 
-        return OffsetPageResponse.from(page) { ProductSummaryResponse.from(result = it) }
+        return OffsetPageResponse.of(page) { ProductSummaryResponse.of(result = it) }
     }
 
     @GetMapping("/{id}")
@@ -44,31 +45,31 @@ class ProductController(
     ): ProductDetailResponse {
         val result = productService.findProduct(id)
 
-        return ProductDetailResponse.from(result)
+        return ProductDetailResponse.of(result)
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
     @ResponseStatus(HttpStatus.CREATED)
     fun createProduct(
-        @RequestBody @Validated request: ProductPutRequest,
+        @RequestBody @Validated request: ProductCreateRequest,
     ): ProductDetailResponse {
         val command = request.toCommand()
         val productResult = productService.createProduct(command)
 
-        return ProductDetailResponse.from(productResult)
+        return ProductDetailResponse.of(productResult)
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
-    fun replaceProduct(
+    fun updateProduct(
         @PathVariable id: Long,
-        @RequestBody @Validated request: ProductPutRequest,
+        @RequestBody @Validated request: ProductUpdateRequest,
     ): ProductDetailResponse {
         val command = request.toCommand(id)
-        val productResult = productService.replaceProduct(command)
+        val productResult = productService.updateProduct(command)
 
-        return ProductDetailResponse.from(productResult)
+        return ProductDetailResponse.of(productResult)
     }
 
     @DeleteMapping("/{id}")

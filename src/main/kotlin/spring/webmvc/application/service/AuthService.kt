@@ -21,6 +21,8 @@ import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
+import spring.webmvc.infrastructure.external.FileType
+import spring.webmvc.infrastructure.external.S3Service
 import spring.webmvc.infrastructure.security.JwtProvider
 
 @Service
@@ -35,6 +37,7 @@ class AuthService(
     private val eventPublisher: ApplicationEventPublisher,
     private val roleRepository: RoleRepository,
     private val permissionRepository: PermissionRepository,
+    private val s3Service: S3Service,
 ) {
     @Transactional
     fun signUp(command: SignUpCommand): User {
@@ -46,7 +49,7 @@ class AuthService(
             throw DuplicateEntityException(kClass = User::class, name = command.phone.value)
         }
 
-        val user = User.create(
+        var user = User.create(
             name = command.name,
             phone = command.phone,
             gender = command.gender,
@@ -56,7 +59,16 @@ class AuthService(
         roleRepository.findAllById(command.roleIds).forEach { user.addUserRole(it) }
         permissionRepository.findAllById(command.permissionIds).forEach { user.addUserPermission(it) }
 
-        userRepository.save(user)
+        user = userRepository.save(user)
+
+        command.profileImageKey?.let { tempKey ->
+            val profileImage = s3Service.copyObject(
+                sourceKey = tempKey,
+                fileType = FileType.PROFILE,
+                id = checkNotNull(user.id),
+            )
+            user.updateProfileImage(profileImage)
+        }
 
         val userCredential = UserCredential.create(
             user = user,
@@ -93,28 +105,32 @@ class AuthService(
         )
         val refreshToken = jwtProvider.createRefreshToken()
 
-        tokenCacheRepository.setRefreshToken(userId = userId, refreshToken = refreshToken)
+        tokenCacheRepository.addRefreshToken(userId = userId, refreshToken = refreshToken)
 
         return TokenResult(accessToken = accessToken, refreshToken = refreshToken)
     }
 
     fun refreshToken(command: RefreshTokenCommand): TokenResult {
+        jwtProvider.parseRefreshToken(command.refreshToken)
+
         val userId = extractUserId(command.accessToken)
 
-        jwtProvider.parseRefreshToken(command.refreshToken)
+        tokenCacheRepository.getRefreshToken(userId = userId, refreshToken = command.refreshToken)
+            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
         val user = userRepository.findById(userId)
 
-        if (tokenCacheRepository.getRefreshToken(userId) != command.refreshToken) {
-            throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
-        }
+        tokenCacheRepository.removeRefreshToken(userId = userId, refreshToken = command.refreshToken)
+
+        val refreshToken = jwtProvider.createRefreshToken()
+        tokenCacheRepository.addRefreshToken(userId = userId, refreshToken = refreshToken)
 
         return TokenResult(
             accessToken = jwtProvider.createAccessToken(
                 userId = userId,
                 permissions = user.getPermissionNames(),
             ),
-            refreshToken = command.refreshToken,
+            refreshToken = refreshToken,
         )
     }
 

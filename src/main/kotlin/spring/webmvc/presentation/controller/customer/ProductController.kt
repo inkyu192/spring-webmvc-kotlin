@@ -26,7 +26,7 @@ class ProductController(
 
         val page = productService.findProductsWithCursorPage(query = query)
 
-        return CursorPageResponse.from(page) { ProductSummaryResponse.from(result = it) }
+        return CursorPageResponse.of(page) { ProductSummaryResponse.of(result = it) }
     }
 
     @GetMapping("/{id}")
@@ -37,6 +37,6 @@ class ProductController(
 
         productService.incrementProductViewCount(id)
 
-        return ProductDetailResponse.from(result)
+        return ProductDetailResponse.of(result)
     }
 }

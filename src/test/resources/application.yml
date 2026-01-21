@@ -11,3 +11,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+
+aws:
+  cloudfront:
+    domain: https://test.cloudfront.net

@@ -33,7 +33,7 @@ class OrderController(
 
         val orderResult = orderService.createOrder(command = command)
 
-        return OrderDetailResponse.from(orderResult)
+        return OrderDetailResponse.of(orderResult)
     }
 
     @GetMapping
@@ -54,7 +54,7 @@ class OrderController(
 
         val page = orderService.findOrdersWithCursorPage(query = query)
 
-        return CursorPageResponse.from(page) { OrderSummaryResponse.from(result = it) }
+        return CursorPageResponse.of(page) { OrderSummaryResponse.of(result = it) }
     }
 
     @GetMapping("/{id}")
@@ -65,7 +65,7 @@ class OrderController(
             userId = SecurityContextUtil.getUserId(),
         )
 
-        return OrderDetailResponse.from(orderResult)
+        return OrderDetailResponse.of(orderResult)
     }
 
     @PatchMapping("/{id}")
@@ -74,6 +74,6 @@ class OrderController(
     fun cancelOrder(@PathVariable id: Long): OrderDetailResponse {
         val orderResult = orderService.cancelOrder(id)
 
-        return OrderDetailResponse.from(orderResult)
+        return OrderDetailResponse.of(orderResult)
     }
 }

@@ -17,7 +17,7 @@ data class UserSummaryResponse(
     val createdAt: Instant,
 ) {
     companion object {
-        fun from(user: User) = UserSummaryResponse(
+        fun of(user: User) = UserSummaryResponse(
             id = checkNotNull(user.id),
             name = user.name,
             phone = user.phone.value,
@@ -39,7 +39,7 @@ data class UserDetailResponse(
     val createdAt: Instant,
 ) {
     companion object {
-        fun from(
+        fun of(
             user: User,
             credential: UserCredential?,
             oauths: List<UserOAuth>,
@@ -49,8 +49,8 @@ data class UserDetailResponse(
             phone = user.phone.value,
             gender = user.gender,
             birthday = user.birthday,
-            credential = credential?.let { UserCredentialResponse.from(it) },
-            oauths = oauths.map { UserOAuthResponse.from(it) },
+            credential = credential?.let { UserCredentialResponse.of(it) },
+            oauths = oauths.map { UserOAuthResponse.of(it) },
             createdAt = user.createdAt,
         )
     }
@@ -61,7 +61,7 @@ data class UserCredentialResponse(
     val verifiedAt: Instant?,
 ) {
     companion object {
-        fun from(credential: UserCredential): UserCredentialResponse {
+        fun of(credential: UserCredential): UserCredentialResponse {
             return UserCredentialResponse(
                 email = credential.email.value,
                 verifiedAt = credential.verifiedAt,
@@ -75,7 +75,7 @@ data class UserOAuthResponse(
     val oauthUserId: String,
 ) {
     companion object {
-        fun from(oauth: UserOAuth) = UserOAuthResponse(
+        fun of(oauth: UserOAuth) = UserOAuthResponse(
             provider = oauth.oauthProvider,
             oauthUserId = oauth.oauthUserId,
         )

@@ -8,9 +8,9 @@ data class CurationListResponse(
     val curations: List<CurationSummaryResponse>,
 ) {
     companion object {
-        fun from(resultList: List<CurationSummaryResult>) = CurationListResponse(
+        fun of(resultList: List<CurationSummaryResult>) = CurationListResponse(
             size = resultList.size.toLong(),
-            curations = resultList.map { CurationSummaryResponse.from(it) },
+            curations = resultList.map { CurationSummaryResponse.of(it) },
         )
     }
 }
@@ -21,7 +21,7 @@ data class CurationSummaryResponse(
     val category: CurationCategory,
 ) {
     companion object {
-        fun from(result: CurationSummaryResult) = CurationSummaryResponse(
+        fun of(result: CurationSummaryResult) = CurationSummaryResponse(
             id = checkNotNull(result.id),
             title = result.title,
             category = result.category,
@@ -36,11 +36,11 @@ data class CurationDetailResponse(
     val products: List<CurationProductResponse>,
 ) {
     companion object {
-        fun from(result: CurationDetailResult) = CurationDetailResponse(
+        fun of(result: CurationDetailResult) = CurationDetailResponse(
             id = result.id,
             title = result.title,
             category = result.category,
-            products = result.products.map { CurationProductResponse.from(result = it) },
+            products = result.products.map { CurationProductResponse.of(result = it) },
         )
     }
 }
@@ -52,11 +52,11 @@ data class CurationDetailCursorPageResponse(
     val products: CursorPageResponse<CurationProductResponse>,
 ) {
     companion object {
-        fun from(result: CurationCursorPageResult) = CurationDetailCursorPageResponse(
+        fun of(result: CurationCursorPageResult) = CurationDetailCursorPageResponse(
             id = result.id,
             title = result.title,
             category = result.category,
-            products = CursorPageResponse.from(result.productPage) { CurationProductResponse.from(result = it) },
+            products = CursorPageResponse.of(result.productPage) { CurationProductResponse.of(result = it) },
         )
     }
 }
@@ -68,11 +68,11 @@ data class CurationDetailOffsetPageResponse(
     val products: OffsetPageResponse<CurationProductResponse>,
 ) {
     companion object {
-        fun from(result: CurationOffsetPageResult) = CurationDetailOffsetPageResponse(
+        fun of(result: CurationOffsetPageResult) = CurationDetailOffsetPageResponse(
             id = result.id,
             title = result.title,
             category = result.category,
-            products = OffsetPageResponse.from(result.productPage) { CurationProductResponse.from(result = it) },
+            products = OffsetPageResponse.of(result.productPage) { CurationProductResponse.of(result = it) },
         )
     }
 }
@@ -84,7 +84,7 @@ data class CurationProductResponse(
     val price: Long,
 ) {
     companion object {
-        fun from(result: CurationProductResult) = CurationProductResponse(
+        fun of(result: CurationProductResult) = CurationProductResponse(
             id = result.id,
             name = result.name,
             description = result.description,

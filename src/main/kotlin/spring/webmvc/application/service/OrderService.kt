@@ -77,7 +77,7 @@ class OrderService(
 
             orderRepository.save(order)
 
-            return OrderDetailResult.from(order)
+            return OrderDetailResult.of(order)
         } catch (e: Exception) {
             processedProducts.forEach { orderProductCreateCommand ->
                 productCacheRepository.incrementProductStock(
@@ -97,7 +97,7 @@ class OrderService(
             orderStatus = query.orderStatus,
             orderedFrom = query.orderedFrom,
             orderedTo = query.orderedTo,
-        ).map { OrderSummaryResult.from(order = it) }
+        ).map { OrderSummaryResult.of(order = it) }
 
     fun findOrdersWithCursorPage(query: OrderCursorPageQuery) =
         orderRepository.findAllWithCursorPage(
@@ -106,19 +106,19 @@ class OrderService(
             orderStatus = query.orderStatus,
             orderedFrom = query.orderedFrom,
             orderedTo = query.orderedTo,
-        ).map { OrderSummaryResult.from(order = it) }
+        ).map { OrderSummaryResult.of(order = it) }
 
     fun findOrder(id: Long): OrderDetailResult {
         val order = orderRepository.findById(id = id)
 
-        return OrderDetailResult.from(order)
+        return OrderDetailResult.of(order)
     }
 
     fun findOrderByUser(id: Long, userId: Long): OrderDetailResult {
         val order = orderRepository.findByIdAndUserId(id = id, userId = userId)
             ?: throw NotFoundEntityException(kClass = Order::class, id = id)
 
-        return OrderDetailResult.from(order)
+        return OrderDetailResult.of(order)
     }
 
     @Transactional
@@ -127,7 +127,7 @@ class OrderService(
 
         order.updateStatus(status = command.orderStatus)
 
-        return OrderDetailResult.from(order)
+        return OrderDetailResult.of(order)
     }
 
     @Transactional
@@ -139,6 +139,6 @@ class OrderService(
 
         order.cancel()
 
-        return OrderDetailResult.from(order)
+        return OrderDetailResult.of(order)
     }
 }

@@ -17,7 +17,7 @@ class CurationController(
     ): CurationListResponse {
         val resultList = curationService.findCurationsCached(category)
 
-        return CurationListResponse.from(resultList = resultList)
+        return CurationListResponse.of(resultList = resultList)
     }
 
     @GetMapping("/{id}")
@@ -30,6 +30,6 @@ class CurationController(
             cursorId = cursorId,
         )
 
-        return CurationDetailCursorPageResponse.from(result)
+        return CurationDetailCursorPageResponse.of(result)
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.enums.ProductCategory
-import spring.webmvc.domain.model.vo.ProductExposureProperty
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.config.RepositoryTest
 
 @RepositoryTest
@@ -33,7 +33,7 @@ class ProductQuerydslRepositoryTest(
             description = "description",
             price = 1000,
             quantity = 10,
-            exposureProperty = ProductExposureProperty(
+            exposureAttribute = ProductExposureAttribute(
                 isPromotional = false,
                 isNewArrival = false,
                 isFeatured = false,
@@ -53,7 +53,7 @@ class ProductQuerydslRepositoryTest(
             description = "description",
             price = 2000,
             quantity = 20,
-            exposureProperty = ProductExposureProperty(
+            exposureAttribute = ProductExposureAttribute(
                 isPromotional = false,
                 isNewArrival = false,
                 isFeatured = false,
@@ -73,7 +73,7 @@ class ProductQuerydslRepositoryTest(
             description = "description",
             price = 3000,
             quantity = 30,
-            exposureProperty = ProductExposureProperty(
+            exposureAttribute = ProductExposureAttribute(
                 isPromotional = false,
                 isNewArrival = false,
                 isFeatured = false,
@@ -93,7 +93,7 @@ class ProductQuerydslRepositoryTest(
             description = "description",
             price = 1500,
             quantity = 30,
-            exposureProperty = ProductExposureProperty(
+            exposureAttribute = ProductExposureAttribute(
                 isPromotional = false,
                 isNewArrival = false,
                 isFeatured = false,

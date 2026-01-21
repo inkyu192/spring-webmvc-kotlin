@@ -1,5 +1,6 @@
 package spring.webmvc.presentation.controller
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -14,6 +15,8 @@ import spring.webmvc.presentation.dto.response.TokenResponse
 @RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
+    @Value("\${aws.cloudfront.domain}")
+    private val cloudfrontDomain: String,
 ) {
     @PostMapping("/sign-up")
     @ResponseBody
@@ -24,7 +27,7 @@ class AuthController(
         val command = request.toCommand()
         val user = authService.signUp(command)
 
-        return SignUpResponse.from(user)
+        return SignUpResponse.of(user, cloudfrontDomain)
     }
 
     @PostMapping("/sign-in")
@@ -35,7 +38,7 @@ class AuthController(
         val command = request.toCommand()
         val tokenResult = authService.signIn(command)
 
-        return TokenResponse.from(tokenResult)
+        return TokenResponse.of(tokenResult)
     }
 
     @PostMapping("/token/refresh")
@@ -46,7 +49,7 @@ class AuthController(
         val command = request.toCommand()
         val tokenResult = authService.refreshToken(command)
 
-        return TokenResponse.from(tokenResult)
+        return TokenResponse.of(tokenResult)
     }
 
     @PostMapping("/join/verify/request")

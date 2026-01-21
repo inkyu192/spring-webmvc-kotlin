@@ -12,7 +12,7 @@ data class CurationSummaryResult(
     val category: CurationCategory,
 ) {
     companion object {
-        fun from(curation: Curation) = CurationSummaryResult(
+        fun of(curation: Curation) = CurationSummaryResult(
             id = checkNotNull(curation.id),
             title = curation.title,
             category = curation.category,
@@ -27,11 +27,11 @@ data class CurationDetailResult(
     val products: List<CurationProductResult>,
 ) {
     companion object {
-        fun from(curation: Curation) = CurationDetailResult(
+        fun of(curation: Curation) = CurationDetailResult(
             id = checkNotNull(curation.id),
             title = curation.title,
             category = curation.category,
-            products = curation.curationProducts.map { CurationProductResult.from(curationProduct = it) },
+            products = curation.curationProducts.map { CurationProductResult.of(curationProduct = it) },
         )
     }
 }
@@ -43,14 +43,14 @@ data class CurationCursorPageResult(
     val productPage: CursorPage<CurationProductResult>,
 ) {
     companion object {
-        fun from(
+        fun of(
             curation: Curation,
             page: CursorPage<CurationProduct>,
         ) = CurationCursorPageResult(
             id = checkNotNull(curation.id),
             title = curation.title,
             category = curation.category,
-            productPage = page.map { CurationProductResult.from(curationProduct = it) },
+            productPage = page.map { CurationProductResult.of(curationProduct = it) },
         )
     }
 }
@@ -62,14 +62,14 @@ data class CurationOffsetPageResult(
     val productPage: Page<CurationProductResult>,
 ) {
     companion object {
-        fun from(
+        fun of(
             curation: Curation,
             page: Page<CurationProduct>,
         ) = CurationOffsetPageResult(
             id = checkNotNull(curation.id),
             title = curation.title,
             category = curation.category,
-            productPage = page.map { CurationProductResult.from(curationProduct = it) },
+            productPage = page.map { CurationProductResult.of(curationProduct = it) },
         )
     }
 }
@@ -81,7 +81,7 @@ data class CurationProductResult(
     val price: Long,
 ) {
     companion object {
-        fun from(curationProduct: CurationProduct) = CurationProductResult(
+        fun of(curationProduct: CurationProduct) = CurationProductResult(
             id = checkNotNull(curationProduct.id),
             name = curationProduct.product.name,
             description = curationProduct.product.description,

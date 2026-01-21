@@ -12,7 +12,7 @@ data class OrderSummaryResponse(
     val status: OrderStatus,
 ) {
     companion object {
-        fun from(result: OrderSummaryResult) = OrderSummaryResponse(
+        fun of(result: OrderSummaryResult) = OrderSummaryResponse(
             id = result.id,
             orderedAt = result.orderedAt,
             status = result.status,
@@ -27,11 +27,11 @@ data class OrderDetailResponse(
     val products: List<OrderProductResponse>,
 ) {
     companion object {
-        fun from(result: OrderDetailResult) = OrderDetailResponse(
+        fun of(result: OrderDetailResult) = OrderDetailResponse(
             id = result.id,
             orderedAt = result.orderedAt,
             status = result.status,
-            products = result.products.map { OrderProductResponse.from(result = it) },
+            products = result.products.map { OrderProductResponse.of(result = it) },
         )
     }
 }
@@ -42,7 +42,7 @@ data class OrderProductResponse(
     val quantity: Long,
 ) {
     companion object {
-        fun from(result: OrderProductResult) = OrderProductResponse(
+        fun of(result: OrderProductResult) = OrderProductResponse(
             name = result.name,
             price = result.price,
             quantity = result.quantity,

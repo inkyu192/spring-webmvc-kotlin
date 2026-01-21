@@ -27,7 +27,7 @@ class CurationController(
         val command = request.toCommand()
         val result = curationService.createCuration(command = command)
 
-        return CurationDetailResponse.from(result)
+        return CurationDetailResponse.of(result)
     }
 
     @GetMapping
@@ -37,7 +37,7 @@ class CurationController(
     ): CurationListResponse {
         val resultList = curationService.findCurations(category)
 
-        return CurationListResponse.from(resultList = resultList)
+        return CurationListResponse.of(resultList = resultList)
     }
 
     @GetMapping("/{id}")
@@ -51,6 +51,6 @@ class CurationController(
             pageable = pageable,
         )
 
-        return CurationDetailOffsetPageResponse.from(result)
+        return CurationDetailOffsetPageResponse.of(result)
     }
 }

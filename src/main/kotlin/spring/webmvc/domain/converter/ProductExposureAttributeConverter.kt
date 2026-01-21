@@ -5,16 +5,16 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
 import org.springframework.stereotype.Component
-import spring.webmvc.domain.model.vo.ProductExposureProperty
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 
 @Component
 @Converter
-class ProductExposurePropertyConverter(
+class ProductExposureAttributeConverter(
     private val objectMapper: ObjectMapper,
-) : AttributeConverter<ProductExposureProperty, String?> {
-    override fun convertToDatabaseColumn(attribute: ProductExposureProperty): String? =
+) : AttributeConverter<ProductExposureAttribute, String?> {
+    override fun convertToDatabaseColumn(attribute: ProductExposureAttribute): String? =
         objectMapper.writeValueAsString(attribute)
 
     override fun convertToEntityAttribute(dbData: String?) =
-        dbData?.let { objectMapper.readValue<ProductExposureProperty>(it) }
+        dbData?.let { objectMapper.readValue<ProductExposureAttribute>(it) }
 }

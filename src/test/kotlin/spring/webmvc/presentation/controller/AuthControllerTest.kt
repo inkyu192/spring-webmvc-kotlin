@@ -90,7 +90,8 @@ class AuthControllerTest {
                         PayloadDocumentation.fieldWithPath("permissionIds").description("권한 ID 목록")
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("id").description("회원 ID")
+                        PayloadDocumentation.fieldWithPath("id").description("회원 ID"),
+                        PayloadDocumentation.fieldWithPath("profileImage").description("프로필 이미지 경로").optional()
                     )
                 )
             )

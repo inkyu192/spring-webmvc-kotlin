@@ -6,7 +6,7 @@ import spring.webmvc.application.dto.result.ProductSummaryResult
 import spring.webmvc.application.dto.result.TransportResult
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.domain.model.vo.ProductExposureProperty
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import java.time.Instant
 
 data class ProductSummaryResponse(
@@ -17,11 +17,11 @@ data class ProductSummaryResponse(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureProperty: ProductExposureProperty,
+    val exposureAttribute: ProductExposureAttribute,
     val createdAt: Instant,
 ) {
     companion object {
-        fun from(result: ProductSummaryResult) = ProductSummaryResponse(
+        fun of(result: ProductSummaryResult) = ProductSummaryResponse(
             id = checkNotNull(result.id),
             category = result.category,
             status = result.status,
@@ -29,7 +29,7 @@ data class ProductSummaryResponse(
             description = result.description,
             price = result.price,
             quantity = result.quantity,
-            exposureProperty = result.exposureProperty,
+            exposureAttribute = result.exposureAttribute,
             createdAt = result.createdAt,
         )
     }
@@ -43,15 +43,15 @@ data class ProductDetailResponse(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureProperty: ProductExposureProperty,
+    val exposureAttribute: ProductExposureAttribute,
     val createdAt: Instant,
-    val property: ProductPropertyResponse,
+    val attribute: ProductAttributeResponse,
 ) {
     companion object {
-        fun from(result: ProductDetailResult): ProductDetailResponse {
-            val responseDetail = when (result.property) {
-                is TransportResult -> TransportResponse.from(result.property)
-                is AccommodationResult -> AccommodationResponse.from(result.property)
+        fun of(result: ProductDetailResult): ProductDetailResponse {
+            val responseAttribute = when (result.attribute) {
+                is TransportResult -> TransportResponse.of(result.attribute)
+                is AccommodationResult -> AccommodationResponse.of(result.attribute)
             }
 
             return ProductDetailResponse(
@@ -62,24 +62,24 @@ data class ProductDetailResponse(
                 description = result.description,
                 price = result.price,
                 quantity = result.quantity,
-                exposureProperty = result.exposureProperty,
+                exposureAttribute = result.exposureAttribute,
                 createdAt = result.createdAt,
-                property = responseDetail,
+                attribute = responseAttribute,
             )
         }
     }
 }
 
-sealed interface ProductPropertyResponse
+sealed interface ProductAttributeResponse
 
 data class TransportResponse(
     val departureLocation: String,
     val arrivalLocation: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
-) : ProductPropertyResponse {
+) : ProductAttributeResponse {
     companion object {
-        fun from(result: TransportResult) = TransportResponse(
+        fun of(result: TransportResult) = TransportResponse(
             departureLocation = result.departureLocation,
             arrivalLocation = result.arrivalLocation,
             departureTime = result.departureTime,
@@ -92,9 +92,9 @@ data class AccommodationResponse(
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
-) : ProductPropertyResponse {
+) : ProductAttributeResponse {
     companion object {
-        fun from(result: AccommodationResult) = AccommodationResponse(
+        fun of(result: AccommodationResult) = AccommodationResponse(
             place = result.place,
             checkInTime = result.checkInTime,
             checkOutTime = result.checkOutTime,

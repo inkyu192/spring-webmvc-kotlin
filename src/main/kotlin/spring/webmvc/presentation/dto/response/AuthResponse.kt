@@ -5,11 +5,13 @@ import spring.webmvc.domain.model.entity.User
 
 data class SignUpResponse(
     val id: Long,
+    val profileImage: String?,
 ) {
     companion object {
-        fun from(user: User): SignUpResponse {
+        fun of(user: User, cloudfrontDomain: String): SignUpResponse {
             return SignUpResponse(
                 id = checkNotNull(user.id),
+                profileImage = user.profileImage?.let { "$cloudfrontDomain/$it" },
             )
         }
     }
@@ -20,7 +22,7 @@ data class TokenResponse(
     val refreshToken: String,
 ) {
     companion object {
-        fun from(tokenResult: TokenResult): TokenResponse {
+        fun of(tokenResult: TokenResult): TokenResponse {
             return TokenResponse(
                 accessToken = tokenResult.accessToken,
                 refreshToken = tokenResult.refreshToken,

@@ -25,7 +25,7 @@ import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.entity.*
 import spring.webmvc.domain.model.enums.CurationCategory
 import spring.webmvc.domain.model.enums.ProductCategory
-import spring.webmvc.domain.model.vo.ProductExposureProperty
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.config.ControllerTest
 
 @ControllerTest([CurationController::class])
@@ -57,7 +57,7 @@ class CurationControllerTest {
                 description = "제주도 3박4일",
                 price = 100000L,
                 quantity = 10L,
-                exposureProperty = ProductExposureProperty(
+                exposureAttribute = ProductExposureAttribute(
                     isPromotional = false,
                     isNewArrival = false,
                     isFeatured = false,
@@ -82,7 +82,7 @@ class CurationControllerTest {
                 description = "부산 왕복 교통편",
                 price = 200000L,
                 quantity = 5L,
-                exposureProperty = ProductExposureProperty(
+                exposureAttribute = ProductExposureAttribute(
                     isPromotional = false,
                     isNewArrival = false,
                     isFeatured = false,
@@ -173,7 +173,7 @@ class CurationControllerTest {
     @Test
     fun findCurations() {
         val category = CurationCategory.HOME
-        val curationResult1 = CurationSummaryResult.from(curation1)
+        val curationResult1 = CurationSummaryResult.of(curation1)
 
         val result = listOf(curationResult1)
 
@@ -228,7 +228,7 @@ class CurationControllerTest {
         val curationProducts = listOf(curationProduct1, curationProduct2)
         val page = PageImpl(curationProducts, pageable, curationProducts.size.toLong())
 
-        val result = CurationOffsetPageResult.from(curation = curation1, page = page)
+        val result = CurationOffsetPageResult.of(curation = curation1, page = page)
 
         every { curationService.findCurationProductWithOffsetPage(curationId, pageable) } returns result
 

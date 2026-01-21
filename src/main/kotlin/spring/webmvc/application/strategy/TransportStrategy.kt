@@ -1,9 +1,9 @@
 package spring.webmvc.application.strategy
 
 import org.springframework.stereotype.Component
-import spring.webmvc.application.dto.command.ProductPropertyPutCommand
+import spring.webmvc.application.dto.command.ProductAttributePutCommand
 import spring.webmvc.application.dto.command.TransportPutCommand
-import spring.webmvc.application.dto.result.ProductPropertyResult
+import spring.webmvc.application.dto.result.ProductAttributeResult
 import spring.webmvc.application.dto.result.TransportResult
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
@@ -13,16 +13,18 @@ import spring.webmvc.domain.repository.TransportRepository
 @Component
 class TransportStrategy(
     private val transportRepository: TransportRepository,
-) : ProductPropertyStrategy {
+) : ProductAttributeStrategy {
     override fun category() = ProductCategory.TRANSPORT
 
-    override fun findByProductId(productId: Long): ProductPropertyResult {
+    override fun supports(command: ProductAttributePutCommand) = command is TransportPutCommand
+
+    override fun findByProductId(productId: Long): ProductAttributeResult {
         val transport = transportRepository.findByProductId(productId)
 
-        return TransportResult.from(transport)
+        return TransportResult.of(transport)
     }
 
-    override fun create(product: Product, command: ProductPropertyPutCommand): ProductPropertyResult {
+    override fun create(product: Product, command: ProductAttributePutCommand): ProductAttributeResult {
         val transportCommand = command as TransportPutCommand
 
         val transport = Transport.create(
@@ -35,10 +37,10 @@ class TransportStrategy(
 
         transportRepository.save(transport)
 
-        return TransportResult.from(transport)
+        return TransportResult.of(transport)
     }
 
-    override fun replace(productId: Long, command: ProductPropertyPutCommand): ProductPropertyResult {
+    override fun update(productId: Long, command: ProductAttributePutCommand): ProductAttributeResult {
         val transportCommand = command as TransportPutCommand
 
         val transport = transportRepository.findByProductId(productId)
@@ -50,7 +52,7 @@ class TransportStrategy(
             arrivalTime = transportCommand.arrivalTime,
         )
 
-        return TransportResult.from(transport)
+        return TransportResult.of(transport)
     }
 
     override fun deleteProduct(productId: Long) {

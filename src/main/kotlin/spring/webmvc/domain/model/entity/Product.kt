@@ -1,10 +1,10 @@
 package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
-import spring.webmvc.domain.converter.ProductExposurePropertyConverter
+import spring.webmvc.domain.converter.ProductExposureAttributeConverter
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.domain.model.vo.ProductExposureProperty
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.exception.InvalidEntityStatusException
 
 @Entity
@@ -21,8 +21,8 @@ class Product(
     var price: Long,
     var quantity: Long,
 
-    @Convert(converter = ProductExposurePropertyConverter::class)
-    var exposureProperty: ProductExposureProperty,
+    @Convert(converter = ProductExposureAttributeConverter::class)
+    var exposureAttribute: ProductExposureAttribute,
 ) : BaseCreator() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +37,7 @@ class Product(
             price: Long,
             quantity: Long,
             status: ProductStatus = ProductStatus.PENDING,
-            exposureProperty: ProductExposureProperty,
+            exposureAttribute: ProductExposureAttribute,
         ) = Product(
             category = category,
             status = status,
@@ -45,19 +45,19 @@ class Product(
             description = description,
             price = price,
             quantity = quantity,
-            exposureProperty = exposureProperty,
+            exposureAttribute = exposureAttribute,
         )
     }
 
-    fun replace(
+    fun update(
         status: ProductStatus,
         name: String,
         description: String,
         price: Long,
         quantity: Long,
-        exposureProperty: ProductExposureProperty,
+        exposureAttribute: ProductExposureAttribute,
     ) {
-        if (status != ProductStatus.PENDING) {
+        if (this.status != ProductStatus.PENDING) {
             throw InvalidEntityStatusException(
                 kClass = Product::class,
                 id = checkNotNull(id),
@@ -71,7 +71,7 @@ class Product(
         this.description = description
         this.price = price
         this.quantity = quantity
-        this.exposureProperty = exposureProperty
+        this.exposureAttribute = exposureAttribute
     }
 
     fun removeQuantity(quantity: Long) {

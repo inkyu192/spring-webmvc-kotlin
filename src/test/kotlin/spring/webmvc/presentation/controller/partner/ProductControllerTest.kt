@@ -18,7 +18,8 @@ import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spring.webmvc.application.dto.command.ProductPutCommand
+import spring.webmvc.application.dto.command.ProductCreateCommand
+import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.application.dto.result.AccommodationResult
 import spring.webmvc.application.dto.result.ProductDetailResult
@@ -30,7 +31,7 @@ import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.domain.model.vo.ProductExposureProperty
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.config.ControllerTest
 import java.time.Instant
 
@@ -58,7 +59,7 @@ class ProductControllerTest {
             description = "description",
             price = 1000,
             quantity = 10,
-            exposureProperty = ProductExposureProperty(
+            exposureAttribute = ProductExposureAttribute(
                 isPromotional = false,
                 isNewArrival = false,
                 isFeatured = false,
@@ -81,7 +82,7 @@ class ProductControllerTest {
             every { product.description } returns "description"
             every { product.price } returns 1000
             every { product.quantity } returns 10
-            every { product.exposureProperty } returns ProductExposureProperty(
+            every { product.exposureAttribute } returns ProductExposureAttribute(
                 isPromotional = false,
                 isNewArrival = false,
                 isFeatured = true,
@@ -96,7 +97,7 @@ class ProductControllerTest {
             description = "description",
             price = 2000,
             quantity = 20,
-            exposureProperty = ProductExposureProperty(
+            exposureAttribute = ProductExposureAttribute(
                 isPromotional = false,
                 isNewArrival = false,
                 isFeatured = false,
@@ -120,7 +121,7 @@ class ProductControllerTest {
             every { product.description } returns "description"
             every { product.price } returns 2000
             every { product.quantity } returns 20
-            every { product.exposureProperty } returns ProductExposureProperty(
+            every { product.exposureAttribute } returns ProductExposureAttribute(
                 isPromotional = true,
                 isNewArrival = false,
                 isFeatured = false,
@@ -129,13 +130,13 @@ class ProductControllerTest {
             every { product.createdAt } returns now
         }
 
-        transportResult = ProductDetailResult.from(
+        transportResult = ProductDetailResult.of(
             product = transport.product,
-            propertyResult = TransportResult.from(transport)
+            attributeResult = TransportResult.of(transport)
         )
-        accommodationResult = ProductDetailResult.from(
+        accommodationResult = ProductDetailResult.of(
             product = accommodation.product,
-            propertyResult = AccommodationResult.from(accommodation)
+            attributeResult = AccommodationResult.of(accommodation)
         )
     }
 
@@ -144,8 +145,8 @@ class ProductControllerTest {
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(
             listOf(
-                ProductSummaryResult.from(accommodation.product),
-                ProductSummaryResult.from(transport.product)
+                ProductSummaryResult.of(accommodation.product),
+                ProductSummaryResult.of(transport.product)
             ),
             pageable,
             2
@@ -194,15 +195,15 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("content[].description").description("설명"),
                         PayloadDocumentation.fieldWithPath("content[].price").description("가격"),
                         PayloadDocumentation.fieldWithPath("content[].quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("content[].exposureProperty").description("노출 속성")
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute").description("노출 속성")
                             .optional(),
-                        PayloadDocumentation.fieldWithPath("content[].exposureProperty.isPromotional")
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isPromotional")
                             .description("프로모션 여부").optional(),
-                        PayloadDocumentation.fieldWithPath("content[].exposureProperty.isNewArrival")
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isNewArrival")
                             .description("신상품 여부").optional(),
-                        PayloadDocumentation.fieldWithPath("content[].exposureProperty.isFeatured")
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isFeatured")
                             .description("추천 상품 여부").optional(),
-                        PayloadDocumentation.fieldWithPath("content[].exposureProperty.isLowStock")
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isLowStock")
                             .description("품절 임박 여부").optional(),
                         PayloadDocumentation.fieldWithPath("content[].createdAt").description("생성일시")
                     )
@@ -236,21 +237,21 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성").optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성").optional(),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부")
                             .optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부")
                             .optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부")
                             .optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.departureLocation").description("출발지"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalLocation").description("도착지"),
-                        PayloadDocumentation.fieldWithPath("property.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
                     )
                 )
             )
@@ -284,20 +285,20 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성").optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성").optional(),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부")
                             .optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부")
                             .optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부")
                             .optional(),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("property.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("property.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
                     )
                 )
             )
@@ -306,7 +307,6 @@ class ProductControllerTest {
     @Test
     fun createTransport() {
         val category = ProductCategory.TRANSPORT
-        val status = ProductStatus.SELLING
         val name = "name"
         val description = "description"
         val price = 1000L
@@ -316,7 +316,7 @@ class ProductControllerTest {
         val departureTime = Instant.now()
         val arrivalTime = Instant.now().plusSeconds(3600)
 
-        every { productService.createProduct(any<ProductPutCommand>()) } returns transportResult
+        every { productService.createProduct(any<ProductCreateCommand>()) } returns transportResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/partner/products")
@@ -324,19 +324,18 @@ class ProductControllerTest {
                 .content(
                     """
 					{
-					  "status": "$status",
 					  "category": "$category",
 					  "name": "$name",
 					  "description": "$description",
 					  "price": $price,
 					  "quantity": $quantity,
-					  "exposureProperty": {
+					  "exposureAttribute": {
 					    "isPromotional": false,
 					    "isNewArrival": false,
 					    "isFeatured": false,
 					    "isLowStock": false
 					  },
-					  "property": {
+					  "attribute": {
 					    "departureLocation": "$departureLocation",
 					    "arrivalLocation": "$arrivalLocation",
 					    "departureTime": "$departureTime",
@@ -356,22 +355,21 @@ class ProductControllerTest {
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("status").description("상태"),
                         PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("교통수단명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.departureLocation").description("출발지"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalLocation").description("도착지"),
-                        PayloadDocumentation.fieldWithPath("property.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
@@ -381,17 +379,17 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.departureLocation").description("출발지"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalLocation").description("도착지"),
-                        PayloadDocumentation.fieldWithPath("property.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
                     )
                 )
             )
@@ -400,7 +398,6 @@ class ProductControllerTest {
     @Test
     fun createAccommodation() {
         val category = ProductCategory.ACCOMMODATION
-        val status = ProductStatus.SELLING
         val name = "name"
         val description = "description"
         val price = 1000L
@@ -409,7 +406,7 @@ class ProductControllerTest {
         val checkInTime = Instant.now()
         val checkOutTime = Instant.now().plusSeconds(86400)
 
-        every { productService.createProduct(any<ProductPutCommand>()) } returns accommodationResult
+        every { productService.createProduct(any<ProductCreateCommand>()) } returns accommodationResult
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/partner/products")
@@ -417,19 +414,18 @@ class ProductControllerTest {
                 .content(
                     """
 					{
-					  "status": "$status",
 					  "category": "$category",
 					  "name": "$name",
 					  "description": "$description",
 					  "price": $price,
 					  "quantity": $quantity,
-					  "exposureProperty": {
+					  "exposureAttribute": {
 					    "isPromotional": false,
 					    "isNewArrival": false,
 					    "isFeatured": false,
 					    "isLowStock": false
 					  },
-					  "property": {
+					  "attribute": {
 					    "place": "$place",
 					    "checkInTime": "$checkInTime",
 					    "checkOutTime": "$checkOutTime"
@@ -448,21 +444,20 @@ class ProductControllerTest {
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     PayloadDocumentation.requestFields(
-                        PayloadDocumentation.fieldWithPath("status").description("상태"),
                         PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("숙소명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("property.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("property.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
@@ -472,25 +467,24 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("property.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("property.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
                     )
                 )
             )
     }
 
     @Test
-    fun replaceTransport() {
+    fun updateTransport() {
         val productId = 1L
-        val category = ProductCategory.TRANSPORT
         val status = ProductStatus.SELLING
         val name = "name"
         val description = "description"
@@ -502,30 +496,29 @@ class ProductControllerTest {
         val arrivalTime = Instant.now().plusSeconds(3600)
 
         every {
-            productService.replaceProduct(
-                command = any<ProductPutCommand>()
+            productService.updateProduct(
+                command = any<ProductUpdateCommand>()
             )
         } returns transportResult
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.put("/partner/products/{id}", productId)
+            RestDocumentationRequestBuilders.patch("/partner/products/{id}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
 					{
 					  "status": "$status",
-					  "category": "$category",
 					  "name": "$name",
 					  "description": "$description",
 					  "price": $price,
 					  "quantity": $quantity,
-					  "exposureProperty": {
+					  "exposureAttribute": {
 					    "isPromotional": false,
 					    "isNewArrival": false,
 					    "isFeatured": false,
 					    "isLowStock": false
 					  },
-					  "property": {
+					  "attribute": {
 					    "departureLocation": "$departureLocation",
 					    "arrivalLocation": "$arrivalLocation",
 					    "departureTime": "$departureTime",
@@ -540,27 +533,26 @@ class ProductControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "partner-transport-replace",
+                    "partner-transport-update",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("status").description("상태"),
-                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("교통수단명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.departureLocation").description("출발지"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalLocation").description("도착지"),
-                        PayloadDocumentation.fieldWithPath("property.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
@@ -570,26 +562,25 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.departureLocation").description("출발지"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalLocation").description("도착지"),
-                        PayloadDocumentation.fieldWithPath("property.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("property.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
+                        PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
                     )
                 )
             )
     }
 
     @Test
-    fun replaceAccommodation() {
+    fun updateAccommodation() {
         val productId = 1L
-        val category = ProductCategory.ACCOMMODATION
         val status = ProductStatus.SELLING
         val name = "name"
         val description = "description"
@@ -600,30 +591,29 @@ class ProductControllerTest {
         val checkOutTime = Instant.now().plusSeconds(86400)
 
         every {
-            productService.replaceProduct(
-                command = any<ProductPutCommand>()
+            productService.updateProduct(
+                command = any<ProductUpdateCommand>()
             )
         } returns accommodationResult
 
         mockMvc.perform(
-            RestDocumentationRequestBuilders.put("/partner/products/{id}", productId)
+            RestDocumentationRequestBuilders.patch("/partner/products/{id}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
 					{
 					  "status": "$status",
-					  "category": "$category",
 					  "name": "$name",
 					  "description": "$description",
 					  "price": $price,
 					  "quantity": $quantity,
-					  "exposureProperty": {
+					  "exposureAttribute": {
 					    "isPromotional": false,
 					    "isNewArrival": false,
 					    "isFeatured": false,
 					    "isLowStock": false
 					  },
-					  "property": {
+					  "attribute": {
 					    "place": "$place",
 					    "checkInTime": "$checkInTime",
 					    "checkOutTime": "$checkOutTime"
@@ -637,26 +627,25 @@ class ProductControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
-                    "partner-accommodation-replace",
+                    "partner-accommodation-update",
                     HeaderDocumentation.requestHeaders(
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("status").description("상태"),
-                        PayloadDocumentation.fieldWithPath("category").description("카테고리"),
                         PayloadDocumentation.fieldWithPath("name").description("숙소명"),
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("property.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("property.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("아이디"),
@@ -666,16 +655,16 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("description").description("설명"),
                         PayloadDocumentation.fieldWithPath("price").description("가격"),
                         PayloadDocumentation.fieldWithPath("quantity").description("수량"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty").description("노출 속성"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isPromotional").description("프로모션 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isNewArrival").description("신상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isFeatured").description("추천 상품 여부"),
-                        PayloadDocumentation.fieldWithPath("exposureProperty.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
-                        PayloadDocumentation.fieldWithPath("property").description("상세 정보"),
-                        PayloadDocumentation.fieldWithPath("property.place").description("장소"),
-                        PayloadDocumentation.fieldWithPath("property.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("property.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
+                        PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
                     )
                 )
             )

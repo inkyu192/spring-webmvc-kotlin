@@ -45,7 +45,7 @@ class S3Service(
         sourceKey: String,
         fileType: FileType,
         id: Long,
-    ) {
+    ): String {
         val fileName = sourceKey.substringAfterLast('/')
         val destinationKey = "data/${fileType.path}/$id/$fileName"
 
@@ -62,6 +62,8 @@ class S3Service(
             logger.error("Failed to copy object to S3", throwable)
             throw FailedAwsIntegrationException(serviceName = "S3", throwable = throwable)
         }
+
+        return destinationKey
     }
 
     private fun extractExtension(filename: String): String {

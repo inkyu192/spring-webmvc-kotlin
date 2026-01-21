@@ -49,7 +49,7 @@ jwt:
     expiration: 10m
   refresh-token:
     key: XhNd_6u1OJvYOCp2JZ0cwlQUKtIJ6B5wAxXHfPSmeTA
-    expiration: 60d
+    expiration: 7d
 
 crypto:
   secret-key: d9ANIqIyfTygI92m6jWFfAzUbEP73TNB
@@ -78,3 +78,5 @@ management:
 aws:
   s3:
     bucket: my-bucket
+  cloudfront:
+    domain: http://localhost:4566/my-bucket

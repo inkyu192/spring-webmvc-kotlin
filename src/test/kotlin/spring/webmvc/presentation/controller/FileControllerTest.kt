@@ -59,7 +59,8 @@ class FileControllerTest {
                         RequestDocumentation.partWithName("file").description("파일")
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("key").description("키")
+                        PayloadDocumentation.fieldWithPath("key").description("키"),
+                        PayloadDocumentation.fieldWithPath("url").description("URL")
                     )
                 )
             )

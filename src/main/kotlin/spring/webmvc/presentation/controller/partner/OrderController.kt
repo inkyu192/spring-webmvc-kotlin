@@ -38,7 +38,7 @@ class OrderController(
 
         val page = orderService.findOrdersWithOffsetPage(query = query)
 
-        return OffsetPageResponse.from(page) { OrderSummaryResponse.from(result = it) }
+        return OffsetPageResponse.of(page) { OrderSummaryResponse.of(result = it) }
     }
 
     @GetMapping("/{id}")
@@ -48,7 +48,7 @@ class OrderController(
     ): OrderDetailResponse {
         val orderResult = orderService.findOrder(id = id)
 
-        return OrderDetailResponse.from(orderResult)
+        return OrderDetailResponse.of(orderResult)
     }
 
     @PatchMapping("/{id}")
@@ -62,6 +62,6 @@ class OrderController(
 
         val orderResult = orderService.updateOrderStatus(command = command)
 
-        return OrderDetailResponse.from(orderResult)
+        return OrderDetailResponse.of(orderResult)
     }
 }

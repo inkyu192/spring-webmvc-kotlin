@@ -46,14 +46,14 @@ class CurationService(
 
         curationRepository.save(curation)
 
-        return CurationDetailResult.from(curation)
+        return CurationDetailResult.of(curation)
     }
 
     @Cacheable(value = ["curations"], key = "'curations:' + #category")
     fun findCurationsCached(category: CurationCategory) = findCurations(category)
 
     fun findCurations(category: CurationCategory) = curationRepository.findAllByCategory(category)
-        .map { CurationSummaryResult.from(curation = it) }
+        .map { CurationSummaryResult.of(curation = it) }
 
     @Cacheable(value = ["curationProducts"], key = "'curations:' + #id + ':' + #cursorId")
     fun findCurationProductWithCursorPageCached(id: Long, cursorId: Long?): CurationCursorPageResult {
@@ -63,7 +63,7 @@ class CurationService(
             cursorId = cursorId,
         )
 
-        return CurationCursorPageResult.from(curation = curation, page = page)
+        return CurationCursorPageResult.of(curation = curation, page = page)
     }
 
     fun findCurationProductWithOffsetPage(id: Long, pageable: Pageable): CurationOffsetPageResult {
@@ -73,6 +73,6 @@ class CurationService(
             pageable = pageable,
         )
 
-        return CurationOffsetPageResult.from(curation = curation, page = page)
+        return CurationOffsetPageResult.of(curation = curation, page = page)
     }
 }

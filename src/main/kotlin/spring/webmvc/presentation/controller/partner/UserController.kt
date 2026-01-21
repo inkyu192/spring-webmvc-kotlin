@@ -35,7 +35,7 @@ class UserController(
 
         val page = userService.findUsers(query)
 
-        return OffsetPageResponse.from(page) { UserSummaryResponse.from(user = it) }
+        return OffsetPageResponse.of(page) { UserSummaryResponse.of(user = it) }
     }
 
     @GetMapping("/{id}")
@@ -43,7 +43,7 @@ class UserController(
     fun findUser(@PathVariable id: Long): UserDetailResponse {
         val userDetail = userService.findUserDetail(id)
 
-        return UserDetailResponse.from(
+        return UserDetailResponse.of(
             user = userDetail.user,
             credential = userDetail.credential,
             oauths = userDetail.oauths,

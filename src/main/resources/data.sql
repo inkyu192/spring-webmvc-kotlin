@@ -77,7 +77,7 @@ VALUES (1, '테크 코퍼레이션', '123-45-67890', '서울특별시 강남구 
        (4, '비즈니스 솔루션', '456-78-90123', '서울특별시 마포구 월드컵북로 321', '02-4567-8901', NOW(6), NOW(6)),
        (5, '엔터프라이즈 주식회사', '567-89-01234', '부산광역시 해운대구 센텀중앙로 654', '051-5678-9012', NOW(6), NOW(6));
 
-INSERT INTO product (id, category, status, name, description, price, quantity, exposure_property, created_by,
+INSERT INTO product (id, category, status, name, description, price, quantity, exposure_attribute, created_by,
                      updated_by,
                      created_at, updated_at)
 VALUES (1, 'TRANSPORT', 'SELLING', '인천-도쿄 왕복', '대한항공 직항 이코노미 클래스', 450000, 100,

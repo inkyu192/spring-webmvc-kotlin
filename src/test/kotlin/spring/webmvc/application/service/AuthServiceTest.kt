@@ -26,6 +26,8 @@ import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
+import spring.webmvc.infrastructure.external.FileType
+import spring.webmvc.infrastructure.external.S3Service
 import spring.webmvc.infrastructure.security.JwtProvider
 import java.time.LocalDate
 
@@ -39,6 +41,7 @@ class AuthServiceTest {
     private val eventPublisher = mockk<ApplicationEventPublisher>()
     private val roleRepository = mockk<RoleRepository>()
     private val permissionRepository = mockk<PermissionRepository>()
+    private val s3Service = mockk<S3Service>()
     private val authService = AuthService(
         jwtProvider = jwtProvider,
         tokenCacheRepository = tokenCacheRepository,
@@ -49,6 +52,7 @@ class AuthServiceTest {
         eventPublisher = eventPublisher,
         roleRepository = roleRepository,
         permissionRepository = permissionRepository,
+        s3Service = s3Service,
     )
 
     private lateinit var user: User
@@ -84,6 +88,7 @@ class AuthServiceTest {
     @Test
     @DisplayName("회원가입 성공")
     fun signUp() {
+        val profileImageKey = "temp/test-image.jpg"
         val command = SignUpCommand(
             email = email,
             password = "password123",
@@ -91,6 +96,49 @@ class AuthServiceTest {
             phone = Phone.create("010-1234-5678"),
             gender = Gender.MALE,
             birthday = LocalDate.of(1990, 1, 1),
+            profileImageKey = profileImageKey,
+            roleIds = emptyList(),
+            permissionIds = emptyList(),
+        )
+
+        every { userCredentialRepository.existsByEmail(email) } returns false
+        every { userRepository.existsByPhone(any()) } returns false
+        every { roleRepository.findAllById(emptyList()) } returns emptyList()
+        every { permissionRepository.findAllById(emptyList()) } returns emptyList()
+        every { passwordEncoder.encode(any()) } returns "encodedPassword"
+        every { userRepository.save(any()) } returns user
+        every {
+            s3Service.copyObject(
+                profileImageKey,
+                FileType.PROFILE,
+                userId
+            )
+        } returns "data/profile/$userId/test-image.jpg"
+        every { userCredentialRepository.save(any()) } returns userCredential
+        every { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) } just runs
+
+        val result = authService.signUp(command)
+
+        Assertions.assertThat(result).isNotNull
+        verify { userCredentialRepository.existsByEmail(email) }
+        verify { userRepository.existsByPhone(any()) }
+        verify { userRepository.save(any()) }
+        verify { s3Service.copyObject(profileImageKey, FileType.PROFILE, userId) }
+        verify { userCredentialRepository.save(any()) }
+        verify { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) }
+    }
+
+    @Test
+    @DisplayName("프로필 이미지 없이 회원가입 성공")
+    fun signUpWithoutProfileImage() {
+        val command = SignUpCommand(
+            email = email,
+            password = "password123",
+            name = "홍길동",
+            phone = Phone.create("010-1234-5678"),
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
+            profileImageKey = null,
             roleIds = emptyList(),
             permissionIds = emptyList(),
         )
@@ -107,11 +155,7 @@ class AuthServiceTest {
         val result = authService.signUp(command)
 
         Assertions.assertThat(result).isNotNull
-        verify { userCredentialRepository.existsByEmail(email) }
-        verify { userRepository.existsByPhone(any()) }
-        verify { userRepository.save(any()) }
-        verify { userCredentialRepository.save(any()) }
-        verify { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) }
+        verify(exactly = 0) { s3Service.copyObject(any(), any(), any()) }
     }
 
     @Test
@@ -124,6 +168,7 @@ class AuthServiceTest {
             phone = Phone.create("010-1234-5678"),
             gender = Gender.MALE,
             birthday = LocalDate.of(1990, 1, 1),
+            profileImageKey = null,
             roleIds = emptyList(),
             permissionIds = emptyList(),
         )
@@ -145,6 +190,7 @@ class AuthServiceTest {
             phone = phone,
             gender = Gender.MALE,
             birthday = LocalDate.of(1990, 1, 1),
+            profileImageKey = null,
             roleIds = emptyList(),
             permissionIds = emptyList(),
         )
@@ -165,7 +211,7 @@ class AuthServiceTest {
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns true
         every { jwtProvider.createAccessToken(userId, emptyList()) } returns accessToken
         every { jwtProvider.createRefreshToken() } returns refreshToken
-        every { tokenCacheRepository.setRefreshToken(userId, refreshToken) } just runs
+        every { tokenCacheRepository.addRefreshToken(userId, refreshToken) } just runs
 
         val result = authService.signIn(command)
 
@@ -220,17 +266,23 @@ class AuthServiceTest {
     fun refreshToken() {
         val command = RefreshTokenCommand(accessToken = accessToken, refreshToken = refreshToken)
         val claims = DefaultClaims(mapOf("userId" to userId))
+        val newRefreshToken = "newRefreshToken"
 
         every { jwtProvider.parseAccessToken(accessToken) } throws ExpiredJwtException(null, claims, "Token expired")
         every { jwtProvider.parseRefreshToken(refreshToken) } returns mockk()
         every { userRepository.findById(userId) } returns user
-        every { tokenCacheRepository.getRefreshToken(userId) } returns refreshToken
+        every { tokenCacheRepository.getRefreshToken(userId, refreshToken) } returns refreshToken
+        every { tokenCacheRepository.removeRefreshToken(userId, refreshToken) } just runs
+        every { jwtProvider.createRefreshToken() } returns newRefreshToken
+        every { tokenCacheRepository.addRefreshToken(userId, newRefreshToken) } just runs
         every { jwtProvider.createAccessToken(userId, emptyList()) } returns "newAccessToken"
 
         val result = authService.refreshToken(command)
 
         Assertions.assertThat(result.accessToken).isEqualTo("newAccessToken")
-        Assertions.assertThat(result.refreshToken).isEqualTo(refreshToken)
+        Assertions.assertThat(result.refreshToken).isEqualTo(newRefreshToken)
+        verify { tokenCacheRepository.removeRefreshToken(userId, refreshToken) }
+        verify { tokenCacheRepository.addRefreshToken(userId, newRefreshToken) }
     }
 
     @Test
@@ -242,7 +294,7 @@ class AuthServiceTest {
         every { jwtProvider.parseAccessToken(accessToken) } throws ExpiredJwtException(null, claims, "Token expired")
         every { jwtProvider.parseRefreshToken("invalidRefreshToken") } returns mockk()
         every { userRepository.findById(userId) } returns user
-        every { tokenCacheRepository.getRefreshToken(userId) } returns refreshToken
+        every { tokenCacheRepository.getRefreshToken(userId, "invalidRefreshToken") } returns null
 
         Assertions.assertThatThrownBy { authService.refreshToken(command) }
             .isInstanceOf(BadCredentialsException::class.java)

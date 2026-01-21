@@ -13,7 +13,7 @@ data class OffsetPageResponse<T>(
     val content: List<T>,
 ) {
     companion object {
-        fun <U, T> from(
+        fun <U, T> of(
             page: Page<U>,
             transform: (U) -> T,
         ) = OffsetPageResponse(
@@ -35,7 +35,7 @@ data class CursorPageResponse<T>(
     val content: List<T>,
 ) {
     companion object {
-        fun <U, T> from(
+        fun <U, T> of(
             page: CursorPage<U>,
             transform: (U) -> T,
         ) = CursorPageResponse(

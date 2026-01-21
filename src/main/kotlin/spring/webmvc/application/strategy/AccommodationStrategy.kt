@@ -2,9 +2,9 @@ package spring.webmvc.application.strategy
 
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.AccommodationPutCommand
-import spring.webmvc.application.dto.command.ProductPropertyPutCommand
+import spring.webmvc.application.dto.command.ProductAttributePutCommand
 import spring.webmvc.application.dto.result.AccommodationResult
-import spring.webmvc.application.dto.result.ProductPropertyResult
+import spring.webmvc.application.dto.result.ProductAttributeResult
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.ProductCategory
@@ -13,16 +13,18 @@ import spring.webmvc.domain.repository.AccommodationRepository
 @Component
 class AccommodationStrategy(
     private val accommodationRepository: AccommodationRepository,
-) : ProductPropertyStrategy {
+) : ProductAttributeStrategy {
     override fun category() = ProductCategory.ACCOMMODATION
 
-    override fun findByProductId(productId: Long): ProductPropertyResult {
+    override fun supports(command: ProductAttributePutCommand) = command is AccommodationPutCommand
+
+    override fun findByProductId(productId: Long): ProductAttributeResult {
         val accommodation = accommodationRepository.findByProductId(productId)
 
-        return AccommodationResult.from(accommodation)
+        return AccommodationResult.of(accommodation)
     }
 
-    override fun create(product: Product, command: ProductPropertyPutCommand): ProductPropertyResult {
+    override fun create(product: Product, command: ProductAttributePutCommand): ProductAttributeResult {
         val accommodationCommand = command as AccommodationPutCommand
 
         val accommodation = Accommodation.create(
@@ -34,10 +36,10 @@ class AccommodationStrategy(
 
         accommodationRepository.save(accommodation)
 
-        return AccommodationResult.from(accommodation)
+        return AccommodationResult.of(accommodation)
     }
 
-    override fun replace(productId: Long, command: ProductPropertyPutCommand): ProductPropertyResult {
+    override fun update(productId: Long, command: ProductAttributePutCommand): ProductAttributeResult {
         val accommodationCommand = command as AccommodationPutCommand
 
         val accommodation = accommodationRepository.findByProductId(productId)
@@ -48,7 +50,7 @@ class AccommodationStrategy(
             checkOutTime = accommodationCommand.checkOutTime,
         )
 
-        return AccommodationResult.from(accommodation)
+        return AccommodationResult.of(accommodation)
     }
 
     override fun deleteProduct(productId: Long) {

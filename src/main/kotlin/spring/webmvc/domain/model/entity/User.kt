@@ -13,6 +13,7 @@ class User protected constructor(
     phone: Phone,
     gender: Gender,
     birthday: LocalDate,
+    profileImage: String?,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +33,9 @@ class User protected constructor(
         protected set
 
     var birthday = birthday
+        protected set
+
+    var profileImage: String? = profileImage
         protected set
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -54,11 +58,13 @@ class User protected constructor(
             phone: Phone,
             gender: Gender,
             birthday: LocalDate,
+            profileImage: String? = null,
         ) = User(
             name = name,
             phone = phone,
             gender = gender,
             birthday = birthday,
+            profileImage = profileImage,
         )
     }
 
@@ -70,6 +76,10 @@ class User protected constructor(
     fun addUserPermission(permission: Permission) {
         val userPermission = UserPermission.create(user = this, permission = permission)
         _userPermissions.add(userPermission)
+    }
+
+    fun updateProfileImage(profileImage: String) {
+        this.profileImage = profileImage
     }
 
     fun getPermissionNames(): List<String> {
