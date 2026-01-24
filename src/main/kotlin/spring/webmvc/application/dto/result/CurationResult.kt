@@ -3,6 +3,7 @@ package spring.webmvc.application.dto.result
 import org.springframework.data.domain.Page
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.CurationProduct
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.CurationCategory
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
@@ -52,6 +53,21 @@ data class CurationCursorPageResult(
             category = curation.category,
             productPage = page.map { CurationProductResult.of(curationProduct = it) },
         )
+
+        fun of(
+            curation: Curation,
+            products: List<Product>,
+        ) = CurationCursorPageResult(
+            id = checkNotNull(curation.id),
+            title = curation.title,
+            category = curation.category,
+            productPage = CursorPage(
+                content = products.map { CurationProductResult.of(product = it) },
+                size = products.size.toLong(),
+                hasNext = false,
+                nextCursorId = null,
+            ),
+        )
     }
 }
 
@@ -82,10 +98,17 @@ data class CurationProductResult(
 ) {
     companion object {
         fun of(curationProduct: CurationProduct) = CurationProductResult(
-            id = checkNotNull(curationProduct.id),
+            id = checkNotNull(curationProduct.product.id),
             name = curationProduct.product.name,
             description = curationProduct.product.description,
             price = curationProduct.product.price,
+        )
+
+        fun of(product: Product) = CurationProductResult(
+            id = checkNotNull(product.id),
+            name = product.name,
+            description = product.description,
+            price = product.price,
         )
     }
 }

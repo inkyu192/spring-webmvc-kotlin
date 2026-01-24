@@ -13,7 +13,8 @@ class LocalStackTestContainerConfig {
         val localStackContainer: LocalStackContainer =
             LocalStackContainer(DockerImageName.parse("localstack/localstack:3.8.1"))
                 .withServices(
-                    LocalStackContainer.Service.S3
+                    LocalStackContainer.Service.S3,
+                    LocalStackContainer.Service.DYNAMODB
                 )
                 .withEnv("DEFAULT_REGION", "ap-northeast-2")
                 .apply { start() }

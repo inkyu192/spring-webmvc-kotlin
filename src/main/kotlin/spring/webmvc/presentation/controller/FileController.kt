@@ -1,6 +1,5 @@
 package spring.webmvc.presentation.controller
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -8,14 +7,14 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import spring.webmvc.infrastructure.external.S3Service
+import spring.webmvc.infrastructure.properties.AwsProperties
 import spring.webmvc.presentation.dto.response.FileResponse
 
 @RestController
 @RequestMapping("/files")
 class FileController(
     private val s3Service: S3Service,
-    @Value("\${aws.cloudfront.domain}")
-    private val cloudfrontDomain: String,
+    private val awsProperties: AwsProperties,
 ) {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
@@ -24,6 +23,6 @@ class FileController(
     ): FileResponse {
         val key = s3Service.putObject(file)
 
-        return FileResponse.of(key = key, cloudfrontDomain = cloudfrontDomain)
+        return FileResponse.of(key = key, cloudfrontDomain = awsProperties.cloudfront.domain)
     }
 }

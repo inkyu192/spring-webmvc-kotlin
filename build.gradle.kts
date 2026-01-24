@@ -63,6 +63,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
 	implementation("software.amazon.awssdk:s3:2.31.25")
+	implementation("software.amazon.awssdk:dynamodb-enhanced:2.31.25")
 
 	implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.6.1")
 	implementation("com.linecorp.kotlin-jdsl:jpql-render:3.6.1")
@@ -79,6 +80,10 @@ allOpen {
 	annotation("jakarta.persistence.Entity")
 	annotation("jakarta.persistence.MappedSuperclass")
 	annotation("jakarta.persistence.Embeddable")
+}
+
+noArg {
+	annotation("software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean")
 }
 
 tasks.withType<Test> {

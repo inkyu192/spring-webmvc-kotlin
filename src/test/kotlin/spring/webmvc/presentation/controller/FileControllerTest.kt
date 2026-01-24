@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.infrastructure.config.ControllerTest
 import spring.webmvc.infrastructure.external.S3Service
+import spring.webmvc.infrastructure.properties.AwsProperties
 
 @ControllerTest([FileController::class])
 class FileControllerTest {
@@ -23,6 +24,9 @@ class FileControllerTest {
 
     @MockkBean
     private lateinit var s3Service: S3Service
+
+    @MockkBean
+    private lateinit var awsProperties: AwsProperties
     private lateinit var file: MockMultipartFile
     private lateinit var key: String
 
@@ -41,6 +45,7 @@ class FileControllerTest {
     @Test
     fun uploadFile() {
         every { s3Service.putObject(file = any()) } returns key
+        every { awsProperties.cloudfront.domain } returns "http://localhost:4566/my-bucket"
 
         // When & Then
         mockMvc.perform(

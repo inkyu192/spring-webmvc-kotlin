@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 import spring.webmvc.infrastructure.config.LocalStackTestContainerConfig
+import spring.webmvc.infrastructure.properties.AwsProperties
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class S3ServiceTest {
@@ -37,7 +38,16 @@ class S3ServiceTest {
             .build()
 
         s3Client.createBucket(CreateBucketRequest.builder().bucket(bucket).build())
-        s3Service = S3Service(s3Client, bucket)
+
+        val endpoint =
+            LocalStackTestContainerConfig.localStackContainer.getEndpointOverride(LocalStackContainer.Service.S3)
+                .toString()
+        val awsProperties = AwsProperties(
+            s3 = AwsProperties.S3Properties(endpoint = endpoint, bucket = bucket),
+            dynamodb = AwsProperties.DynamoDbProperties(endpoint = endpoint),
+            cloudfront = AwsProperties.CloudFrontProperties(domain = "$endpoint/$bucket"),
+        )
+        s3Service = S3Service(s3Client, awsProperties)
     }
 
     @AfterEach

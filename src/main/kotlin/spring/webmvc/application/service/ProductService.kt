@@ -36,9 +36,7 @@ class ProductService(
             .map { ProductSummaryResult.of(product = it) }
 
     @Cacheable(value = ["product"], key = "'product:' + #id")
-    fun findProductCached(id: Long): ProductDetailResult {
-        return findProduct(id)
-    }
+    fun findProductCached(id: Long) = findProduct(id)
 
     fun findProduct(id: Long): ProductDetailResult {
         val product = productRepository.findById(id)

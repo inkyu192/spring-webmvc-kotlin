@@ -2,48 +2,51 @@ package spring.webmvc.infrastructure.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
 import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.S3Configuration
+import spring.webmvc.infrastructure.properties.AwsProperties
 import java.net.URI
 
 @Configuration(proxyBeanMethods = false)
 class AwsConfig(
-    private val environment: Environment,
+    private val awsProperties: AwsProperties,
 ) {
     @Bean
     fun awsCredentialsProvider(): AwsCredentialsProvider {
-        if (isLocal()) {
-            return StaticCredentialsProvider.create(
-                AwsBasicCredentials.create("accessKey", "secretKey")
-            )
-        }
-        return DefaultCredentialsProvider.create()
+        return StaticCredentialsProvider.create(
+            AwsBasicCredentials.create("accessKey", "secretKey")
+        )
     }
 
     @Bean
-    fun s3Client(awsCredentialsProvider: AwsCredentialsProvider): S3Client {
-        val builder = S3Client.builder()
+    fun s3Client(awsCredentialsProvider: AwsCredentialsProvider): S3Client =
+        S3Client.builder()
             .region(Region.AP_NORTHEAST_2)
             .credentialsProvider(awsCredentialsProvider)
+            .endpointOverride(URI.create(awsProperties.s3.endpoint))
+            .serviceConfiguration(
+                S3Configuration.builder()
+                    .pathStyleAccessEnabled(true)
+                    .build()
+            ).build()
 
-        if (isLocal()) {
-            builder
-                .endpointOverride(URI.create("http://localhost:4566"))
-                .serviceConfiguration(
-                    S3Configuration.builder()
-                        .pathStyleAccessEnabled(true)
-                        .build()
-                )
-        }
+    @Bean
+    fun dynamoDbClient(awsCredentialsProvider: AwsCredentialsProvider): DynamoDbClient =
+        DynamoDbClient.builder()
+            .region(Region.AP_NORTHEAST_2)
+            .credentialsProvider(awsCredentialsProvider)
+            .endpointOverride(URI.create(awsProperties.dynamodb.endpoint))
+            .build()
 
-        return builder.build()
-    }
-
-    fun isLocal() = environment.activeProfiles.contains("local")
+    @Bean
+    fun dynamoDbEnhancedClient(dynamoDbClient: DynamoDbClient): DynamoDbEnhancedClient =
+        DynamoDbEnhancedClient.builder()
+            .dynamoDbClient(dynamoDbClient)
+            .build()
 }

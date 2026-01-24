@@ -14,4 +14,4 @@ logging:
 
 aws:
   cloudfront:
-    domain: https://test.cloudfront.net
+    domain: http://localhost:4566/my-bucket

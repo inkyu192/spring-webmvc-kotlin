@@ -3,6 +3,7 @@ package spring.webmvc.presentation.controller.customer
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.infrastructure.security.SecurityContextUtil
 import spring.webmvc.presentation.dto.response.CurationDetailCursorPageResponse
 import spring.webmvc.presentation.dto.response.CurationListResponse
 
@@ -25,8 +26,9 @@ class CurationController(
         @PathVariable id: Long,
         @RequestParam(required = false) cursorId: Long?,
     ): CurationDetailCursorPageResponse {
-        val result = curationService.findCurationProductWithCursorPageCached(
-            id = id,
+        val result = curationService.findCurationProductCached(
+            userId = SecurityContextUtil.getUserIdOrNull(),
+            curationId = id,
             cursorId = cursorId,
         )
 

@@ -128,6 +128,7 @@ class CurationControllerTest {
 
     @Test
     fun findCurationProduct() {
+        val userId = null
         val curationId = 1L
         val cursorId = null
 
@@ -156,7 +157,7 @@ class CurationControllerTest {
 
         val result = CurationCursorPageResult.of(curation = curation1, page = curationProductPage)
 
-        every { curationService.findCurationProductWithCursorPageCached(curationId, cursorId) } returns result
+        every { curationService.findCurationProductCached(userId, curationId, cursorId) } returns result
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/customer/curations/{id}", curationId)

@@ -20,6 +20,7 @@ import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.ControllerTest
+import spring.webmvc.infrastructure.properties.AwsProperties
 import java.time.LocalDate
 
 @ControllerTest([AuthController::class])
@@ -29,6 +30,9 @@ class AuthControllerTest {
 
     @MockkBean
     private lateinit var authService: AuthService
+
+    @MockkBean
+    private lateinit var awsProperties: AwsProperties
     private lateinit var accessToken: String
     private lateinit var refreshToken: String
     private lateinit var email: String
@@ -56,6 +60,7 @@ class AuthControllerTest {
         )
         every { user.id } returns 1L
         every { authService.signUp(any()) } returns user
+        every { awsProperties.cloudfront.domain } returns "http://localhost:4566/my-bucket"
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/auth/sign-up")

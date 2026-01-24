@@ -1,12 +1,12 @@
 package spring.webmvc.presentation.controller
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.AuthService
+import spring.webmvc.infrastructure.properties.AwsProperties
 import spring.webmvc.presentation.dto.request.*
 import spring.webmvc.presentation.dto.response.SignUpResponse
 import spring.webmvc.presentation.dto.response.TokenResponse
@@ -15,8 +15,7 @@ import spring.webmvc.presentation.dto.response.TokenResponse
 @RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
-    @Value("\${aws.cloudfront.domain}")
-    private val cloudfrontDomain: String,
+    private val awsProperties: AwsProperties,
 ) {
     @PostMapping("/sign-up")
     @ResponseBody
@@ -27,7 +26,7 @@ class AuthController(
         val command = request.toCommand()
         val user = authService.signUp(command)
 
-        return SignUpResponse.of(user, cloudfrontDomain)
+        return SignUpResponse.of(user, awsProperties.cloudfront.domain)
     }
 
     @PostMapping("/sign-in")
