@@ -10,7 +10,7 @@ import java.time.Duration
 class ProductRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : ProductCacheRepository {
-    private val logger = LoggerFactory.getLogger(ProductRedisRepository::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
         private const val PRODUCT_STOCK_KEY = "product:%d:stock"

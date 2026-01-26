@@ -16,8 +16,6 @@ class AccommodationStrategy(
 ) : ProductAttributeStrategy {
     override fun category() = ProductCategory.ACCOMMODATION
 
-    override fun supports(command: ProductAttributePutCommand) = command is AccommodationPutCommand
-
     override fun findByProductId(productId: Long): ProductAttributeResult {
         val accommodation = accommodationRepository.findByProductId(productId)
 

@@ -12,7 +12,7 @@ class TokenRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
     private val jwtProperties: JwtProperties,
 ) : TokenCacheRepository {
-    private val logger = LoggerFactory.getLogger(TokenRedisRepository::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
         private const val REFRESH_TOKEN_KEY = "user:%d:refresh-tokens"

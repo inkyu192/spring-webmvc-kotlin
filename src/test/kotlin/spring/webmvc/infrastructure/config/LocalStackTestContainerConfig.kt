@@ -14,7 +14,8 @@ class LocalStackTestContainerConfig {
             LocalStackContainer(DockerImageName.parse("localstack/localstack:3.8.1"))
                 .withServices(
                     LocalStackContainer.Service.S3,
-                    LocalStackContainer.Service.DYNAMODB
+                    LocalStackContainer.Service.DYNAMODB,
+                    LocalStackContainer.Service.SQS,
                 )
                 .withEnv("DEFAULT_REGION", "ap-northeast-2")
                 .apply { start() }

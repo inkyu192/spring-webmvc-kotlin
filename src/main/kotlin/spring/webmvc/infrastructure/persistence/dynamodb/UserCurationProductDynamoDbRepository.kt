@@ -12,7 +12,7 @@ import spring.webmvc.infrastructure.exception.FailedAwsIntegrationException
 class UserCurationProductDynamoDbRepository(
     dynamoDbEnhancedClient: DynamoDbEnhancedClient,
 ) {
-    private val logger = LoggerFactory.getLogger(UserCurationProductDynamoDbRepository::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     private val table = dynamoDbEnhancedClient.table(
         UserCurationProduct.TABLE_NAME,

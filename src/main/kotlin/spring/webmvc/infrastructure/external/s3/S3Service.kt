@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.external
+package spring.webmvc.infrastructure.external.s3
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -18,7 +18,7 @@ class S3Service(
     private val awsProperties: AwsProperties,
 ) {
     private val bucket: String get() = awsProperties.s3.bucket
-    private val logger = LoggerFactory.getLogger(S3Service::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun putObject(file: MultipartFile): String {
         val filename = requireNotNull(file.originalFilename)

@@ -42,3 +42,9 @@ awslocal dynamodb put-item \
 
 echo "[init] DynamoDB setup completed!"
 awslocal dynamodb list-tables --region $REGION
+
+echo "[init] Creating SQS queues..."
+awslocal sqs create-queue --queue-name email-queue --region $REGION
+
+echo "[init] SQS setup completed!"
+awslocal sqs list-queues --region $REGION

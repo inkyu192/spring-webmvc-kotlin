@@ -11,7 +11,7 @@ import java.time.Duration
 class AuthRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : AuthCacheRepository {
-    private val logger = LoggerFactory.getLogger(AuthRedisRepository::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
         private const val JOIN_VERIFY_KEY = "auth:join-verify:%s"

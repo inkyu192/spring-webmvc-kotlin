@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import spring.webmvc.infrastructure.external.S3Service
+import spring.webmvc.infrastructure.external.s3.S3Service
 import spring.webmvc.infrastructure.properties.AwsProperties
 import spring.webmvc.presentation.dto.response.FileResponse
 

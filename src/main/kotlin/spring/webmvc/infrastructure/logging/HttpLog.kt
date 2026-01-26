@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets
 class HttpLog(
     private val objectMapper: ObjectMapper,
 ) {
-    private val logger = LoggerFactory.getLogger(HttpLog::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun write(
         requestWrapper: ContentCachingRequestWrapper,

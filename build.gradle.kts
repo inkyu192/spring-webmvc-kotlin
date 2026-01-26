@@ -64,6 +64,7 @@ dependencies {
 
 	implementation("software.amazon.awssdk:s3:2.31.25")
 	implementation("software.amazon.awssdk:dynamodb-enhanced:2.31.25")
+	implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs:3.4.2")
 
 	implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.6.1")
 	implementation("com.linecorp.kotlin-jdsl:jpql-render:3.6.1")

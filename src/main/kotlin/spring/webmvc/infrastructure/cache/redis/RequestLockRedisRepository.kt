@@ -10,7 +10,7 @@ import java.time.Duration
 class RequestLockRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : RequestLockCacheRepository {
-    private val logger = LoggerFactory.getLogger(RequestLockRedisRepository::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
         private const val REQUEST_LOCK_KEY = "request-lock:%s:%s:%s"

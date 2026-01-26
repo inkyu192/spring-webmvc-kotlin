@@ -14,7 +14,7 @@ import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.infrastructure.config.ControllerTest
-import spring.webmvc.infrastructure.external.S3Service
+import spring.webmvc.infrastructure.external.s3.S3Service
 import spring.webmvc.infrastructure.properties.AwsProperties
 
 @ControllerTest([FileController::class])

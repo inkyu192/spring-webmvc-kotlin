@@ -16,8 +16,6 @@ class TransportStrategy(
 ) : ProductAttributeStrategy {
     override fun category() = ProductCategory.TRANSPORT
 
-    override fun supports(command: ProductAttributePutCommand) = command is TransportPutCommand
-
     override fun findByProductId(productId: Long): ProductAttributeResult {
         val transport = transportRepository.findByProductId(productId)
 

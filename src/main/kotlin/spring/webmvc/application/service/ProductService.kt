@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import spring.webmvc.application.dto.command.ProductAttributePutCommand
 import spring.webmvc.application.dto.command.ProductCreateCommand
 import spring.webmvc.application.dto.command.ProductUpdateCommand
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
@@ -23,10 +22,23 @@ import spring.webmvc.domain.repository.ProductRepository
 @Service
 @Transactional(readOnly = true)
 class ProductService(
+    productStrategies: List<ProductAttributeStrategy>,
     private val productRepository: ProductRepository,
-    private val productAttributeStrategyMap: Map<ProductCategory, ProductAttributeStrategy>,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
+    private val productAttributeStrategyMap: Map<ProductCategory, ProductAttributeStrategy>
+
+    init {
+        val duplicates = productStrategies
+            .groupBy { it.category() }
+            .filter { it.value.size > 1 }
+            .keys
+
+        check(duplicates.isEmpty()) { "중복된 ProductAttributeStrategy가 존재합니다: $duplicates" }
+
+        productAttributeStrategyMap = productStrategies.associateBy { it.category() }
+    }
+
     fun findProductsWithCursorPage(query: ProductCursorPageQuery) =
         productRepository.findAllWithCursorPage(query = query)
             .map { ProductSummaryResult.of(product = it) }
@@ -54,8 +66,6 @@ class ProductService(
 
     @Transactional
     fun createProduct(command: ProductCreateCommand): ProductDetailResult {
-        validate(category = command.category, attribute = command.attribute)
-
         val product = Product.create(
             category = command.category,
             name = command.name,
@@ -84,8 +94,6 @@ class ProductService(
     )
     fun updateProduct(command: ProductUpdateCommand): ProductDetailResult {
         val product = productRepository.findById(command.id)
-
-        validate(category = product.category, attribute = command.attribute)
 
         product.update(
             status = command.status,
@@ -118,17 +126,5 @@ class ProductService(
 
         strategy.deleteProduct(productId = id)
         productRepository.delete(product)
-    }
-
-    private fun validate(
-        category: ProductCategory,
-        attribute: ProductAttributePutCommand,
-    ) {
-        val strategy = productAttributeStrategyMap[category]
-            ?: throw UnsupportedOperationException("$category")
-
-        require(strategy.supports(attribute)) {
-            "상품 카테고리($category)와 attribute 타입(${attribute::class.simpleName})이 일치하지 않습니다"
-        }
     }
 }

@@ -21,8 +21,8 @@ import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
-import spring.webmvc.infrastructure.external.FileType
-import spring.webmvc.infrastructure.external.S3Service
+import spring.webmvc.infrastructure.external.s3.FileType
+import spring.webmvc.infrastructure.external.s3.S3Service
 import spring.webmvc.infrastructure.security.JwtProvider
 
 @Service

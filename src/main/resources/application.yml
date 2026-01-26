@@ -1,6 +1,17 @@
 spring:
   application:
     name: spring-webmvc-kotlin
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: test
+        secret-key: test
+      sqs:
+        endpoint: http://localhost:4566
+        queues:
+          email: email-queue
   datasource:
     url: jdbc:mysql://localhost:3306/my_db
     username: my_user
@@ -74,6 +85,10 @@ management:
     web:
       exposure:
         include: "*"
+
+external:
+  notification:
+    host: http://localhost:8080
 
 aws:
   s3:
