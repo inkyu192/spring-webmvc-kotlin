@@ -10,12 +10,12 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.S3Configuration
-import spring.webmvc.infrastructure.properties.AwsProperties
+import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
 
 @Configuration(proxyBeanMethods = false)
 class AwsConfig(
-    private val awsProperties: AwsProperties,
+    private val appProperties: AppProperties,
 ) {
     @Bean
     fun awsCredentialsProvider(): AwsCredentialsProvider {
@@ -29,7 +29,7 @@ class AwsConfig(
         S3Client.builder()
             .region(Region.AP_NORTHEAST_2)
             .credentialsProvider(awsCredentialsProvider)
-            .endpointOverride(URI.create(awsProperties.s3.endpoint))
+            .endpointOverride(URI.create(appProperties.aws.s3.endpoint))
             .serviceConfiguration(
                 S3Configuration.builder()
                     .pathStyleAccessEnabled(true)
@@ -41,7 +41,7 @@ class AwsConfig(
         DynamoDbClient.builder()
             .region(Region.AP_NORTHEAST_2)
             .credentialsProvider(awsCredentialsProvider)
-            .endpointOverride(URI.create(awsProperties.dynamodb.endpoint))
+            .endpointOverride(URI.create(appProperties.aws.dynamodb.endpoint))
             .build()
 
     @Bean

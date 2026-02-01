@@ -1,17 +1,18 @@
 package spring.webmvc.infrastructure.external.notification
 
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import spring.webmvc.infrastructure.properties.ExternalProperties
+import spring.webmvc.infrastructure.properties.AppProperties
 
 @Component
 class NotificationClient(
-    externalProperties: ExternalProperties,
+    appProperties: AppProperties,
 ) {
     private val restClient: RestClient = RestClient.builder()
-        .baseUrl(externalProperties.notification.host)
-        .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .baseUrl(appProperties.external.notification.host)
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .build()
 
     fun sendVerifyEmail(request: VerifyEmailRequest) {

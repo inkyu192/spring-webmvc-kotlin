@@ -5,17 +5,17 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Component
-import spring.webmvc.infrastructure.properties.JwtProperties
+import spring.webmvc.infrastructure.properties.AppProperties
 import java.util.*
 
 @Component
 class JwtProvider(
-    jwtProperties: JwtProperties,
+    appProperties: AppProperties,
 ) {
-    private val accessTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(jwtProperties.accessToken.key))
-    private val accessTokenExpirationTime = jwtProperties.accessToken.expiration.toMillis()
-    private val refreshTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(jwtProperties.refreshToken.key))
-    private val refreshTokenExpirationTime = jwtProperties.refreshToken.expiration.toMillis()
+    private val accessTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(appProperties.jwt.accessToken.key))
+    private val accessTokenExpirationTime = appProperties.jwt.accessToken.expiration.toMillis()
+    private val refreshTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(appProperties.jwt.refreshToken.key))
+    private val refreshTokenExpirationTime = appProperties.jwt.refreshToken.expiration.toMillis()
 
     fun createAccessToken(userId: Long, permissions: List<String>): String =
         Jwts.builder()

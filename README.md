@@ -1,6 +1,7 @@
 ## 개발 환경
 - **Language:** Kotlin
-- **Library / Framework:** Spring Web MVC, Spring Data JPA, Kotlin JDSL, Querydsl, Spring REST Docs
+- **Framework:** Spring Web MVC, Spring Data JPA, Spring REST Docs
+- **Library / Framework:** Kotlin JDSL, Querydsl
 - **Database:** MySQL, Redis, DynamoDB
 - **Test:** JUnit 5, MockK, Testcontainers
 - **Infrastructure**: Docker, Docker Compose, LocalStack
@@ -41,7 +42,7 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=s3,dynamodb
+      - SERVICES=s3,dynamodb,sqs
       - DEBUG=1
       - AWS_ACCESS_KEY_ID=accessKey
       - AWS_SECRET_ACCESS_KEY=secretKey

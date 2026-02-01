@@ -8,11 +8,12 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
 import spring.webmvc.infrastructure.common.ResponseWriter
-import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.properties.AppProperties
+import java.net.URI
 
 @Component
 class AuthenticationExceptionHandler(
-    private val uriFactory: UriFactory,
+    private val appProperties: AppProperties,
     private val responseWriter: ResponseWriter,
 ) : AuthenticationEntryPoint {
     override fun commence(
@@ -21,7 +22,7 @@ class AuthenticationExceptionHandler(
         exception: AuthenticationException?,
     ) {
         val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception?.message).apply {
-            type = uriFactory.createApiDocUri(HttpStatus.UNAUTHORIZED)
+            type = URI.create("${appProperties.docsUrl}#${HttpStatus.UNAUTHORIZED.name}")
         }
 
         responseWriter.writeResponse(problemDetail)

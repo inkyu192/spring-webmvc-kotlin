@@ -4,13 +4,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
-import spring.webmvc.infrastructure.properties.JwtProperties
+import spring.webmvc.infrastructure.properties.AppProperties
 import java.util.concurrent.TimeUnit
 
 @Repository
 class TokenRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
-    private val jwtProperties: JwtProperties,
+    private val appProperties: AppProperties,
 ) : TokenCacheRepository {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -22,7 +22,7 @@ class TokenRedisRepository(
     override fun addRefreshToken(userId: Long, refreshToken: String) {
         val key = REFRESH_TOKEN_KEY.format(userId)
 
-        runCatching {
+        try {
             val score = System.currentTimeMillis().toDouble()
             redisTemplate.opsForZSet().add(key, refreshToken, score)
 
@@ -31,30 +31,31 @@ class TokenRedisRepository(
                 redisTemplate.opsForZSet().removeRange(key, 0, size - MAX_TOKENS - 1)
             }
 
-            val ttl = jwtProperties.refreshToken.expiration.seconds
+            val ttl = appProperties.jwt.refreshToken.expiration.seconds
             redisTemplate.expire(key, ttl, TimeUnit.SECONDS)
-        }.onFailure {
-            logger.error("Failed to add refresh token for userId={}: {}", userId, it.message, it)
+        } catch (e: Exception) {
+            logger.error("Failed to add refresh token for userId={}: {}", userId, e.message, e)
         }
     }
 
     override fun getRefreshToken(userId: Long, refreshToken: String): String? {
         val key = REFRESH_TOKEN_KEY.format(userId)
 
-        return runCatching {
+        return try {
             if (redisTemplate.opsForZSet().score(key, refreshToken) != null) refreshToken else null
-        }.onFailure {
-            logger.warn("Failed to get refresh token for userId={}: {}", userId, it.message)
-        }.getOrNull()
+        } catch (e: Exception) {
+            logger.warn("Failed to get refresh token for userId={}: {}", userId, e.message)
+            null
+        }
     }
 
     override fun removeRefreshToken(userId: Long, refreshToken: String) {
         val key = REFRESH_TOKEN_KEY.format(userId)
 
-        runCatching {
+        try {
             redisTemplate.opsForZSet().remove(key, refreshToken)
-        }.onFailure {
-            logger.error("Failed to remove refresh token for userId={}: {}", userId, it.message, it)
+        } catch (e: Exception) {
+            logger.error("Failed to remove refresh token for userId={}: {}", userId, e.message, e)
         }
     }
 }

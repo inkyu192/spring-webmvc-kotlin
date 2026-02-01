@@ -1,4 +1,4 @@
-package spring.webmvc.application.strategy
+package spring.webmvc.application.strategy.email
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

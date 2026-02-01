@@ -26,6 +26,8 @@ class Role protected constructor(
     }
 
     fun addPermission(permission: Permission) {
-        _rolePermissions.add(RolePermission.create(role = this, permission = permission))
+        val rolePermission = RolePermission.create(role = this, permission = permission)
+
+        _rolePermissions.add(rolePermission)
     }
 }

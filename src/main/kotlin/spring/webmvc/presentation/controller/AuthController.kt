@@ -6,7 +6,7 @@ import org.springframework.ui.Model
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.AuthService
-import spring.webmvc.infrastructure.properties.AwsProperties
+import spring.webmvc.infrastructure.properties.AppProperties
 import spring.webmvc.presentation.dto.request.*
 import spring.webmvc.presentation.dto.response.SignUpResponse
 import spring.webmvc.presentation.dto.response.TokenResponse
@@ -15,7 +15,7 @@ import spring.webmvc.presentation.dto.response.TokenResponse
 @RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
-    private val awsProperties: AwsProperties,
+    private val appProperties: AppProperties,
 ) {
     @PostMapping("/sign-up")
     @ResponseBody
@@ -26,7 +26,7 @@ class AuthController(
         val command = request.toCommand()
         val user = authService.signUp(command)
 
-        return SignUpResponse.of(user, awsProperties.cloudfront.domain)
+        return SignUpResponse.of(user, appProperties.aws.cloudfront.domain)
     }
 
     @PostMapping("/sign-in")

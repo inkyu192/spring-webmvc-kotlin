@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import spring.webmvc.infrastructure.properties.CorsProperties
+import spring.webmvc.infrastructure.properties.AppProperties
 import spring.webmvc.infrastructure.security.JwtAuthenticationFilter
 import spring.webmvc.presentation.exception.handler.AccessDeniedExceptionHandler
 import spring.webmvc.presentation.exception.handler.AuthenticationExceptionHandler
@@ -24,7 +24,7 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(
         httpSecurity: HttpSecurity,
-        corsProperties: CorsProperties,
+        appProperties: AppProperties,
         authenticationExceptionHandler: AuthenticationExceptionHandler,
         accessDeniedExceptionHandler: AccessDeniedExceptionHandler,
         jwtAuthenticationFilter: JwtAuthenticationFilter,
@@ -41,12 +41,12 @@ class SecurityConfig {
             it.accessDeniedHandler(accessDeniedExceptionHandler)
         }
         .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-        .cors { it.configurationSource(createCorsConfig(corsProperties)) }
+        .cors { it.configurationSource(createCorsConfig(appProperties.cors)) }
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
         .addFilterBefore(jwtExceptionHandler, jwtAuthenticationFilter.javaClass)
         .build()
 
-    private fun createCorsConfig(corsProperties: CorsProperties): CorsConfigurationSource {
+    private fun createCorsConfig(corsProperties: AppProperties.CorsProperties): CorsConfigurationSource {
         val config = CorsConfiguration().apply {
             allowedOrigins = corsProperties.allowedOrigins
             allowedOriginPatterns = corsProperties.allowedOriginPatterns

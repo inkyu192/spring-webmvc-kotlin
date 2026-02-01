@@ -1,4 +1,4 @@
-package spring.webmvc.application.strategy
+package spring.webmvc.application.strategy.product
 
 import spring.webmvc.application.dto.command.ProductAttributePutCommand
 import spring.webmvc.application.dto.result.ProductAttributeResult

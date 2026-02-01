@@ -13,16 +13,16 @@ import org.springframework.http.ProblemDetail
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import spring.webmvc.infrastructure.common.ResponseWriter
-import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.properties.AppProperties
 import spring.webmvc.presentation.exception.handler.JwtExceptionHandler
 import java.net.URI
 
 class JwtExceptionHandlerTest {
     private val filterChain = mockk<FilterChain>(relaxed = true)
-    private val uriFactory = mockk<UriFactory>()
+    private val appProperties = mockk<AppProperties>()
     private val responseWriter = mockk<ResponseWriter>(relaxed = true)
     private val jwtExceptionHandler = JwtExceptionHandler(
-        uriFactory = uriFactory,
+        appProperties = appProperties,
         responseWriter = responseWriter,
     )
     private lateinit var request: MockHttpServletRequest
@@ -39,13 +39,13 @@ class JwtExceptionHandlerTest {
     fun doFilterWhenJwtExceptionOccurs() {
         val status = HttpStatus.UNAUTHORIZED
         val message = "JwtException"
-        val uri = URI.create("uri")
+        val docsUrl = "http://localhost:8080/docs/index.html"
 
         every { filterChain.doFilter(request, response) } throws JwtException(message)
-        every { uriFactory.createApiDocUri(status) } returns uri
+        every { appProperties.docsUrl } returns docsUrl
 
         val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
-        problemDetail.type = uri
+        problemDetail.type = URI.create("$docsUrl#${status.name}")
 
         jwtExceptionHandler.doFilter(request, response, filterChain)
 
@@ -57,13 +57,13 @@ class JwtExceptionHandlerTest {
     fun doFilterWhenRuntimeExceptionOccurs() {
         val status = HttpStatus.INTERNAL_SERVER_ERROR
         val message = "RuntimeException"
-        val uri = URI.create("uri")
+        val docsUrl = "http://localhost:8080/docs/index.html"
 
         every { filterChain.doFilter(request, response) } throws RuntimeException(message)
-        every { uriFactory.createApiDocUri(status) } returns uri
+        every { appProperties.docsUrl } returns docsUrl
 
         val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
-        problemDetail.type = uri
+        problemDetail.type = URI.create("$docsUrl#${status.name}")
 
         jwtExceptionHandler.doFilter(request, response, filterChain)
 

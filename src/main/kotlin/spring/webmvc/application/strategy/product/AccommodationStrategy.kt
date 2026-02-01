@@ -1,4 +1,4 @@
-package spring.webmvc.application.strategy
+package spring.webmvc.application.strategy.product
 
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.AccommodationPutCommand
@@ -42,7 +42,7 @@ class AccommodationStrategy(
 
         val accommodation = accommodationRepository.findByProductId(productId)
 
-        accommodation.replace(
+        accommodation.update(
             place = accommodationCommand.place,
             checkInTime = accommodationCommand.checkInTime,
             checkOutTime = accommodationCommand.checkOutTime,

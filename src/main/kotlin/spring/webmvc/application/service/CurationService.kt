@@ -27,7 +27,7 @@ class CurationService(
     @Transactional
     fun createCuration(command: CurationCreateCommand): CurationDetailResult {
         val requestProductIds = command.products.map { it.productId }
-        val productsMap = productRepository.findAllById(requestProductIds)
+        val productMap = productRepository.findAllById(requestProductIds)
             .associateBy { checkNotNull(it.id) }
 
         val curation = Curation.create(
@@ -38,7 +38,7 @@ class CurationService(
         )
 
         command.products.forEach { (productId, sortOrder) ->
-            productsMap[productId]?.let { product ->
+            productMap[productId]?.let { product ->
                 curation.addProduct(
                     product = product,
                     sortOrder = sortOrder,
@@ -99,10 +99,10 @@ class CurationService(
 
         val curation = curationRepository.findById(curationId)
         val productIds = userCurationProduct.productIds
-        val productsMap = productRepository.findAllById(productIds)
+        val productMap = productRepository.findAllById(productIds)
             .associateBy { checkNotNull(it.id) }
 
-        val products = productIds.mapNotNull { productsMap[it] }
+        val products = productIds.mapNotNull { productMap[it] }
 
         return CurationCursorPageResult.of(curation = curation, products = products)
     }

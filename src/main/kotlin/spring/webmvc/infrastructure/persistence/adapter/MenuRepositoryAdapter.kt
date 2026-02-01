@@ -11,6 +11,8 @@ class MenuRepositoryAdapter(
     private val jpaRepository: MenuJpaRepository,
     private val querydslRepository: MenuQuerydslRepository,
 ) : MenuRepository {
+    override fun findAll(): List<Menu> = jpaRepository.findAll()
+
     override fun findAllById(ids: List<Long>): List<Menu> = jpaRepository.findAllById(ids)
 
     override fun findAllByPermissions(permissions: Iterable<String>) =

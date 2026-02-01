@@ -20,51 +20,64 @@ class ProductRedisRepository(
     override fun getProductStock(productId: Long): Long? {
         val key = PRODUCT_STOCK_KEY.format(productId)
 
-        return runCatching {
+        return try {
             redisTemplate.opsForValue().get(key)?.toLong()
-        }.onFailure {
-            logger.warn("Failed to get product stock for productId={}: {}", productId, it.message)
-        }.getOrElse { null }
+        } catch (e: Exception) {
+            logger.warn("Failed to get product stock for productId={}: {}", productId, e.message)
+            null
+        }
     }
 
-    override fun setProductStockIfAbsent(productId: Long, stock: Long, timeout: Duration?): Boolean {
+    override fun setProductStockIfAbsent(
+        productId: Long,
+        stock: Long,
+        timeout: Duration?,
+    ): Boolean {
         val key = PRODUCT_STOCK_KEY.format(productId)
 
-        return runCatching {
+        return try {
             if (timeout != null) {
                 redisTemplate.opsForValue().setIfAbsent(key, stock.toString(), timeout) ?: false
             } else {
                 redisTemplate.opsForValue().setIfAbsent(key, stock.toString()) ?: false
             }
-        }.onFailure {
-            logger.error("Failed to set product stock if absent for productId={}: {}", productId, it.message, it)
-        }.getOrElse { false }
+        } catch (e: Exception) {
+            logger.error("Failed to set product stock if absent for productId={}: {}", productId, e.message, e)
+            false
+        }
     }
 
     override fun incrementProductViewCount(productId: Long, delta: Long): Long? {
         val key = PRODUCT_VIEW_COUNT_KEY.format(productId)
-        return runCatching {
+
+        return try {
             redisTemplate.opsForValue().increment(key, delta)
-        }.onFailure {
-            logger.error("Failed to increment product view count for productId={}: {}", productId, it.message, it)
-        }.getOrElse { null }
+        } catch (e: Exception) {
+            logger.error("Failed to increment product view count for productId={}: {}", productId, e.message, e)
+            null
+        }
     }
 
     override fun incrementProductStock(productId: Long, delta: Long): Long? {
         val key = PRODUCT_STOCK_KEY.format(productId)
-        return runCatching {
+
+        return try {
             redisTemplate.opsForValue().increment(key, delta)
-        }.onFailure {
-            logger.error("Failed to increment product stock for productId={}: {}", productId, it.message, it)
-        }.getOrElse { null }
+        } catch (e: Exception) {
+            logger.error("Failed to increment product stock for productId={}: {}", productId, e.message, e)
+            null
+        }
     }
 
     override fun decrementProductStock(productId: Long, delta: Long): Long? {
         val key = PRODUCT_STOCK_KEY.format(productId)
-        return runCatching {
+
+        return try {
             redisTemplate.opsForValue().decrement(key, delta)
-        }.onFailure {
-            logger.error("Failed to decrement product stock for productId={}: {}", productId, it.message, it)
-        }.getOrElse { null }
+        } catch (e: Exception) {
+            logger.error("Failed to decrement product stock for productId={}: {}", productId, e.message, e)
+            null
+        }
     }
+
 }

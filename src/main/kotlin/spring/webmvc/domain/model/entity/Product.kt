@@ -36,11 +36,10 @@ class Product(
             description: String,
             price: Long,
             quantity: Long,
-            status: ProductStatus = ProductStatus.PENDING,
             exposureAttribute: ProductExposureAttribute,
         ) = Product(
             category = category,
-            status = status,
+            status = ProductStatus.PENDING,
             name = name,
             description = description,
             price = price,

@@ -14,7 +14,7 @@ import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.application.dto.result.ProductDetailResult
 import spring.webmvc.application.dto.result.ProductSummaryResult
 import spring.webmvc.application.event.ProductViewEvent
-import spring.webmvc.application.strategy.ProductAttributeStrategy
+import spring.webmvc.application.strategy.product.ProductAttributeStrategy
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.repository.ProductRepository

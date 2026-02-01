@@ -1,4 +1,4 @@
-package spring.webmvc.application.strategy
+package spring.webmvc.application.strategy.email
 
 import spring.webmvc.application.enums.EmailTemplate
 

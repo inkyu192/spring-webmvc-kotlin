@@ -27,23 +27,25 @@ class MenuService(
 
     fun getParentMenus(menus: List<Menu>): List<Menu> {
         val parentIds = menus.mapNotNull { it.parent?.id }.distinct()
+
         if (parentIds.isEmpty()) {
             return menus
         }
+
         val parentMenus = menuRepository.findAllById(parentIds)
         return (menus + getParentMenus(parentMenus)).distinctBy { it.id }
     }
 
     private fun mapToResult(menu: Menu, allMenus: List<Menu>): MenuResult {
-        val childMenus = allMenus.filter { it.parent?.id == menu.id }
+        val children = allMenus.filter { it.parent?.id == menu.id }
+            .sortedBy { it.sortOrder }
+            .map { mapToResult(menu = it, allMenus = allMenus) }
 
         return MenuResult(
             id = checkNotNull(menu.id),
             name = menu.name,
             path = menu.path,
-            children = childMenus
-                .sortedBy { it.sortOrder }
-                .map { mapToResult(menu = it, allMenus = allMenus) }
+            children = children,
         )
     }
 }

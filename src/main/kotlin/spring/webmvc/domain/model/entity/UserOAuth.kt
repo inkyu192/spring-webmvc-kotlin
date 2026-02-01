@@ -1,20 +1,17 @@
 package spring.webmvc.domain.model.entity
 
 import jakarta.persistence.*
-import spring.webmvc.domain.model.enums.OAuthProvider
+import spring.webmvc.domain.model.enums.OauthProvider
 
 @Entity
-@Table(name = "user_oauth")
 class UserOAuth protected constructor(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     val user: User,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "oauth_provider")
-    val oauthProvider: OAuthProvider,
+    val oauthProvider: OauthProvider,
 
-    @Column(name = "oauth_user_id")
     val oauthUserId: String,
 ) {
     @Id
@@ -25,7 +22,7 @@ class UserOAuth protected constructor(
     companion object {
         fun create(
             user: User,
-            oauthProvider: OAuthProvider,
+            oauthProvider: OauthProvider,
             oauthUserId: String,
         ) = UserOAuth(
             user = user,

@@ -18,7 +18,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 import spring.webmvc.infrastructure.config.LocalStackTestContainerConfig
 import spring.webmvc.infrastructure.external.s3.FileType
 import spring.webmvc.infrastructure.external.s3.S3Service
-import spring.webmvc.infrastructure.properties.AwsProperties
+import spring.webmvc.infrastructure.properties.AppProperties
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class S3ServiceTest {
@@ -48,12 +48,12 @@ class S3ServiceTest {
             .getEndpointOverride(LocalStackContainer.Service.S3)
             .toString()
 
-        val awsProperties = mockk<AwsProperties> {
-            every { s3 } returns AwsProperties.S3Properties(endpoint = endpoint, bucket = bucket)
-            every { cloudfront } returns AwsProperties.CloudFrontProperties(domain = "$endpoint/$bucket")
+        val appProperties = mockk<AppProperties> {
+            every { aws.s3 } returns AppProperties.AwsProperties.S3Properties(endpoint = endpoint, bucket = bucket)
+            every { aws.cloudfront } returns AppProperties.AwsProperties.CloudFrontProperties(domain = "$endpoint/$bucket")
         }
 
-        s3Service = S3Service(s3Client, awsProperties)
+        s3Service = S3Service(s3Client, appProperties)
     }
 
     @AfterEach

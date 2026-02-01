@@ -11,9 +11,9 @@ import spring.webmvc.domain.model.vo.ProductExposureAttribute
 @Converter
 class ProductExposureAttributeConverter(
     private val objectMapper: ObjectMapper,
-) : AttributeConverter<ProductExposureAttribute, String?> {
-    override fun convertToDatabaseColumn(attribute: ProductExposureAttribute): String? =
-        objectMapper.writeValueAsString(attribute)
+) : AttributeConverter<ProductExposureAttribute?, String?> {
+    override fun convertToDatabaseColumn(attribute: ProductExposureAttribute?) =
+        attribute?.let { objectMapper.writeValueAsString(attribute) }
 
     override fun convertToEntityAttribute(dbData: String?) =
         dbData?.let { objectMapper.readValue<ProductExposureAttribute>(it) }

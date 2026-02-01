@@ -101,6 +101,15 @@ class AuthServiceTest {
             permissionIds = emptyList(),
         )
 
+        mockkObject(User.Companion)
+        every {
+            User.create(
+                name = any(),
+                phone = any(),
+                gender = any(),
+                birthday = any(),
+            )
+        } returns user
         every { userCredentialRepository.existsByEmail(email) } returns false
         every { userRepository.existsByPhone(any()) } returns false
         every { roleRepository.findAllById(emptyList()) } returns emptyList()
@@ -126,6 +135,8 @@ class AuthServiceTest {
         verify { s3Service.copyObject(profileImageKey, FileType.PROFILE, userId) }
         verify { userCredentialRepository.save(any()) }
         verify { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) }
+
+        unmockkObject(User.Companion)
     }
 
     @Test

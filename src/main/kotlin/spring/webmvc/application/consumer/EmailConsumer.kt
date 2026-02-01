@@ -6,7 +6,7 @@ import org.springframework.messaging.handler.annotation.Header
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Component
 import spring.webmvc.application.enums.EmailTemplate
-import spring.webmvc.application.strategy.EmailStrategy
+import spring.webmvc.application.strategy.email.EmailStrategy
 
 @Component
 class EmailConsumer(

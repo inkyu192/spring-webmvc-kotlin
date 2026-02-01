@@ -22,55 +22,63 @@ class AuthRedisRepository(
 
     override fun setJoinVerifyToken(token: String, email: Email) {
         val key = JOIN_VERIFY_KEY.format(token)
-        runCatching {
+
+        try {
             redisTemplate.opsForValue().set(key, email.value, JOIN_VERIFY_TTL)
-        }.onFailure {
-            logger.error("Failed to save join verify token email={}: {}", email.value, it.message, it)
+        } catch (e: Exception) {
+            logger.error("Failed to save join verify token email={}: {}", email.value, e.message, e)
         }
     }
 
     override fun getJoinVerifyToken(token: String): String? {
         val key = JOIN_VERIFY_KEY.format(token)
-        return runCatching {
+
+        return try {
             redisTemplate.opsForValue().get(key)
-        }.onFailure {
-            logger.warn("Failed to get join verify token token={}: {}", token, it.message)
-        }.getOrNull()
+        } catch (e: Exception) {
+            logger.warn("Failed to get join verify token token={}: {}", token, e.message)
+            null
+        }
     }
 
     override fun deleteJoinVerifyToken(token: String) {
         val key = JOIN_VERIFY_KEY.format(token)
-        runCatching {
+
+        try {
             redisTemplate.delete(key)
-        }.onFailure {
-            logger.warn("Failed to delete join verify token token={}: {}", token, it.message)
+        } catch (e: Exception) {
+            logger.warn("Failed to delete join verify token={}: {}", token, e.message)
         }
     }
 
     override fun setPasswordResetToken(token: String, email: Email) {
         val key = PASSWORD_RESET_KEY.format(token)
-        runCatching {
+
+        try {
             redisTemplate.opsForValue().set(key, email.value, PASSWORD_RESET_TTL)
-        }.onFailure {
-            logger.error("Failed to save password reset token email={}: {}", email.value, it.message, it)
+        } catch (e: Exception) {
+            logger.error("Failed to save password reset token email={}: {}", email.value, e.message, e)
         }
     }
 
     override fun getPasswordResetToken(token: String): String? {
         val key = PASSWORD_RESET_KEY.format(token)
-        return runCatching {
+
+        return try {
             redisTemplate.opsForValue().get(key)
-        }.onFailure {
-            logger.warn("Failed to get password reset token token={}: {}", token, it.message)
-        }.getOrNull()
+        } catch (e: Exception) {
+            logger.warn("Failed to get password reset token token={}: {}", token, e.message)
+            null
+        }
     }
 
     override fun deletePasswordResetToken(token: String) {
         val key = PASSWORD_RESET_KEY.format(token)
-        runCatching {
+
+        try {
             redisTemplate.delete(key)
-        }.onFailure {
-            logger.warn("Failed to delete password reset token token={}: {}", token, it.message)
+        } catch (e: Exception) {
+            logger.warn("Failed to delete password reset token={}: {}", token, e.message)
         }
     }
 }

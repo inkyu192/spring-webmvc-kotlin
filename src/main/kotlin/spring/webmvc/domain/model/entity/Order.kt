@@ -41,6 +41,7 @@ class Order protected constructor(
 
     fun addProduct(product: Product, quantity: Long) {
         val orderProduct = OrderProduct.create(order = this, product = product, quantity = quantity)
+
         _orderProducts.add(orderProduct)
     }
 

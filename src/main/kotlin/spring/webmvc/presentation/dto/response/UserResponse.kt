@@ -4,7 +4,7 @@ import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserCredential
 import spring.webmvc.domain.model.entity.UserOAuth
 import spring.webmvc.domain.model.enums.Gender
-import spring.webmvc.domain.model.enums.OAuthProvider
+import spring.webmvc.domain.model.enums.OauthProvider
 import java.time.Instant
 import java.time.LocalDate
 
@@ -71,7 +71,7 @@ data class UserCredentialResponse(
 }
 
 data class UserOAuthResponse(
-    val provider: OAuthProvider,
+    val provider: OauthProvider,
     val oauthUserId: String,
 ) {
     companion object {

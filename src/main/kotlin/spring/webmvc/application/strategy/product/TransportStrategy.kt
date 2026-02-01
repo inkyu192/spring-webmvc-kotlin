@@ -1,4 +1,4 @@
-package spring.webmvc.application.strategy
+package spring.webmvc.application.strategy.product
 
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.ProductAttributePutCommand

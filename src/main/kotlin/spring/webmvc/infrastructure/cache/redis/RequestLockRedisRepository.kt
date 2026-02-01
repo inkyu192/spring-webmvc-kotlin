@@ -19,17 +19,14 @@ class RequestLockRedisRepository(
 
     override fun tryLock(method: String, uri: String, hash: String): Boolean {
         val key = REQUEST_LOCK_KEY.format(method, uri, hash)
-        return runCatching {
+
+        return try {
             redisTemplate.opsForValue().setIfAbsent(key, "1", LOCK_TIMEOUT) ?: false
-        }.onFailure {
-            logger.error(
-                "Failed to acquire request lock for method={}, uri={}, hash={}: {}",
-                method,
-                uri,
-                hash,
-                it.message,
-                it
-            )
-        }.getOrElse { false }
+        } catch (e: Exception) {
+            val message = "Failed to acquire request lock for method={}, uri={}, hash={}: {}"
+            logger.error(message, method, uri, hash, e.message, e)
+
+            false
+        }
     }
 }

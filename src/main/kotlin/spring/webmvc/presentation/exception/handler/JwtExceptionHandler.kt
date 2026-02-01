@@ -9,11 +9,12 @@ import org.springframework.http.ProblemDetail
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import spring.webmvc.infrastructure.common.ResponseWriter
-import spring.webmvc.infrastructure.common.UriFactory
+import spring.webmvc.infrastructure.properties.AppProperties
+import java.net.URI
 
 @Component
 class JwtExceptionHandler(
-    private val uriFactory: UriFactory,
+    private val appProperties: AppProperties,
     private val responseWriter: ResponseWriter,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
@@ -39,7 +40,7 @@ class JwtExceptionHandler(
 
     private fun handleException(status: HttpStatus, message: String?) {
         val problemDetail = ProblemDetail.forStatusAndDetail(status, message).apply {
-            type = uriFactory.createApiDocUri(status)
+            type = URI.create("${appProperties.docsUrl}#${status.name}")
         }
 
         responseWriter.writeResponse(problemDetail)

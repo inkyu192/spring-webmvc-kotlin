@@ -1,6 +1,6 @@
 package spring.webmvc.domain.model.enums
 
-enum class OAuthProvider(
+enum class OauthProvider(
     val description: String,
 ) {
     GOOGLE("구글"),

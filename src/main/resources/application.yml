@@ -54,47 +54,46 @@ logging:
         SQL: debug
         type: info
 
-jwt:
-  access-token:
-    key: S3fR9pOWh0D2k-MX37rm8N6K3u0aXvdcqD4muOxZK8g
-    expiration: 10m
-  refresh-token:
-    key: XhNd_6u1OJvYOCp2JZ0cwlQUKtIJ6B5wAxXHfPSmeTA
-    expiration: 7d
-
-crypto:
-  secret-key: d9ANIqIyfTygI92m6jWFfAzUbEP73TNB
-  iv-parameter: F22DBBB19D308662
-
-cors:
-  allowed-origins:
-    - "http://localhost:3000"
-  allowed-origin-patterns:
-    - "http://localhost:*"
-  allowed-methods:
-    - "HEAD"
-    - "GET"
-    - "POST"
-    - "PUT"
-    - "DELETE"
-  allowed-headers:
-    - "*"
-
 management:
   endpoints:
     web:
       exposure:
         include: "*"
 
-external:
-  notification:
-    host: http://localhost:8080
-
-aws:
-  s3:
-    endpoint: http://localhost:4566
-    bucket: my-bucket
-  dynamodb:
-    endpoint: http://localhost:4566
-  cloudfront:
-    domain: http://localhost:4566/my-bucket
+app:
+  base-url: http://localhost:8080
+  docs-url: http://localhost:8080/docs/index.html
+  jwt:
+    access-token:
+      key: S3fR9pOWh0D2k-MX37rm8N6K3u0aXvdcqD4muOxZK8g
+      expiration: 10m
+    refresh-token:
+      key: XhNd_6u1OJvYOCp2JZ0cwlQUKtIJ6B5wAxXHfPSmeTA
+      expiration: 7d
+  crypto:
+    secret-key: d9ANIqIyfTygI92m6jWFfAzUbEP73TNB
+    iv-parameter: F22DBBB19D308662
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
+    allowed-origin-patterns:
+      - "http://localhost:*"
+    allowed-methods:
+      - "HEAD"
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+    allowed-headers:
+      - "*"
+  aws:
+    s3:
+      endpoint: http://localhost:4566
+      bucket: my-bucket
+    dynamodb:
+      endpoint: http://localhost:4566
+    cloudfront:
+      domain: http://localhost:4566/my-bucket
+  external:
+    notification:
+      host: http://localhost:8080

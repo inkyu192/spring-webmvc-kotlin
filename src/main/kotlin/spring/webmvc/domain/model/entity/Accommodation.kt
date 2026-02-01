@@ -34,7 +34,7 @@ class Accommodation(
         )
     }
 
-    fun replace(
+    fun update(
         place: String,
         checkInTime: Instant,
         checkOutTime: Instant,

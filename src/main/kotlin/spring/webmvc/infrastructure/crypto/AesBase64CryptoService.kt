@@ -1,6 +1,7 @@
 package spring.webmvc.infrastructure.crypto
 
 import org.springframework.stereotype.Component
+import spring.webmvc.infrastructure.properties.AppProperties
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.crypto.Cipher
@@ -9,10 +10,10 @@ import javax.crypto.spec.SecretKeySpec
 
 @Component
 class AesBase64CryptoService(
-    cryptoProperties: CryptoProperties,
+    appProperties: AppProperties,
 ) : CryptoService {
-    private val secretKey = SecretKeySpec(cryptoProperties.secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
-    private val ivParameter = IvParameterSpec(cryptoProperties.ivParameter.toByteArray(StandardCharsets.UTF_8))
+    private val secretKey = SecretKeySpec(appProperties.crypto.secretKey.toByteArray(StandardCharsets.UTF_8), "AES")
+    private val ivParameter = IvParameterSpec(appProperties.crypto.ivParameter.toByteArray(StandardCharsets.UTF_8))
 
     override fun encrypt(plainText: String): String = runCatching {
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")

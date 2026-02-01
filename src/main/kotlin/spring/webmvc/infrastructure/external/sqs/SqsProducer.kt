@@ -17,8 +17,8 @@ class SqsProducer(
         sqsTemplate.send {
             it.queue(queueName)
                 .payload(objectMapper.writeValueAsString(payload))
-                .apply { headers.forEach {
-                    (key, value) -> it.header(key, value) }
+                .apply {
+                    headers.forEach { (key, value) -> it.header(key, value) }
                 }
         }
     }

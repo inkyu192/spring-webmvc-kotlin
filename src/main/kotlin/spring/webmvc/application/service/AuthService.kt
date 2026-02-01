@@ -49,7 +49,7 @@ class AuthService(
             throw DuplicateEntityException(kClass = User::class, name = command.phone.value)
         }
 
-        var user = User.create(
+        val user = User.create(
             name = command.name,
             phone = command.phone,
             gender = command.gender,
@@ -59,7 +59,7 @@ class AuthService(
         roleRepository.findAllById(command.roleIds).forEach { user.addUserRole(it) }
         permissionRepository.findAllById(command.permissionIds).forEach { user.addUserPermission(it) }
 
-        user = userRepository.save(user)
+        userRepository.save(user)
 
         command.profileImageKey?.let { tempKey ->
             val profileImage = s3Service.copyObject(
@@ -83,7 +83,6 @@ class AuthService(
         return user
     }
 
-    @Transactional
     fun signIn(command: SignInCommand): TokenResult {
         val userCredential = userCredentialRepository.findByEmail(command.email)
             ?: throw NotFoundEntityException(kClass = UserCredential::class, id = command.email.value)
@@ -135,13 +134,11 @@ class AuthService(
     }
 
     private fun extractUserId(accessToken: String): Long {
-        val claims = runCatching { jwtProvider.parseAccessToken(accessToken) }
-            .getOrElse { throwable ->
-                when (throwable) {
-                    is ExpiredJwtException -> throwable.claims
-                    else -> throw throwable
-                }
-            }
+        val claims = try {
+            jwtProvider.parseAccessToken(accessToken)
+        } catch (e: ExpiredJwtException) {
+            e.claims
+        }
 
         return claims["userId"].toString().toLong()
     }

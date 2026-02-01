@@ -11,17 +11,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.resource.NoResourceFoundException
-import spring.webmvc.infrastructure.common.UriFactory
 import spring.webmvc.infrastructure.exception.AbstractHttpException
+import spring.webmvc.infrastructure.properties.AppProperties
+import java.net.URI
 
 @RestControllerAdvice
 class ApplicationExceptionHandler(
-    private val uriFactory: UriFactory,
+    private val appProperties: AppProperties,
 ) {
     @ExceptionHandler(AbstractHttpException::class)
     fun handleBusinessException(e: AbstractHttpException): ProblemDetail =
         ProblemDetail.forStatusAndDetail(e.httpStatus, e.message).apply {
-            type = uriFactory.createApiDocUri(status)
+            type = createDocsUri(status)
         }
 
     @ExceptionHandler(
@@ -30,7 +31,7 @@ class ApplicationExceptionHandler(
         ServletRequestBindingException::class,
     )
     fun handleResourceNotFound(errorResponse: ErrorResponse): ProblemDetail =
-        errorResponse.body.apply { type = uriFactory.createApiDocUri(status) }
+        errorResponse.body.apply { type = createDocsUri(status) }
 
     @ExceptionHandler(
         HttpMessageNotReadableException::class,
@@ -38,13 +39,21 @@ class ApplicationExceptionHandler(
     )
     fun handleInvalidRequestBody(exception: Exception): ProblemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.message).apply {
-            type = uriFactory.createApiDocUri(HttpStatus.BAD_REQUEST)
+            type = createDocsUri(HttpStatus.BAD_REQUEST)
         }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(exception: MethodArgumentNotValidException): ProblemDetail =
         exception.body.apply {
-            type = uriFactory.createApiDocUri(status)
+            type = createDocsUri(status)
             setProperty("fields", exception.bindingResult.fieldErrors.associate { it.field to it.defaultMessage })
         }
+
+    private fun createDocsUri(status: HttpStatus): URI =
+        URI.create("${appProperties.docsUrl}#${status.name}")
+
+    private fun createDocsUri(statusCode: Int): URI {
+        val status = HttpStatus.resolve(statusCode) ?: return URI.create("about:blank")
+        return createDocsUri(status)
+    }
 }
