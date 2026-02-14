@@ -13,6 +13,10 @@ enum class OrderStatus(
     companion object {
         @JsonCreator
         @JvmStatic
-        fun of(name: String) = entries.find { it.name == name }
+        fun of(name: String?): OrderStatus? {
+            if (name.isNullOrBlank()) return null
+
+            return entries.find { it.name == name }
+        }
     }
 }

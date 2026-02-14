@@ -31,16 +31,12 @@ class ProductRedisRepository(
     override fun setProductStockIfAbsent(
         productId: Long,
         stock: Long,
-        timeout: Duration?,
+        timeout: Duration,
     ): Boolean {
         val key = PRODUCT_STOCK_KEY.format(productId)
 
         return try {
-            if (timeout != null) {
-                redisTemplate.opsForValue().setIfAbsent(key, stock.toString(), timeout) ?: false
-            } else {
-                redisTemplate.opsForValue().setIfAbsent(key, stock.toString()) ?: false
-            }
+            redisTemplate.opsForValue().setIfAbsent(key, stock.toString(), timeout) ?: false
         } catch (e: Exception) {
             logger.error("Failed to set product stock if absent for productId={}: {}", productId, e.message, e)
             false

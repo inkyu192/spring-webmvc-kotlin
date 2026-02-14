@@ -19,6 +19,7 @@ import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.infrastructure.exception.InsufficientQuantityException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
 import spring.webmvc.infrastructure.security.SecurityContextUtil
+import java.time.Duration
 
 @Service
 @Transactional(readOnly = true)
@@ -46,6 +47,7 @@ class OrderService(
                     productCacheRepository.setProductStockIfAbsent(
                         productId = orderProductCreateCommand.id,
                         stock = product.quantity,
+                        timeout = Duration.ofHours(1)
                     )
                 }
 
@@ -132,10 +134,9 @@ class OrderService(
 
     @Transactional
     fun cancelOrder(id: Long): OrderDetailResult {
-        val order = orderRepository.findByIdAndUserId(
-            id = id,
-            userId = SecurityContextUtil.getUserId(),
-        ) ?: throw NotFoundEntityException(kClass = Order::class, id = id)
+        val userId = SecurityContextUtil.getUserId()
+        val order = orderRepository.findByIdAndUserId(id = id, userId = userId)
+            ?: throw NotFoundEntityException(kClass = Order::class, id = id)
 
         order.cancel()
 

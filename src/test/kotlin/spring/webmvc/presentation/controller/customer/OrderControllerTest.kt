@@ -57,6 +57,7 @@ class OrderControllerTest {
         orderCreateCommand = OrderCreateCommand(userId = userId, products = listOf(orderProductCreateCommand))
 
         orderProductResult = OrderProductResult(
+            id = productId,
             name = "name",
             price = 5000,
             quantity = 3
@@ -120,6 +121,7 @@ class OrderControllerTest {
                         PayloadDocumentation.fieldWithPath("id").description("주문아이디"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
+                        PayloadDocumentation.fieldWithPath("products[].id").description("상품아이디"),
                         PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
                         PayloadDocumentation.fieldWithPath("products[].price").description("주문가격"),
                         PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")
@@ -187,6 +189,7 @@ class OrderControllerTest {
                         PayloadDocumentation.fieldWithPath("id").description("주문아이디"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
+                        PayloadDocumentation.fieldWithPath("products[].id").description("상품아이디"),
                         PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
                         PayloadDocumentation.fieldWithPath("products[].price").description("주문가격"),
                         PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")
@@ -217,6 +220,7 @@ class OrderControllerTest {
                         PayloadDocumentation.fieldWithPath("id").description("주문아이디"),
                         PayloadDocumentation.fieldWithPath("orderedAt").description("주문일시"),
                         PayloadDocumentation.fieldWithPath("status").description("주문상태"),
+                        PayloadDocumentation.fieldWithPath("products[].id").description("상품아이디"),
                         PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
                         PayloadDocumentation.fieldWithPath("products[].price").description("주문가격"),
                         PayloadDocumentation.fieldWithPath("products[].quantity").description("주문수량")

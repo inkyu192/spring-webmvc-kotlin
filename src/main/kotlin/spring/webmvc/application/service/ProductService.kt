@@ -52,8 +52,9 @@ class ProductService(
 
     fun findProduct(id: Long): ProductDetailResult {
         val product = productRepository.findById(id)
-        val strategy = productAttributeStrategyMap[product.category]
-            ?: throw UnsupportedOperationException("${product.category}")
+        val strategy = checkNotNull(productAttributeStrategyMap[product.category]) {
+            "구현되지 않은 상품 카테고리: ${product.category}"
+        }
 
         val attributeResult = strategy.findByProductId(productId = id)
 
@@ -77,8 +78,9 @@ class ProductService(
 
         productRepository.save(product)
 
-        val strategy = productAttributeStrategyMap[command.category]
-            ?: throw UnsupportedOperationException("${command.category}")
+        val strategy = checkNotNull(productAttributeStrategyMap[product.category]) {
+            "구현되지 않은 상품 카테고리: ${product.category}"
+        }
 
         val attributeResult = strategy.create(product = product, command = command.attribute)
 
@@ -104,8 +106,9 @@ class ProductService(
             exposureAttribute = command.exposureAttribute,
         )
 
-        val strategy = productAttributeStrategyMap[product.category]
-            ?: throw UnsupportedOperationException("${product.category}")
+        val strategy = checkNotNull(productAttributeStrategyMap[product.category]) {
+            "구현되지 않은 상품 카테고리: ${product.category}"
+        }
 
         val attributeResult = strategy.update(productId = command.id, command = command.attribute)
 
@@ -121,8 +124,9 @@ class ProductService(
     )
     fun deleteProduct(id: Long) {
         val product = productRepository.findById(id)
-        val strategy = productAttributeStrategyMap[product.category]
-            ?: throw UnsupportedOperationException("${product.category}")
+        val strategy = checkNotNull(productAttributeStrategyMap[product.category]) {
+            "구현되지 않은 상품 카테고리: ${product.category}"
+        }
 
         strategy.deleteProduct(productId = id)
         productRepository.delete(product)

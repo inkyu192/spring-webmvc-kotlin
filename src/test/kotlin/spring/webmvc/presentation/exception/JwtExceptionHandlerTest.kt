@@ -1,5 +1,6 @@
 package spring.webmvc.presentation.exception
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.JwtException
 import io.mockk.every
 import io.mockk.mockk
@@ -12,18 +13,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
-import spring.webmvc.infrastructure.common.ResponseWriter
 import spring.webmvc.infrastructure.properties.AppProperties
 import spring.webmvc.presentation.exception.handler.JwtExceptionHandler
-import java.net.URI
 
 class JwtExceptionHandlerTest {
     private val filterChain = mockk<FilterChain>(relaxed = true)
     private val appProperties = mockk<AppProperties>()
-    private val responseWriter = mockk<ResponseWriter>(relaxed = true)
+    private val objectMapper = mockk<ObjectMapper>()
     private val jwtExceptionHandler = JwtExceptionHandler(
         appProperties = appProperties,
-        responseWriter = responseWriter,
+        objectMapper = objectMapper,
     )
     private lateinit var request: MockHttpServletRequest
     private lateinit var response: MockHttpServletResponse
@@ -41,15 +40,15 @@ class JwtExceptionHandlerTest {
         val message = "JwtException"
         val docsUrl = "http://localhost:8080/docs/index.html"
 
+        val problemDetailJson = """{"type":"$docsUrl#${status.name}","title":"Unauthorized","status":401,"detail":"$message"}"""
+
         every { filterChain.doFilter(request, response) } throws JwtException(message)
         every { appProperties.docsUrl } returns docsUrl
-
-        val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
-        problemDetail.type = URI.create("$docsUrl#${status.name}")
+        every { objectMapper.writeValueAsString(any<ProblemDetail>()) } returns problemDetailJson
 
         jwtExceptionHandler.doFilter(request, response, filterChain)
 
-        verify { responseWriter.writeResponse(problemDetail) }
+        verify { objectMapper.writeValueAsString(any<ProblemDetail>()) }
     }
 
     @Test
@@ -59,14 +58,14 @@ class JwtExceptionHandlerTest {
         val message = "RuntimeException"
         val docsUrl = "http://localhost:8080/docs/index.html"
 
+        val problemDetailJson = """{"type":"$docsUrl#${status.name}","title":"Internal Server Error","status":500,"detail":"$message"}"""
+
         every { filterChain.doFilter(request, response) } throws RuntimeException(message)
         every { appProperties.docsUrl } returns docsUrl
-
-        val problemDetail = ProblemDetail.forStatusAndDetail(status, message)
-        problemDetail.type = URI.create("$docsUrl#${status.name}")
+        every { objectMapper.writeValueAsString(any<ProblemDetail>()) } returns problemDetailJson
 
         jwtExceptionHandler.doFilter(request, response, filterChain)
 
-        verify { responseWriter.writeResponse(problemDetail) }
+        verify { objectMapper.writeValueAsString(any<ProblemDetail>()) }
     }
 }

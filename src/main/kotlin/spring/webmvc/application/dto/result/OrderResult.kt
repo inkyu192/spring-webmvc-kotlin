@@ -36,12 +36,14 @@ data class OrderDetailResult(
 }
 
 data class OrderProductResult(
+    val id: Long,
     val name: String,
     val price: Long,
     val quantity: Long,
 ) {
     companion object {
         fun of(orderProduct: OrderProduct) = OrderProductResult(
+            id = checkNotNull(orderProduct.product.id),
             name = orderProduct.product.name,
             price = orderProduct.orderPrice,
             quantity = orderProduct.quantity,

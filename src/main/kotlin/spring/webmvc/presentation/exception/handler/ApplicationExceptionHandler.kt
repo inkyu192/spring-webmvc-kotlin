@@ -22,7 +22,7 @@ class ApplicationExceptionHandler(
     @ExceptionHandler(AbstractHttpException::class)
     fun handleBusinessException(e: AbstractHttpException): ProblemDetail =
         ProblemDetail.forStatusAndDetail(e.httpStatus, e.message).apply {
-            type = createDocsUri(status)
+            type = URI.create("${appProperties.docsUrl}#$status")
         }
 
     @ExceptionHandler(
@@ -31,29 +31,24 @@ class ApplicationExceptionHandler(
         ServletRequestBindingException::class,
     )
     fun handleResourceNotFound(errorResponse: ErrorResponse): ProblemDetail =
-        errorResponse.body.apply { type = createDocsUri(status) }
+        errorResponse.body.apply { type = URI.create("${appProperties.docsUrl}#$status") }
 
     @ExceptionHandler(
         HttpMessageNotReadableException::class,
         MethodArgumentTypeMismatchException::class,
     )
-    fun handleInvalidRequestBody(exception: Exception): ProblemDetail =
-        ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.message).apply {
-            type = createDocsUri(HttpStatus.BAD_REQUEST)
+    fun handleInvalidRequestBody(exception: Exception): ProblemDetail {
+        val status = HttpStatus.BAD_REQUEST
+
+        return ProblemDetail.forStatusAndDetail(status, exception.message).apply {
+            type = URI.create("${appProperties.docsUrl}#$status")
         }
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(exception: MethodArgumentNotValidException): ProblemDetail =
         exception.body.apply {
-            type = createDocsUri(status)
+            type = URI.create("${appProperties.docsUrl}#$status")
             setProperty("fields", exception.bindingResult.fieldErrors.associate { it.field to it.defaultMessage })
         }
-
-    private fun createDocsUri(status: HttpStatus): URI =
-        URI.create("${appProperties.docsUrl}#${status.name}")
-
-    private fun createDocsUri(statusCode: Int): URI {
-        val status = HttpStatus.resolve(statusCode) ?: return URI.create("about:blank")
-        return createDocsUri(status)
-    }
 }

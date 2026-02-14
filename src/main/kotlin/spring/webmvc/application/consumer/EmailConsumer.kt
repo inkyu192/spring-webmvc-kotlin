@@ -12,7 +12,7 @@ import spring.webmvc.application.strategy.email.EmailStrategy
 class EmailConsumer(
     emailStrategies: List<EmailStrategy>,
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val logger = LoggerFactory.getLogger(javaClass)
     private val emailStrategyMap: Map<EmailTemplate, EmailStrategy>
 
     init {
@@ -31,16 +31,15 @@ class EmailConsumer(
         @Header(required = false) emailTemplate: String?,
         @Payload payload: String,
     ) {
-        runCatching {
-            requireNotNull(emailTemplate)
+        try {
+            requireNotNull(emailTemplate) { "emailTemplate header is null" }
 
             val template = EmailTemplate.valueOf(emailTemplate)
-            val strategy = emailStrategyMap[template]
-                ?: throw UnsupportedOperationException("$template")
+            val strategy = checkNotNull(emailStrategyMap[template]) { "구현되지 않은 이메일 템플릿: $template" }
 
             strategy.handle(payload)
-        }.onFailure { e ->
-            log.error("이메일 처리 실패: template=$emailTemplate, payload=$payload", e)
+        } catch (e: Exception) {
+            logger.error("이메일 처리 실패: template=$emailTemplate, payload=$payload", e)
         }
     }
 }
