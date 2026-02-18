@@ -16,9 +16,9 @@ class CurationController(
     fun findCurations(
         @RequestParam category: CurationCategory,
     ): CurationListResponse {
-        val resultList = curationService.findCurationsCached(category)
+        val results = curationService.findCurationsCached(category)
 
-        return CurationListResponse.of(resultList = resultList)
+        return CurationListResponse.of(results = results)
     }
 
     @GetMapping("/{id}")

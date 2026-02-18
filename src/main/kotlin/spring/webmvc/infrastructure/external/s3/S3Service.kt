@@ -9,7 +9,6 @@ import software.amazon.awssdk.services.s3.model.CopyObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import spring.webmvc.infrastructure.exception.FailedAwsIntegrationException
 import spring.webmvc.infrastructure.properties.AppProperties
-import java.net.URLConnection
 import java.util.*
 
 @Component

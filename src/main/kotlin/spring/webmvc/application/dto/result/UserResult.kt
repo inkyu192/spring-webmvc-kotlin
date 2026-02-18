@@ -7,5 +7,5 @@ import spring.webmvc.domain.model.entity.UserOAuth
 data class UserCredentialResult(
     val user: User,
     val credential: UserCredential?,
-    val oauths: List<UserOAuth>,
+    val oAuths: List<UserOAuth>,
 )

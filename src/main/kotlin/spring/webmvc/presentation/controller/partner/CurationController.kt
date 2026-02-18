@@ -1,10 +1,10 @@
 package spring.webmvc.presentation.controller.partner
 
-import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.model.enums.CurationCategory
@@ -22,7 +22,7 @@ class CurationController(
     @PreAuthorize("hasAuthority('CURATION_WRITE')")
     @ResponseStatus(HttpStatus.CREATED)
     fun createCuration(
-        @Valid @RequestBody request: CurationCreateRequest,
+        @RequestBody @Validated request: CurationCreateRequest,
     ): CurationDetailResponse {
         val command = request.toCommand()
         val result = curationService.createCuration(command = command)
@@ -35,9 +35,9 @@ class CurationController(
     fun findCurations(
         @RequestParam category: CurationCategory,
     ): CurationListResponse {
-        val resultList = curationService.findCurations(category)
+        val results = curationService.findCurations(category)
 
-        return CurationListResponse.of(resultList = resultList)
+        return CurationListResponse.of(results = results)
     }
 
     @GetMapping("/{id}")

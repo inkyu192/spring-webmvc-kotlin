@@ -41,12 +41,12 @@ class UserController(
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_READ')")
     fun findUser(@PathVariable id: Long): UserDetailResponse {
-        val userDetail = userService.findUserDetail(id)
+        val result = userService.findUserDetail(id)
 
         return UserDetailResponse.of(
-            user = userDetail.user,
-            credential = userDetail.credential,
-            oauths = userDetail.oauths,
+            user = result.user,
+            credential = result.credential,
+            oAuths = result.oAuths,
         )
     }
 }

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
-import spring.webmvc.application.dto.command.AccommodationPutCommand
-import spring.webmvc.application.dto.command.ProductCreateCommand
-import spring.webmvc.application.dto.command.ProductUpdateCommand
-import spring.webmvc.application.dto.command.TransportPutCommand
+import spring.webmvc.application.dto.command.*
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
 import spring.webmvc.domain.model.vo.ProductExposureAttribute
@@ -37,32 +34,15 @@ data class ProductCreateRequest(
 
     val exposureAttribute: ProductExposureAttribute,
 ) {
-    fun toCommand(): ProductCreateCommand {
-        val commandAttribute = when (attribute) {
-            is TransportPutRequest -> TransportPutCommand(
-                departureLocation = attribute.departureLocation,
-                arrivalLocation = attribute.arrivalLocation,
-                departureTime = attribute.departureTime,
-                arrivalTime = attribute.arrivalTime,
-            )
-
-            is AccommodationPutRequest -> AccommodationPutCommand(
-                place = attribute.place,
-                checkInTime = attribute.checkInTime,
-                checkOutTime = attribute.checkOutTime,
-            )
-        }
-
-        return ProductCreateCommand(
-            category = category,
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            attribute = commandAttribute,
-            exposureAttribute = exposureAttribute,
-        )
-    }
+    fun toCommand() = ProductCreateCommand(
+        category = category,
+        name = name,
+        description = description,
+        price = price,
+        quantity = quantity,
+        attribute = attribute.toCommand(),
+        exposureAttribute = exposureAttribute,
+    )
 }
 
 data class ProductUpdateRequest(
@@ -85,46 +65,44 @@ data class ProductUpdateRequest(
 
     val exposureAttribute: ProductExposureAttribute,
 ) {
-    fun toCommand(id: Long): ProductUpdateCommand {
-        val commandAttribute = when (attribute) {
-            is TransportPutRequest -> TransportPutCommand(
-                departureLocation = attribute.departureLocation,
-                arrivalLocation = attribute.arrivalLocation,
-                departureTime = attribute.departureTime,
-                arrivalTime = attribute.arrivalTime,
-            )
-
-            is AccommodationPutRequest -> AccommodationPutCommand(
-                place = attribute.place,
-                checkInTime = attribute.checkInTime,
-                checkOutTime = attribute.checkOutTime,
-            )
-        }
-
-        return ProductUpdateCommand(
-            id = id,
-            status = status,
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity,
-            attribute = commandAttribute,
-            exposureAttribute = exposureAttribute,
-        )
-    }
+    fun toCommand(id: Long) = ProductUpdateCommand(
+        id = id,
+        status = status,
+        name = name,
+        description = description,
+        price = price,
+        quantity = quantity,
+        attribute = attribute.toCommand(),
+        exposureAttribute = exposureAttribute,
+    )
 }
 
-sealed interface ProductAttributePutRequest
+sealed interface ProductAttributePutRequest {
+    fun toCommand(): ProductAttributePutCommand
+}
 
 data class TransportPutRequest(
     val departureLocation: String,
     val arrivalLocation: String,
     val departureTime: Instant,
     val arrivalTime: Instant,
-) : ProductAttributePutRequest
+) : ProductAttributePutRequest {
+    override fun toCommand() = TransportPutCommand(
+        departureLocation = departureLocation,
+        arrivalLocation = arrivalLocation,
+        departureTime = departureTime,
+        arrivalTime = arrivalTime,
+    )
+}
 
 data class AccommodationPutRequest(
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
-) : ProductAttributePutRequest
+) : ProductAttributePutRequest {
+    override fun toCommand() = AccommodationPutCommand(
+        place = place,
+        checkInTime = checkInTime,
+        checkOutTime = checkOutTime,
+    )
+}

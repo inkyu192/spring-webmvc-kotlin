@@ -1,9 +1,6 @@
 package spring.webmvc.presentation.dto.response
 
-import spring.webmvc.application.dto.result.AccommodationResult
-import spring.webmvc.application.dto.result.ProductDetailResult
-import spring.webmvc.application.dto.result.ProductSummaryResult
-import spring.webmvc.application.dto.result.TransportResult
+import spring.webmvc.application.dto.result.*
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
 import spring.webmvc.domain.model.vo.ProductExposureAttribute
@@ -48,29 +45,29 @@ data class ProductDetailResponse(
     val attribute: ProductAttributeResponse,
 ) {
     companion object {
-        fun of(result: ProductDetailResult): ProductDetailResponse {
-            val responseAttribute = when (result.attribute) {
-                is TransportResult -> TransportResponse.of(result.attribute)
-                is AccommodationResult -> AccommodationResponse.of(result.attribute)
-            }
-
-            return ProductDetailResponse(
-                id = result.id,
-                category = result.category,
-                status = result.status,
-                name = result.name,
-                description = result.description,
-                price = result.price,
-                quantity = result.quantity,
-                exposureAttribute = result.exposureAttribute,
-                createdAt = result.createdAt,
-                attribute = responseAttribute,
-            )
-        }
+        fun of(result: ProductDetailResult) = ProductDetailResponse(
+            id = result.id,
+            category = result.category,
+            status = result.status,
+            name = result.name,
+            description = result.description,
+            price = result.price,
+            quantity = result.quantity,
+            exposureAttribute = result.exposureAttribute,
+            createdAt = result.createdAt,
+            attribute = ProductAttributeResponse.of(result.attribute),
+        )
     }
 }
 
-sealed interface ProductAttributeResponse
+sealed interface ProductAttributeResponse {
+    companion object {
+        fun of(result: ProductAttributeResult): ProductAttributeResponse = when (result) {
+            is TransportResult -> TransportResponse.of(result)
+            is AccommodationResult -> AccommodationResponse.of(result)
+        }
+    }
+}
 
 data class TransportResponse(
     val departureLocation: String,

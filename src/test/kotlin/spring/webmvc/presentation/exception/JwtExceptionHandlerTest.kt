@@ -40,7 +40,8 @@ class JwtExceptionHandlerTest {
         val message = "JwtException"
         val docsUrl = "http://localhost:8080/docs/index.html"
 
-        val problemDetailJson = """{"type":"$docsUrl#${status.name}","title":"Unauthorized","status":401,"detail":"$message"}"""
+        val problemDetailJson =
+            """{"type":"$docsUrl#${status.name}","title":"Unauthorized","status":401,"detail":"$message"}"""
 
         every { filterChain.doFilter(request, response) } throws JwtException(message)
         every { appProperties.docsUrl } returns docsUrl
@@ -58,7 +59,8 @@ class JwtExceptionHandlerTest {
         val message = "RuntimeException"
         val docsUrl = "http://localhost:8080/docs/index.html"
 
-        val problemDetailJson = """{"type":"$docsUrl#${status.name}","title":"Internal Server Error","status":500,"detail":"$message"}"""
+        val problemDetailJson =
+            """{"type":"$docsUrl#${status.name}","title":"Internal Server Error","status":500,"detail":"$message"}"""
 
         every { filterChain.doFilter(request, response) } throws RuntimeException(message)
         every { appProperties.docsUrl } returns docsUrl

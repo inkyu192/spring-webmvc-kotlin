@@ -28,7 +28,7 @@ class UserService(
         return UserCredentialResult(
             user = user,
             credential = credential,
-            oauths = emptyList(),
+            oAuths = emptyList(),
         )
     }
 }

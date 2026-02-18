@@ -25,9 +25,9 @@ class OrderController(
     @RequestLock
     @ResponseStatus(HttpStatus.CREATED)
     fun createOrder(
-        @RequestBody @Validated orderCreateRequest: OrderCreateRequest,
+        @RequestBody @Validated request: OrderCreateRequest,
     ): OrderDetailResponse {
-        val command = orderCreateRequest.toCommand(
+        val command = request.toCommand(
             userId = SecurityContextUtil.getUserId(),
         )
 
@@ -72,8 +72,8 @@ class OrderController(
     @PreAuthorize("isAuthenticated()")
     @RequestLock
     fun cancelOrder(@PathVariable id: Long): OrderDetailResponse {
-        val orderResult = orderService.cancelOrder(id)
+        val result = orderService.cancelOrder(id)
 
-        return OrderDetailResponse.of(orderResult)
+        return OrderDetailResponse.of(result)
     }
 }

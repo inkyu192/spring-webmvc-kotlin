@@ -81,7 +81,7 @@ class UserControllerTest {
         userDetail = UserCredentialResult(
             user = user,
             credential = userCredential,
-            oauths = emptyList(),
+            oAuths = emptyList(),
         )
     }
 

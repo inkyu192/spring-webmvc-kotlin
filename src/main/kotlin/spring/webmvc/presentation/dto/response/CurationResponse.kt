@@ -8,9 +8,9 @@ data class CurationListResponse(
     val curations: List<CurationSummaryResponse>,
 ) {
     companion object {
-        fun of(resultList: List<CurationSummaryResult>) = CurationListResponse(
-            size = resultList.size.toLong(),
-            curations = resultList.map { CurationSummaryResponse.of(it) },
+        fun of(results: List<CurationSummaryResult>) = CurationListResponse(
+            size = results.size.toLong(),
+            curations = results.map { CurationSummaryResponse.of(it) },
         )
     }
 }

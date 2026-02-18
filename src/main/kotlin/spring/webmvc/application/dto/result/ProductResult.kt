@@ -68,7 +68,6 @@ data class ProductDetailResult(
 sealed interface ProductAttributeResult
 
 data class TransportResult(
-    val transportId: Long,
     val departureLocation: String,
     val arrivalLocation: String,
     val departureTime: Instant,
@@ -76,7 +75,6 @@ data class TransportResult(
 ) : ProductAttributeResult {
     companion object {
         fun of(transport: Transport) = TransportResult(
-            transportId = checkNotNull(transport.id),
             departureLocation = transport.departureLocation,
             arrivalLocation = transport.arrivalLocation,
             departureTime = transport.departureTime,
@@ -86,14 +84,12 @@ data class TransportResult(
 }
 
 data class AccommodationResult(
-    val accommodationId: Long,
     val place: String,
     val checkInTime: Instant,
     val checkOutTime: Instant,
 ) : ProductAttributeResult {
     companion object {
         fun of(accommodation: Accommodation) = AccommodationResult(
-            accommodationId = checkNotNull(accommodation.id),
             place = accommodation.place,
             checkInTime = accommodation.checkInTime,
             checkOutTime = accommodation.checkOutTime,

@@ -7,7 +7,7 @@ import spring.webmvc.domain.model.enums.CurationCategory
 
 data class CurationCreateRequest(
     val title: String,
-    val category: String,
+    val category: CurationCategory,
     val isExposed: Boolean,
     val sortOrder: Long,
     @field:Size(min = 1)
@@ -15,7 +15,7 @@ data class CurationCreateRequest(
 ) {
     fun toCommand() = CurationCreateCommand(
         title = title,
-        category = CurationCategory.valueOf(category),
+        category = category,
         isExposed = isExposed,
         sortOrder = sortOrder,
         products = products.map { it.toCommand() }.toList()

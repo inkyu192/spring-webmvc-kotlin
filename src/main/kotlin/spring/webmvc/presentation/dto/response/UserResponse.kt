@@ -35,14 +35,14 @@ data class UserDetailResponse(
     val gender: Gender,
     val birthday: LocalDate,
     val credential: UserCredentialResponse?,
-    val oauths: List<UserOAuthResponse>,
+    val oAuths: List<UserOAuthResponse>,
     val createdAt: Instant,
 ) {
     companion object {
         fun of(
             user: User,
             credential: UserCredential?,
-            oauths: List<UserOAuth>,
+            oAuths: List<UserOAuth>,
         ) = UserDetailResponse(
             id = checkNotNull(user.id),
             name = user.name,
@@ -50,7 +50,7 @@ data class UserDetailResponse(
             gender = user.gender,
             birthday = user.birthday,
             credential = credential?.let { UserCredentialResponse.of(it) },
-            oauths = oauths.map { UserOAuthResponse.of(it) },
+            oAuths = oAuths.map { UserOAuthResponse.of(it) },
             createdAt = user.createdAt,
         )
     }

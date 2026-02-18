@@ -11,7 +11,7 @@
 ## 환경 설정
 
 ### Docker 설정
-`docker-compose.yml`을 사용하여 MySQL, Redis, LocalStack 실행할 수 있다.
+`docker-compose.yml`을 사용하여 MySQL, Redis, LocalStack 실행할 수 있습니다.
 
 ```yaml
 services:
@@ -57,7 +57,7 @@ networks:
 ```
 
 ### SMTP 설정
-이메일 발송 기능을 사용하려면 SMTP 서버 정보를 환경 변수로 설정해야 한다.
+이메일 발송 기능을 사용하려면 SMTP 서버 정보를 환경 변수로 설정해야 합니다.
 
 - `SMTP_USERNAME`: Gmail 계정
 - `SMTP_PASSWORD`: Gmail 앱 비밀번호
@@ -89,8 +89,8 @@ http://localhost:8080/docs/index.html
 │  
 └── presentation  # 프레젠테이션 계층  
 ```
-- **application (애플리케이션 계층):** 사용자 요청을 처리하고 도메인 계층을 활용한다.
-- **domain (도메인 계층):** 비즈니스 규칙과 도메인 모델을 관리한다.
-- **infrastructure (인프라스트럭처 계층):** 외부 시스템, DB, 메시징, 설정 등 기술적 세부 사항을 관리한다.
-- **presentation (프레젠테이션 계층):** 클라이언트 요청을 수신하고 애플리케이션 계층에 전달한다.
+- **application (애플리케이션 계층):** 사용자 요청을 처리하고 도메인 계층을 활용합니다.
+- **domain (도메인 계층):** 비즈니스 규칙과 도메인 모델을 관리합니다.
+- **infrastructure (인프라스트럭처 계층):** 외부 시스템, DB, 메시징, 설정 등 기술적 세부 사항을 관리합니다.
+- **presentation (프레젠테이션 계층):** 클라이언트 요청을 수신하고 애플리케이션 계층에 전달합니다.
 

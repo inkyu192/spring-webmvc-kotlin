@@ -55,9 +55,9 @@ class ProductController(
         @RequestBody @Validated request: ProductCreateRequest,
     ): ProductDetailResponse {
         val command = request.toCommand()
-        val productResult = productService.createProduct(command)
+        val result = productService.createProduct(command)
 
-        return ProductDetailResponse.of(productResult)
+        return ProductDetailResponse.of(result)
     }
 
     @PatchMapping("/{id}")

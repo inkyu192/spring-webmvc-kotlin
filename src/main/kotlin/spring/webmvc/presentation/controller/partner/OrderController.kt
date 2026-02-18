@@ -46,9 +46,9 @@ class OrderController(
     fun findOrder(
         @PathVariable id: Long,
     ): OrderDetailResponse {
-        val orderResult = orderService.findOrder(id = id)
+        val result = orderService.findOrder(id = id)
 
-        return OrderDetailResponse.of(orderResult)
+        return OrderDetailResponse.of(result)
     }
 
     @PatchMapping("/{id}")
@@ -60,8 +60,8 @@ class OrderController(
     ): OrderDetailResponse {
         val command = request.toCommand(id)
 
-        val orderResult = orderService.updateOrderStatus(command = command)
+        val result = orderService.updateOrderStatus(command = command)
 
-        return OrderDetailResponse.of(orderResult)
+        return OrderDetailResponse.of(result)
     }
 }

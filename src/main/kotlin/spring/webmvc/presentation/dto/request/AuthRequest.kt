@@ -1,6 +1,5 @@
 package spring.webmvc.presentation.dto.request
 
-import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import spring.webmvc.application.dto.command.*
 import spring.webmvc.domain.model.enums.Gender
@@ -66,7 +65,6 @@ data class JoinVerifyRequest(
 }
 
 data class JoinVerifyConfirmRequest(
-    @field:NotBlank
     val token: String,
 ) {
     fun toCommand() = JoinVerifyConfirmCommand(
@@ -84,9 +82,7 @@ data class PasswordResetRequest(
 }
 
 data class PasswordResetConfirmRequest(
-    @field:NotBlank
     val token: String,
-    @field:NotBlank
     val password: String,
 ) {
     fun toCommand() = PasswordResetConfirmCommand(
