@@ -1,11 +1,11 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.repository.ProductRepository
-import spring.webmvc.infrastructure.extensions.findByIdOrThrow
 import spring.webmvc.infrastructure.persistence.jpa.ProductJpaRepository
 import spring.webmvc.infrastructure.persistence.jpa.ProductQuerydslRepository
 
@@ -14,7 +14,7 @@ class ProductRepositoryAdapter(
     private val jpaRepository: ProductJpaRepository,
     private val querydslRepository: ProductQuerydslRepository,
 ) : ProductRepository {
-    override fun findById(id: Long): Product = jpaRepository.findByIdOrThrow(id)
+    override fun findById(id: Long): Product? = jpaRepository.findByIdOrNull(id)
 
     override fun findAllById(ids: Iterable<Long>): List<Product> = jpaRepository.findAllById(ids)
 

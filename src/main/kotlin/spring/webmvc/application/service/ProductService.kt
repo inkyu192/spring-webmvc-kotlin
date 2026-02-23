@@ -18,6 +18,7 @@ import spring.webmvc.application.strategy.product.ProductAttributeStrategy
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.infrastructure.exception.NotFoundEntityException
 
 @Service
 @Transactional(readOnly = true)
@@ -52,6 +53,7 @@ class ProductService(
 
     fun findProduct(id: Long): ProductDetailResult {
         val product = productRepository.findById(id)
+            ?: throw NotFoundEntityException(kClass = Product::class, id = id)
         val strategy = checkNotNull(productAttributeStrategyMap[product.category]) {
             "구현되지 않은 상품 카테고리: ${product.category}"
         }
@@ -96,6 +98,7 @@ class ProductService(
     )
     fun updateProduct(command: ProductUpdateCommand): ProductDetailResult {
         val product = productRepository.findById(command.id)
+            ?: throw NotFoundEntityException(kClass = Product::class, id = command.id)
 
         product.update(
             status = command.status,
@@ -124,6 +127,7 @@ class ProductService(
     )
     fun deleteProduct(id: Long) {
         val product = productRepository.findById(id)
+            ?: throw NotFoundEntityException(kClass = Product::class, id = id)
         val strategy = checkNotNull(productAttributeStrategyMap[product.category]) {
             "구현되지 않은 상품 카테고리: ${product.category}"
         }

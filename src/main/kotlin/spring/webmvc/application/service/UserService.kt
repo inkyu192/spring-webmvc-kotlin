@@ -4,8 +4,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import spring.webmvc.application.dto.query.UserQuery
 import spring.webmvc.application.dto.result.UserCredentialResult
+import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.repository.UserCredentialRepository
 import spring.webmvc.domain.repository.UserRepository
+import spring.webmvc.infrastructure.exception.NotFoundEntityException
 
 @Service
 @Transactional(readOnly = true)
@@ -23,6 +25,7 @@ class UserService(
 
     fun findUserDetail(id: Long): UserCredentialResult {
         val user = userRepository.findById(id)
+            ?: throw NotFoundEntityException(kClass = User::class, id = id)
         val credential = userCredentialRepository.findByUserId(id)
 
         return UserCredentialResult(

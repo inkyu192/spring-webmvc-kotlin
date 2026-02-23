@@ -7,7 +7,7 @@ import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
 interface ProductRepository {
-    fun findById(id: Long): Product
+    fun findById(id: Long): Product?
     fun findAllById(ids: Iterable<Long>): List<Product>
     fun findAllWithCursorPage(query: ProductCursorPageQuery): CursorPage<Product>
     fun findAllWithOffsetPage(query: ProductOffsetPageQuery): Page<Product>

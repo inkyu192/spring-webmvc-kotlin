@@ -1,11 +1,11 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.enums.OrderStatus
 import spring.webmvc.domain.repository.OrderRepository
-import spring.webmvc.infrastructure.extensions.findByIdOrThrow
 import spring.webmvc.infrastructure.persistence.jpa.OrderJpaRepository
 import spring.webmvc.infrastructure.persistence.jpa.OrderQuerydslRepository
 import java.time.Instant
@@ -43,7 +43,7 @@ class OrderRepositoryAdapter(
         orderedTo = orderedTo,
     )
 
-    override fun findById(id: Long): Order = jpaRepository.findByIdOrThrow(id = id)
+    override fun findById(id: Long): Order? = jpaRepository.findByIdOrNull(id)
 
     override fun findByIdAndUserId(id: Long, userId: Long) =
         jpaRepository.findByIdAndUserId(id = id, userId = userId)

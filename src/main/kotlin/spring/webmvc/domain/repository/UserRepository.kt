@@ -7,7 +7,7 @@ import spring.webmvc.domain.model.vo.Phone
 import java.time.Instant
 
 interface UserRepository {
-    fun findById(id: Long): User
+    fun findById(id: Long): User?
     fun findAllWithOffsetPage(
         pageable: Pageable,
         phone: Phone?,

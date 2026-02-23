@@ -118,6 +118,7 @@ class AuthService(
             ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
 
         val user = userRepository.findById(userId)
+            ?: throw NotFoundEntityException(kClass = User::class, id = userId)
 
         tokenCacheRepository.removeRefreshToken(userId = userId, refreshToken = command.refreshToken)
 

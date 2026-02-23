@@ -1,11 +1,11 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.domain.repository.UserRepository
-import spring.webmvc.infrastructure.extensions.findByIdOrThrow
 import spring.webmvc.infrastructure.persistence.jpa.UserJpaRepository
 import spring.webmvc.infrastructure.persistence.jpa.UserKotlinJdslRepository
 import spring.webmvc.infrastructure.persistence.jpa.UserQuerydslRepository
@@ -17,7 +17,7 @@ class UserRepositoryAdapter(
     private val querydslRepository: UserQuerydslRepository,
     private val kotlinJdslRepository: UserKotlinJdslRepository,
 ) : UserRepository {
-    override fun findById(id: Long): User = jpaRepository.findByIdOrThrow(id)
+    override fun findById(id: Long): User? = jpaRepository.findByIdOrNull(id)
 
     override fun findAllWithOffsetPage(
         pageable: Pageable,

@@ -15,6 +15,7 @@ import spring.webmvc.domain.repository.CurationProductRepository
 import spring.webmvc.domain.repository.CurationRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.domain.repository.UserCurationProductRepository
+import spring.webmvc.infrastructure.exception.NotFoundEntityException
 
 @Service
 @Transactional(readOnly = true)
@@ -59,6 +60,7 @@ class CurationService(
 
     fun findCurationProductWithOffsetPage(id: Long, pageable: Pageable): CurationOffsetPageResult {
         val curation = curationRepository.findById(id)
+            ?: throw NotFoundEntityException(kClass = Curation::class, id = id)
         val page = curationProductRepository.findAllWithOffsetPage(
             curationId = id,
             pageable = pageable,
@@ -83,6 +85,7 @@ class CurationService(
 
     fun findCurationProductWithCursorPage(curationId: Long, cursorId: Long?): CurationCursorPageResult {
         val curation = curationRepository.findById(curationId)
+            ?: throw NotFoundEntityException(kClass = Curation::class, id = curationId)
         val page = curationProductRepository.findAllWithCursorPage(
             curationId = curationId,
             cursorId = cursorId,
@@ -98,6 +101,7 @@ class CurationService(
         ) ?: return null
 
         val curation = curationRepository.findById(curationId)
+            ?: throw NotFoundEntityException(kClass = Curation::class, id = curationId)
         val productIds = userCurationProduct.productIds
         val productMap = productRepository.findAllById(productIds)
             .associateBy { checkNotNull(it.id) }

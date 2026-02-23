@@ -24,7 +24,7 @@ interface OrderRepository {
         orderedTo: Instant?,
     ): CursorPage<Order>
 
-    fun findById(id: Long): Order
+    fun findById(id: Long): Order?
     fun findByIdAndUserId(id: Long, userId: Long): Order?
     fun save(order: Order): Order
 }

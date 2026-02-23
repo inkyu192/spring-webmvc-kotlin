@@ -12,6 +12,7 @@ import spring.webmvc.application.dto.result.OrderDetailResult
 import spring.webmvc.application.dto.result.OrderSummaryResult
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.repository.OrderRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.domain.repository.UserRepository
@@ -32,6 +33,7 @@ class OrderService(
     @Transactional
     fun createOrder(command: OrderCreateCommand): OrderDetailResult {
         val user = userRepository.findById(id = command.userId)
+            ?: throw NotFoundEntityException(kClass = User::class, id = command.userId)
         val productMap = productRepository.findAllById(ids = command.products.map { it.id }).associateBy { it.id }
 
         val order = Order.create(user = user)
@@ -112,6 +114,7 @@ class OrderService(
 
     fun findOrder(id: Long): OrderDetailResult {
         val order = orderRepository.findById(id = id)
+            ?: throw NotFoundEntityException(kClass = Order::class, id = id)
 
         return OrderDetailResult.of(order)
     }
@@ -126,6 +129,7 @@ class OrderService(
     @Transactional
     fun updateOrderStatus(command: OrderStatusUpdateCommand): OrderDetailResult {
         val order = orderRepository.findById(id = command.id)
+            ?: throw NotFoundEntityException(kClass = Order::class, id = command.id)
 
         order.updateStatus(status = command.orderStatus)
 
