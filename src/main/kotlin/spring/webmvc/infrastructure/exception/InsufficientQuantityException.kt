@@ -7,6 +7,6 @@ class InsufficientQuantityException(
     requestQuantity: Long,
     stock: Long,
 ) : AbstractHttpException(
-    message = "$productName 상품의 재고가 부족합니다. (요청수량: $requestQuantity, 재고: $stock)",
     httpStatus = HttpStatus.CONFLICT,
+    translationArgs = arrayOf(productName, requestQuantity, stock),
 )

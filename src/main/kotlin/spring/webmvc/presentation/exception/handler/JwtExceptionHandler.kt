@@ -5,11 +5,13 @@ import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import spring.webmvc.domain.repository.cache.TranslationCacheRepository
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -18,6 +20,7 @@ import java.nio.charset.StandardCharsets
 class JwtExceptionHandler(
     private val appProperties: AppProperties,
     private val objectMapper: ObjectMapper,
+    private val translationCacheRepository: TranslationCacheRepository,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -27,13 +30,19 @@ class JwtExceptionHandler(
         try {
             filterChain.doFilter(request, response)
         } catch (e: Exception) {
-            val status = if (e is JwtException) {
-                HttpStatus.UNAUTHORIZED
+            val locale = LocaleContextHolder.getLocale()
+            val status: HttpStatus
+            val detail: String
+
+            if (e is JwtException) {
+                status = HttpStatus.UNAUTHORIZED
+                detail = translationCacheRepository.getMessage(JwtException::class.java.simpleName, locale)
             } else {
-                HttpStatus.INTERNAL_SERVER_ERROR
+                status = HttpStatus.INTERNAL_SERVER_ERROR
+                detail = translationCacheRepository.getMessage(Exception::class.java.simpleName, locale)
             }
 
-            val problemDetail = ProblemDetail.forStatusAndDetail(status, e.message)
+            val problemDetail = ProblemDetail.forStatusAndDetail(status, detail)
                 .apply { type = URI.create("${appProperties.docsUrl}#${status.name}") }
 
             response.status = status.value()

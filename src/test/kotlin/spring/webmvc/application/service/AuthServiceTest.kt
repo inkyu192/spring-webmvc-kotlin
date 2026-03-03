@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import spring.webmvc.application.dto.command.*
 import spring.webmvc.application.event.SendPasswordResetEmailEvent
@@ -25,6 +24,7 @@ import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
+import spring.webmvc.infrastructure.exception.InvalidCredentialsException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
 import spring.webmvc.infrastructure.external.s3.FileType
 import spring.webmvc.infrastructure.external.s3.S3Service
@@ -242,7 +242,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("잘못된 비밀번호로 로그인 시 BadCredentialsException 발생")
+    @DisplayName("잘못된 비밀번호로 로그인 시 InvalidCredentialsException 발생")
     fun signInWithWrongPassword() {
         val command = SignInCommand(email = email, password = "wrongPassword")
 
@@ -250,11 +250,11 @@ class AuthServiceTest {
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns false
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
-            .isInstanceOf(BadCredentialsException::class.java)
+            .isInstanceOf(InvalidCredentialsException::class.java)
     }
 
     @Test
-    @DisplayName("이메일 인증 안된 계정으로 로그인 시 BadCredentialsException 발생")
+    @DisplayName("이메일 인증 안된 계정으로 로그인 시 InvalidCredentialsException 발생")
     fun signInWithUnverifiedEmail() {
         val command = SignInCommand(email = email, password = "password123")
         val unverifiedCredential = spyk(
@@ -269,7 +269,7 @@ class AuthServiceTest {
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns true
 
         Assertions.assertThatThrownBy { authService.signIn(command) }
-            .isInstanceOf(BadCredentialsException::class.java)
+            .isInstanceOf(InvalidCredentialsException::class.java)
     }
 
     @Test
@@ -297,7 +297,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 refresh token으로 갱신 시 BadCredentialsException 발생")
+    @DisplayName("유효하지 않은 refresh token으로 갱신 시 InvalidCredentialsException 발생")
     fun refreshTokenWithInvalidToken() {
         val command = RefreshTokenCommand(accessToken = accessToken, refreshToken = "invalidRefreshToken")
         val claims = DefaultClaims(mapOf("userId" to userId))
@@ -308,7 +308,7 @@ class AuthServiceTest {
         every { tokenCacheRepository.getRefreshToken(userId, "invalidRefreshToken") } returns null
 
         Assertions.assertThatThrownBy { authService.refreshToken(command) }
-            .isInstanceOf(BadCredentialsException::class.java)
+            .isInstanceOf(InvalidCredentialsException::class.java)
     }
 
     @Test
@@ -346,7 +346,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 토큰으로 회원가입 인증 확인 시 BadCredentialsException 발생")
+    @DisplayName("유효하지 않은 토큰으로 회원가입 인증 확인 시 InvalidCredentialsException 발생")
     fun confirmJoinVerifyWithInvalidToken() {
         val token = "invalidToken"
         val command = JoinVerifyConfirmCommand(token = token)
@@ -354,7 +354,7 @@ class AuthServiceTest {
         every { authCacheRepository.getJoinVerifyToken(token) } returns null
 
         Assertions.assertThatThrownBy { authService.confirmJoinVerify(command) }
-            .isInstanceOf(BadCredentialsException::class.java)
+            .isInstanceOf(InvalidCredentialsException::class.java)
     }
 
     @Test
@@ -401,7 +401,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 토큰으로 비밀번호 재설정 확인 시 BadCredentialsException 발생")
+    @DisplayName("유효하지 않은 토큰으로 비밀번호 재설정 확인 시 InvalidCredentialsException 발생")
     fun confirmPasswordResetWithInvalidToken() {
         val token = "invalidToken"
         val command = PasswordResetConfirmCommand(token = token, password = "newPassword123")
@@ -409,6 +409,6 @@ class AuthServiceTest {
         every { authCacheRepository.getPasswordResetToken(token) } returns null
 
         Assertions.assertThatThrownBy { authService.confirmPasswordReset(command) }
-            .isInstanceOf(BadCredentialsException::class.java)
+            .isInstanceOf(InvalidCredentialsException::class.java)
     }
 }

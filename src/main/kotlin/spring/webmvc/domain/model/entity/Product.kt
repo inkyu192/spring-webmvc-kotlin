@@ -60,8 +60,8 @@ class Product(
             throw InvalidEntityStatusException(
                 kClass = Product::class,
                 id = checkNotNull(id),
-                fromStatus = this.status.description,
-                toStatus = status.description,
+                fromStatus = this.status.name,
+                toStatus = status.name,
             )
         }
 

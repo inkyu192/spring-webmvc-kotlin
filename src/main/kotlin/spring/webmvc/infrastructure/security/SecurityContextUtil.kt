@@ -1,19 +1,19 @@
 package spring.webmvc.infrastructure.security
 
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.context.SecurityContextHolder
+import spring.webmvc.infrastructure.exception.InvalidCredentialsException
 
 object SecurityContextUtil {
     fun getUserId(): Long {
         val authentication = SecurityContextHolder.getContext().authentication
-            ?: throw BadCredentialsException("인증 정보가 없습니다.")
+            ?: throw InvalidCredentialsException()
 
         if (!authentication.isAuthenticated) {
-            throw BadCredentialsException("인증되지 않은 사용자입니다.")
+            throw InvalidCredentialsException()
         }
 
         return authentication.principal.toString().toLongOrNull()
-            ?: throw BadCredentialsException("잘못된 인증 정보입니다.")
+            ?: throw InvalidCredentialsException()
     }
 
     fun getUserIdOrNull(): Long? {
@@ -28,10 +28,10 @@ object SecurityContextUtil {
 
     fun getAuthorities(): Set<String> {
         val authentication = SecurityContextHolder.getContext().authentication
-            ?: throw BadCredentialsException("인증 정보가 없습니다.")
+            ?: throw InvalidCredentialsException()
 
         if (!authentication.isAuthenticated) {
-            throw BadCredentialsException("인증되지 않은 사용자입니다.")
+            throw InvalidCredentialsException()
         }
 
         return authentication.authorities.map { it.authority }.toSet()

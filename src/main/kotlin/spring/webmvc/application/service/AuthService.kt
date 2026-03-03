@@ -2,7 +2,6 @@ package spring.webmvc.application.service
 
 import io.jsonwebtoken.ExpiredJwtException
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +19,7 @@ import spring.webmvc.domain.repository.UserRepository
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
+import spring.webmvc.infrastructure.exception.InvalidCredentialsException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
 import spring.webmvc.infrastructure.external.s3.FileType
 import spring.webmvc.infrastructure.external.s3.S3Service
@@ -88,11 +88,11 @@ class AuthService(
             ?: throw NotFoundEntityException(kClass = UserCredential::class, id = command.email.value)
 
         if (!passwordEncoder.matches(command.password, userCredential.password)) {
-            throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            throw InvalidCredentialsException()
         }
 
         if (!userCredential.isVerified()) {
-            throw BadCredentialsException("이메일 인증이 필요합니다.")
+            throw InvalidCredentialsException()
         }
 
         val user = userCredential.user
@@ -115,7 +115,7 @@ class AuthService(
         val userId = extractUserId(command.accessToken)
 
         tokenCacheRepository.getRefreshToken(userId = userId, refreshToken = command.refreshToken)
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            ?: throw InvalidCredentialsException()
 
         val user = userRepository.findById(userId)
             ?: throw NotFoundEntityException(kClass = User::class, id = userId)
@@ -151,7 +151,7 @@ class AuthService(
     @Transactional
     fun confirmJoinVerify(command: JoinVerifyConfirmCommand) {
         val email = authCacheRepository.getJoinVerifyToken(command.token)
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            ?: throw InvalidCredentialsException()
 
         val userCredential = userCredentialRepository.findByEmail(Email.create(email))
             ?: throw NotFoundEntityException(kClass = UserCredential::class, id = email)
@@ -171,7 +171,7 @@ class AuthService(
     @Transactional
     fun confirmPasswordReset(command: PasswordResetConfirmCommand) {
         val email = authCacheRepository.getPasswordResetToken(command.token)
-            ?: throw BadCredentialsException("유효하지 않은 인증 정보입니다.")
+            ?: throw InvalidCredentialsException()
 
         val userCredential = userCredentialRepository.findByEmail(Email.create(email))
             ?: throw NotFoundEntityException(kClass = UserCredential::class, id = email)

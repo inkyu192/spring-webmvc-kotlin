@@ -50,8 +50,8 @@ class Order protected constructor(
             throw InvalidEntityStatusException(
                 kClass = Order::class,
                 id = checkNotNull(id),
-                fromStatus = status.description,
-                toStatus = OrderStatus.CANCEL.description,
+                fromStatus = status.name,
+                toStatus = OrderStatus.CANCEL.name,
             )
         }
 
@@ -65,8 +65,8 @@ class Order protected constructor(
             throw InvalidEntityStatusException(
                 kClass = Order::class,
                 id = checkNotNull(id),
-                fromStatus = this.status.description,
-                toStatus = status.description,
+                fromStatus = this.status.name,
+                toStatus = status.name,
             )
         }
 

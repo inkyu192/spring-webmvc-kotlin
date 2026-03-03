@@ -1,5 +1,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS translation;
 DROP TABLE IF EXISTS curation_product;
 DROP TABLE IF EXISTS curation;
 DROP TABLE IF EXISTS order_product;
@@ -236,4 +237,15 @@ CREATE TABLE curation_product
     product_id  BIGINT NOT NULL,
     CONSTRAINT fk_curation_product_curation FOREIGN KEY (curation_id) REFERENCES curation (id),
     CONSTRAINT fk_curation_product_product FOREIGN KEY (product_id) REFERENCES product (id)
+);
+
+CREATE TABLE translation
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code       VARCHAR(100) NOT NULL,
+    locale     VARCHAR(10)  NOT NULL,
+    message    VARCHAR(500) NOT NULL,
+    created_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    UNIQUE KEY uk_translation (code, locale)
 );

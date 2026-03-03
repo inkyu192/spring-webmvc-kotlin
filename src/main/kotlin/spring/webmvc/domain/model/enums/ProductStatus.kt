@@ -2,12 +2,10 @@ package spring.webmvc.domain.model.enums
 
 import com.fasterxml.jackson.annotation.JsonCreator
 
-enum class ProductStatus(
-    val description: String,
-) {
-    PENDING("대기"),
-    SELLING("판매중"),
-    DISCONTINUED("중지"),
+enum class ProductStatus {
+    PENDING,
+    SELLING,
+    DISCONTINUED,
     ;
 
     companion object {

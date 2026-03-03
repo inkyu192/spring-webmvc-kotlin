@@ -3,12 +3,14 @@ package spring.webmvc.presentation.exception.handler
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
+import spring.webmvc.domain.repository.cache.TranslationCacheRepository
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -17,6 +19,7 @@ import java.nio.charset.StandardCharsets
 class AuthenticationExceptionHandler(
     private val appProperties: AppProperties,
     private val objectMapper: ObjectMapper,
+    private val translationCacheRepository: TranslationCacheRepository,
 ) : AuthenticationEntryPoint {
     override fun commence(
         request: HttpServletRequest,
@@ -24,7 +27,12 @@ class AuthenticationExceptionHandler(
         exception: AuthenticationException,
     ) {
         val status = HttpStatus.UNAUTHORIZED
-        val problemDetail = ProblemDetail.forStatusAndDetail(status, exception.message)
+        val locale = LocaleContextHolder.getLocale()
+        val detail = translationCacheRepository.getMessageOrNull(
+            code = exception::class.java.simpleName,
+            locale = locale,
+        ) ?: translationCacheRepository.getMessage(AuthenticationException::class.java.simpleName, locale)
+        val problemDetail = ProblemDetail.forStatusAndDetail(status, detail)
             .apply { type = URI.create("${appProperties.docsUrl}#${status}") }
 
         response.status = status.value()

@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus
 
 abstract class AbstractHttpException(
     val httpStatus: HttpStatus,
-    message: String,
+    val translationArgs: Array<Any> = emptyArray(),
     throwable: Throwable? = null,
-) : RuntimeException(message, throwable)
+) : RuntimeException(throwable) {
+    open val translationCode: String
+        get() = this::class.java.simpleName
+}

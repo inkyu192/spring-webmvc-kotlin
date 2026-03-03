@@ -17,4 +17,10 @@ class ProductExposureAttributeConverter(
 
     override fun convertToEntityAttribute(dbData: String?) =
         dbData?.let { objectMapper.readValue<ProductExposureAttribute>(it) }
+            ?: ProductExposureAttribute(
+                isPromotional = false,
+                isNewArrival = false,
+                isFeatured = false,
+                isLowStock = false,
+            )
 }

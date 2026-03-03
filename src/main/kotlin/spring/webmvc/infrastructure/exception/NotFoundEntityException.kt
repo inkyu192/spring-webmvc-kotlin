@@ -5,6 +5,6 @@ import kotlin.reflect.KClass
 
 class NotFoundEntityException(kClass: KClass<*>, id: Any) :
     AbstractHttpException(
-        message = "${kClass.simpleName} 엔티티를 찾을 수 없습니다. (ID: $id)",
         httpStatus = HttpStatus.NOT_FOUND,
+        translationArgs = arrayOf(kClass.java.simpleName, id),
     )
