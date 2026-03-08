@@ -19,21 +19,10 @@ class MenuService(
             return listOf()
         }
 
-        val allMenus = getParentMenus(menuRepository.findAllByPermissions(permissions))
+        val allMenus = menuRepository.findAllWithRecursiveByPermissions(permissions)
         val rootMenus = allMenus.filter { it.parent == null }
 
         return rootMenus.map { mapToResult(menu = it, allMenus = allMenus) }
-    }
-
-    fun getParentMenus(menus: List<Menu>): List<Menu> {
-        val parentIds = menus.mapNotNull { it.parent?.id }.distinct()
-
-        if (parentIds.isEmpty()) {
-            return menus
-        }
-
-        val parentMenus = menuRepository.findAllById(parentIds)
-        return (menus + getParentMenus(parentMenus)).distinctBy { it.id }
     }
 
     private fun mapToResult(menu: Menu, allMenus: List<Menu>): MenuResult {

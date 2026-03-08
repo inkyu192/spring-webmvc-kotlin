@@ -15,12 +15,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.dto.result.CurationCursorPageResult
 import spring.webmvc.application.dto.result.CurationSummaryResult
 import spring.webmvc.application.service.CurationService
+import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.*
 import spring.webmvc.domain.model.enums.CurationCategory
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.config.ControllerTest
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
 @ControllerTest([CurationController::class])
 class CurationControllerTest {

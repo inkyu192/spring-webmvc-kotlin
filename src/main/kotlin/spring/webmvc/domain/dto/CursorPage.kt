@@ -1,4 +1,4 @@
-package spring.webmvc.infrastructure.persistence.dto
+package spring.webmvc.domain.dto
 
 data class CursorPage<T>(
     val content: List<T>,

@@ -5,11 +5,11 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
+import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Order
 import spring.webmvc.domain.model.entity.QOrder.order
 import spring.webmvc.domain.model.entity.QUser.user
 import spring.webmvc.domain.model.enums.OrderStatus
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import java.time.Instant
 
 @Repository

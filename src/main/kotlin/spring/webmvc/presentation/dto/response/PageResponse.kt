@@ -1,7 +1,7 @@
 package spring.webmvc.presentation.dto.response
 
 import org.springframework.data.domain.Page
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
+import spring.webmvc.domain.dto.CursorPage
 
 data class OffsetPageResponse<T>(
     val page: Int,

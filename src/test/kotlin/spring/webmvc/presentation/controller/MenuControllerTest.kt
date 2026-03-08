@@ -74,10 +74,11 @@ class MenuControllerTest {
                         HeaderDocumentation.headerWithName("Authorization").description("액세스 토큰")
                     ),
                     PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("[].id").description("메뉴 ID"),
-                        PayloadDocumentation.fieldWithPath("[].name").description("메뉴명"),
-                        PayloadDocumentation.fieldWithPath("[].path").description("메뉴 경로").optional(),
-                        PayloadDocumentation.subsectionWithPath("[].children").description("하위 메뉴 목록")
+                        PayloadDocumentation.fieldWithPath("size").description("메뉴 수"),
+                        PayloadDocumentation.fieldWithPath("menus[].id").description("메뉴 ID"),
+                        PayloadDocumentation.fieldWithPath("menus[].name").description("메뉴명"),
+                        PayloadDocumentation.fieldWithPath("menus[].path").description("메뉴 경로").optional(),
+                        PayloadDocumentation.subsectionWithPath("menus[].children").description("하위 메뉴 목록")
                     )
                 )
             )

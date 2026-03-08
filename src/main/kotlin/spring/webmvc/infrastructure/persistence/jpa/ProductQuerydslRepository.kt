@@ -6,10 +6,10 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.stereotype.Repository
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.application.dto.query.ProductOffsetPageQuery
+import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.QProduct.product
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
 @Repository
 class ProductQuerydslRepository(

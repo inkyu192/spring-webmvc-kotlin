@@ -21,6 +21,7 @@ import spring.webmvc.application.dto.result.ProductDetailResult
 import spring.webmvc.application.dto.result.ProductSummaryResult
 import spring.webmvc.application.dto.result.TransportResult
 import spring.webmvc.application.service.ProductService
+import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
@@ -28,7 +29,6 @@ import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
 import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.config.ControllerTest
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
 import java.time.Instant
 
 @ControllerTest([ProductController::class])

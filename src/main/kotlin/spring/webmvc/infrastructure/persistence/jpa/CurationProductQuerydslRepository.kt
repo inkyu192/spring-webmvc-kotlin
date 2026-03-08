@@ -5,11 +5,11 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
+import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.CurationProduct
 import spring.webmvc.domain.model.entity.QCuration.curation
 import spring.webmvc.domain.model.entity.QCurationProduct.curationProduct
 import spring.webmvc.domain.model.entity.QProduct.product
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
 @Repository
 class CurationProductQuerydslRepository(

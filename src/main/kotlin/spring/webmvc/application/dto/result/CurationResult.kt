@@ -1,11 +1,11 @@
 package spring.webmvc.application.dto.result
 
 import org.springframework.data.domain.Page
+import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.CurationProduct
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.CurationCategory
-import spring.webmvc.infrastructure.persistence.dto.CursorPage
 
 data class CurationSummaryResult(
     val id: Long,
