@@ -9,6 +9,7 @@ import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.repository.TransportRepository
+import spring.webmvc.infrastructure.exception.NotFoundEntityException
 
 @Component
 class TransportStrategy(
@@ -18,6 +19,7 @@ class TransportStrategy(
 
     override fun findByProductId(productId: Long): ProductAttributeResult {
         val transport = transportRepository.findByProductId(productId)
+            ?: throw NotFoundEntityException(kClass = Transport::class, id = productId)
 
         return TransportResult.of(transport)
     }
@@ -42,6 +44,7 @@ class TransportStrategy(
         val transportCommand = command as TransportPutCommand
 
         val transport = transportRepository.findByProductId(productId)
+            ?: throw NotFoundEntityException(kClass = Transport::class, id = productId)
 
         transport.update(
             departureLocation = transportCommand.departureLocation,
@@ -55,6 +58,7 @@ class TransportStrategy(
 
     override fun deleteProduct(productId: Long) {
         val transport = transportRepository.findByProductId(productId)
+            ?: throw NotFoundEntityException(kClass = Transport::class, id = productId)
 
         transportRepository.delete(transport)
     }

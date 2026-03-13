@@ -73,7 +73,7 @@ class CurationControllerTest {
                 checkInTime = java.time.Instant.now(),
                 checkOutTime = java.time.Instant.now().plusSeconds(3600 * 24 * 4)
             )
-        ).apply { every { id } returns 1L }
+        ).apply { every { productId } returns 1L }
 
         val mockProduct2 = spyk(
             Product.create(
@@ -99,7 +99,7 @@ class CurationControllerTest {
                 departureTime = java.time.Instant.now(),
                 arrivalTime = java.time.Instant.now().plusSeconds(3600 * 2)
             )
-        ).apply { every { id } returns 2L }
+        ).apply { every { productId } returns 2L }
     }
 
     @Test

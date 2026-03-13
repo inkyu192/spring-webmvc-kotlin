@@ -1,5 +1,6 @@
 package spring.webmvc.infrastructure.persistence.adapter
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Transport
 import spring.webmvc.domain.repository.TransportRepository
@@ -9,7 +10,7 @@ import spring.webmvc.infrastructure.persistence.jpa.TransportJpaRepository
 class TransportRepositoryAdapter(
     private val jpaRepository: TransportJpaRepository,
 ) : TransportRepository {
-    override fun findByProductId(productId: Long) = jpaRepository.findByProductId(productId)
+    override fun findByProductId(productId: Long) = jpaRepository.findByIdOrNull(productId)
 
     override fun save(transport: Transport): Transport = jpaRepository.save(transport)
 

@@ -8,7 +8,6 @@ import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.exception.InvalidEntityStatusException
 
 @Entity
-@Table(name = "product")
 class Product(
     @Enumerated(EnumType.STRING)
     val category: ProductCategory,

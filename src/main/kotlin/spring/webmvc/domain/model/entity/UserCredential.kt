@@ -5,7 +5,6 @@ import spring.webmvc.domain.model.vo.Email
 import java.time.Instant
 
 @Entity
-@Table(name = "user_credential")
 class UserCredential protected constructor(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

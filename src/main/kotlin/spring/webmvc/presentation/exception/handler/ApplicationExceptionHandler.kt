@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.resource.NoResourceFoundException
-import spring.webmvc.domain.repository.cache.TranslationCacheRepository
+import spring.webmvc.application.service.TranslationService
 import spring.webmvc.infrastructure.exception.AbstractHttpException
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
@@ -21,12 +21,12 @@ import java.net.URI
 @RestControllerAdvice
 class ApplicationExceptionHandler(
     private val appProperties: AppProperties,
-    private val translationCacheRepository: TranslationCacheRepository,
+    private val translationService: TranslationService,
 ) {
     @ExceptionHandler(AbstractHttpException::class)
     fun handleBusinessException(e: AbstractHttpException): ProblemDetail {
         val locale = LocaleContextHolder.getLocale()
-        val detail = translationCacheRepository.getMessage(e.translationCode, locale, e.translationArgs)
+        val detail = translationService.getMessage(e.translationCode, locale, e.translationArgs)
 
         return ProblemDetail.forStatusAndDetail(e.httpStatus, detail).apply {
             type = URI.create("${appProperties.docsUrl}#$status")
@@ -42,7 +42,7 @@ class ApplicationExceptionHandler(
         val locale = LocaleContextHolder.getLocale()
 
         val translationCode = exception::class.java.simpleName
-        val detail = translationCacheRepository.getMessage(translationCode, locale)
+        val detail = translationService.getMessage(translationCode, locale)
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail).apply {
             type = URI.create("${appProperties.docsUrl}#$status")
@@ -57,7 +57,7 @@ class ApplicationExceptionHandler(
     fun handleResourceNotFound(errorResponse: ErrorResponse): ProblemDetail {
         val locale = LocaleContextHolder.getLocale()
         val translationCode = errorResponse::class.java.simpleName
-        val detail = translationCacheRepository.getMessage(translationCode, locale)
+        val detail = translationService.getMessage(translationCode, locale)
 
         return ProblemDetail.forStatusAndDetail(errorResponse.statusCode, detail).apply {
             type = URI.create("${appProperties.docsUrl}#$status")
@@ -68,15 +68,15 @@ class ApplicationExceptionHandler(
     fun handleValidationException(exception: MethodArgumentNotValidException): ProblemDetail {
         val locale = LocaleContextHolder.getLocale()
         val translationCode = exception::class.java.simpleName
-        val detail = translationCacheRepository.getMessage(translationCode, locale)
+        val detail = translationService.getMessage(translationCode, locale)
 
         return ProblemDetail.forStatusAndDetail(exception.statusCode, detail).apply {
             type = URI.create("${appProperties.docsUrl}#$status")
             setProperty("fields", exception.bindingResult.fieldErrors.associate { fieldError ->
                 val fieldTranslationCode = "$translationCode.${fieldError.code}"
                 val args = fieldError.arguments?.drop(1)?.toTypedArray() ?: emptyArray()
-                val resolvedMessage = translationCacheRepository.getMessageOrNull(fieldTranslationCode, locale, args)
-                    ?: translationCacheRepository.getMessage("$translationCode.default", locale)
+                val resolvedMessage = translationService.getMessageOrNull(fieldTranslationCode, locale, args)
+                    ?: translationService.getMessage("$translationCode.default", locale)
                 fieldError.field to resolvedMessage
             })
         }

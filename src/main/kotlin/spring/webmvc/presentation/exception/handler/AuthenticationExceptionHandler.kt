@@ -10,7 +10,7 @@ import org.springframework.http.ProblemDetail
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
-import spring.webmvc.domain.repository.cache.TranslationCacheRepository
+import spring.webmvc.application.service.TranslationService
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets
 class AuthenticationExceptionHandler(
     private val appProperties: AppProperties,
     private val objectMapper: ObjectMapper,
-    private val translationCacheRepository: TranslationCacheRepository,
+    private val translationService: TranslationService,
 ) : AuthenticationEntryPoint {
     override fun commence(
         request: HttpServletRequest,
@@ -28,10 +28,10 @@ class AuthenticationExceptionHandler(
     ) {
         val status = HttpStatus.UNAUTHORIZED
         val locale = LocaleContextHolder.getLocale()
-        val detail = translationCacheRepository.getMessageOrNull(
+        val detail = translationService.getMessageOrNull(
             code = exception::class.java.simpleName,
             locale = locale,
-        ) ?: translationCacheRepository.getMessage(AuthenticationException::class.java.simpleName, locale)
+        ) ?: translationService.getMessage(AuthenticationException::class.java.simpleName, locale)
         val problemDetail = ProblemDetail.forStatusAndDetail(status, detail)
             .apply { type = URI.create("${appProperties.docsUrl}#${status}") }
 

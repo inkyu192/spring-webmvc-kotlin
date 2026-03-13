@@ -37,18 +37,18 @@ VALUES (1, 1),
        (4, 3),
        (4, 5);
 
-INSERT INTO menu (id, name, path, sort_order, parent_id, created_at, updated_at)
-VALUES (1, '회원', NULL, 1, NULL, NOW(6), NOW(6)),
-       (2, '상품', NULL, 2, NULL, NOW(6), NOW(6)),
-       (3, '주문', NULL, 3, NULL, NOW(6), NOW(6)),
-       (4, '큐레이션', NULL, 4, NULL, NOW(6), NOW(6));
+INSERT INTO menu (id, translation_code, path, sort_order, parent_id, created_at, updated_at)
+VALUES (1, 'menu.users', NULL, 1, NULL, NOW(6), NOW(6)),
+       (2, 'menu.products', NULL, 2, NULL, NOW(6), NOW(6)),
+       (3, 'menu.orders', NULL, 3, NULL, NOW(6), NOW(6)),
+       (4, 'menu.curations', NULL, 4, NULL, NOW(6), NOW(6));
 
-INSERT INTO menu (id, name, path, sort_order, parent_id, created_at, updated_at)
-VALUES (5, '회원관리', '/users', 1, 1, NOW(6), NOW(6)),
-       (6, '교통수단관리', '/products/transports', 1, 2, NOW(6), NOW(6)),
-       (7, '숙박관리', '/products/accommodations', 2, 2, NOW(6), NOW(6)),
-       (9, '주문관리', '/orders', 1, 3, NOW(6), NOW(6)),
-       (10, '큐레이션관리', '/curations', 1, 4, NOW(6), NOW(6));
+INSERT INTO menu (id, translation_code, path, sort_order, parent_id, created_at, updated_at)
+VALUES (5, 'menu.users.management', '/users', 1, 1, NOW(6), NOW(6)),
+       (6, 'menu.products.transports', '/products/transports', 1, 2, NOW(6), NOW(6)),
+       (7, 'menu.products.accommodations', '/products/accommodations', 2, 2, NOW(6), NOW(6)),
+       (9, 'menu.orders.management', '/orders', 1, 3, NOW(6), NOW(6)),
+       (10, 'menu.curations.management', '/curations', 1, 4, NOW(6), NOW(6));
 
 INSERT INTO permission_menu (permission_id, menu_id)
 VALUES (1, 1),
@@ -483,7 +483,25 @@ VALUES ('Gender', 'ko', '성별', NOW(6), NOW(6)),
        ('JwtException', 'ko', '유효하지 않은 인증 토큰입니다.', NOW(6), NOW(6)),
        ('JwtException', 'en', 'Invalid authentication token.', NOW(6), NOW(6)),
        ('Exception', 'ko', '예상치 못한 오류가 발생했습니다.', NOW(6), NOW(6)),
-       ('Exception', 'en', 'An unexpected error has occurred.', NOW(6), NOW(6));
+       ('Exception', 'en', 'An unexpected error has occurred.', NOW(6), NOW(6)),
+       ('menu.users', 'ko', '회원', NOW(6), NOW(6)),
+       ('menu.users', 'en', 'Users', NOW(6), NOW(6)),
+       ('menu.products', 'ko', '상품', NOW(6), NOW(6)),
+       ('menu.products', 'en', 'Products', NOW(6), NOW(6)),
+       ('menu.orders', 'ko', '주문', NOW(6), NOW(6)),
+       ('menu.orders', 'en', 'Orders', NOW(6), NOW(6)),
+       ('menu.curations', 'ko', '큐레이션', NOW(6), NOW(6)),
+       ('menu.curations', 'en', 'Curations', NOW(6), NOW(6)),
+       ('menu.users.management', 'ko', '회원관리', NOW(6), NOW(6)),
+       ('menu.users.management', 'en', 'User Management', NOW(6), NOW(6)),
+       ('menu.products.transports', 'ko', '교통수단관리', NOW(6), NOW(6)),
+       ('menu.products.transports', 'en', 'Transport Management', NOW(6), NOW(6)),
+       ('menu.products.accommodations', 'ko', '숙박관리', NOW(6), NOW(6)),
+       ('menu.products.accommodations', 'en', 'Accommodation Management', NOW(6), NOW(6)),
+       ('menu.orders.management', 'ko', '주문관리', NOW(6), NOW(6)),
+       ('menu.orders.management', 'en', 'Order Management', NOW(6), NOW(6)),
+       ('menu.curations.management', 'ko', '큐레이션관리', NOW(6), NOW(6)),
+       ('menu.curations.management', 'en', 'Curation Management', NOW(6), NOW(6));
 
 ALTER TABLE permission AUTO_INCREMENT = 51;
 ALTER TABLE role AUTO_INCREMENT = 51;

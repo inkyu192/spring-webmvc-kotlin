@@ -1,9 +1,11 @@
 package spring.webmvc.domain.model.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
 
 @Entity
-@Table(name = "translation")
 class Translation(
     val code: String,
 

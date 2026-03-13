@@ -6,11 +6,10 @@ import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.stereotype.Service
 import spring.webmvc.application.dto.result.CodeGroupResult
 import spring.webmvc.application.dto.result.CodeResult
-import spring.webmvc.domain.repository.cache.TranslationCacheRepository
 
 @Service
 class CodeService(
-    private val translationCacheRepository: TranslationCacheRepository,
+    private val translationService: TranslationService,
 ) {
     private val codeRegistry: Map<String, List<Enum<*>>>
 
@@ -34,11 +33,11 @@ class CodeService(
         return codeRegistry.map { (groupName, codes) ->
             CodeGroupResult(
                 name = groupName,
-                label = translationCacheRepository.getMessage(code = groupName, locale = locale),
+                label = translationService.getMessage(code = groupName, locale = locale),
                 codes = codes.map { code ->
                     CodeResult(
                         code = code.name,
-                        label = translationCacheRepository.getMessage(
+                        label = translationService.getMessage(
                             code = "${groupName}.${code.name}",
                             locale = locale,
                         ),

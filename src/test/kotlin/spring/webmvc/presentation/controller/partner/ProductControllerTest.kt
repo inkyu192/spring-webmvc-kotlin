@@ -74,7 +74,7 @@ class ProductControllerTest {
                 checkOutTime = now.plusSeconds(3600)
             )
         ).apply {
-            every { id } returns 1L
+            every { productId } returns 1L
             every { product.id } returns 1L
             every { product.category } returns ProductCategory.ACCOMMODATION
             every { product.status } returns ProductStatus.SELLING
@@ -113,7 +113,7 @@ class ProductControllerTest {
                 arrivalTime = now.plusSeconds(7200)
             )
         ).apply {
-            every { id } returns 2L
+            every { productId } returns 2L
             every { product.id } returns 2L
             every { product.category } returns ProductCategory.TRANSPORT
             every { product.status } returns ProductStatus.SELLING

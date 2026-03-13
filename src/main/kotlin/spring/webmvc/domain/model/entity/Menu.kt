@@ -4,7 +4,7 @@ import jakarta.persistence.*
 
 @Entity
 class Menu protected constructor(
-    name: String,
+    translationCode: String,
     path: String?,
     sortOrder: Long?,
     parent: Menu?,
@@ -14,7 +14,7 @@ class Menu protected constructor(
     var id: Long? = null
         protected set
 
-    var name = name
+    var translationCode = translationCode
         protected set
 
     var path = path
@@ -29,7 +29,7 @@ class Menu protected constructor(
         protected set
 
     companion object {
-        fun create(name: String, path: String? = null, parent: Menu? = null, sortOrder: Long? = null) =
-            Menu(name = name, path = path, sortOrder = sortOrder, parent = parent)
+        fun create(translationCode: String, path: String? = null, parent: Menu? = null, sortOrder: Long? = null) =
+            Menu(translationCode = translationCode, path = path, sortOrder = sortOrder, parent = parent)
     }
 }

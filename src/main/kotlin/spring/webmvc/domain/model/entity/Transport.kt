@@ -4,8 +4,8 @@ import jakarta.persistence.*
 import java.time.Instant
 
 @Entity
-@Table(name = "transport")
 class Transport(
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     val product: Product,
@@ -16,9 +16,7 @@ class Transport(
     var arrivalTime: Instant,
 ) {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    var id: Long? = null
+    var productId: Long? = null
         protected set
 
     companion object {

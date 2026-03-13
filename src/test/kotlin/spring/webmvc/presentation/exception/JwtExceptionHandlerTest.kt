@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
-import spring.webmvc.domain.repository.cache.TranslationCacheRepository
+import spring.webmvc.application.service.TranslationService
 import spring.webmvc.infrastructure.properties.AppProperties
 import spring.webmvc.presentation.exception.handler.JwtExceptionHandler
 
@@ -21,11 +21,11 @@ class JwtExceptionHandlerTest {
     private val filterChain = mockk<FilterChain>(relaxed = true)
     private val appProperties = mockk<AppProperties>()
     private val objectMapper = mockk<ObjectMapper>()
-    private val translationCacheRepository = mockk<TranslationCacheRepository>()
+    private val translationService = mockk<TranslationService>()
     private val jwtExceptionHandler = JwtExceptionHandler(
         appProperties = appProperties,
         objectMapper = objectMapper,
-        translationCacheRepository = translationCacheRepository,
+        translationService = translationService,
     )
     private lateinit var request: MockHttpServletRequest
     private lateinit var response: MockHttpServletResponse
@@ -48,7 +48,7 @@ class JwtExceptionHandlerTest {
 
         every { filterChain.doFilter(request, response) } throws JwtException(message)
         every { appProperties.docsUrl } returns docsUrl
-        every { translationCacheRepository.getMessage(any(), any(), any()) } returns message
+        every { translationService.getMessage(any(), any(), any()) } returns message
         every { objectMapper.writeValueAsString(any<ProblemDetail>()) } returns problemDetailJson
 
         jwtExceptionHandler.doFilter(request, response, filterChain)
@@ -68,7 +68,7 @@ class JwtExceptionHandlerTest {
 
         every { filterChain.doFilter(request, response) } throws RuntimeException(message)
         every { appProperties.docsUrl } returns docsUrl
-        every { translationCacheRepository.getMessage(any(), any(), any()) } returns message
+        every { translationService.getMessage(any(), any(), any()) } returns message
         every { objectMapper.writeValueAsString(any<ProblemDetail>()) } returns problemDetailJson
 
         jwtExceptionHandler.doFilter(request, response, filterChain)

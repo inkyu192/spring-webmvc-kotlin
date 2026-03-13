@@ -11,7 +11,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import spring.webmvc.domain.repository.cache.TranslationCacheRepository
+import spring.webmvc.application.service.TranslationService
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets
 class JwtExceptionHandler(
     private val appProperties: AppProperties,
     private val objectMapper: ObjectMapper,
-    private val translationCacheRepository: TranslationCacheRepository,
+    private val translationService: TranslationService,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -36,10 +36,10 @@ class JwtExceptionHandler(
 
             if (e is JwtException) {
                 status = HttpStatus.UNAUTHORIZED
-                detail = translationCacheRepository.getMessage(JwtException::class.java.simpleName, locale)
+                detail = translationService.getMessage(JwtException::class.java.simpleName, locale)
             } else {
                 status = HttpStatus.INTERNAL_SERVER_ERROR
-                detail = translationCacheRepository.getMessage(Exception::class.java.simpleName, locale)
+                detail = translationService.getMessage(Exception::class.java.simpleName, locale)
             }
 
             val problemDetail = ProblemDetail.forStatusAndDetail(status, detail)

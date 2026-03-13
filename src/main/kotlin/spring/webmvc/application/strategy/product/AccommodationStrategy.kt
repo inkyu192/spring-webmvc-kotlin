@@ -9,6 +9,7 @@ import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.repository.AccommodationRepository
+import spring.webmvc.infrastructure.exception.NotFoundEntityException
 
 @Component
 class AccommodationStrategy(
@@ -18,6 +19,7 @@ class AccommodationStrategy(
 
     override fun findByProductId(productId: Long): ProductAttributeResult {
         val accommodation = accommodationRepository.findByProductId(productId)
+            ?: throw NotFoundEntityException(kClass = Accommodation::class, id = productId)
 
         return AccommodationResult.of(accommodation)
     }
@@ -41,6 +43,7 @@ class AccommodationStrategy(
         val accommodationCommand = command as AccommodationPutCommand
 
         val accommodation = accommodationRepository.findByProductId(productId)
+            ?: throw NotFoundEntityException(kClass = Accommodation::class, id = productId)
 
         accommodation.update(
             place = accommodationCommand.place,
@@ -53,6 +56,7 @@ class AccommodationStrategy(
 
     override fun deleteProduct(productId: Long) {
         val accommodation = accommodationRepository.findByProductId(productId)
+            ?: throw NotFoundEntityException(kClass = Accommodation::class, id = productId)
 
         accommodationRepository.delete(accommodation)
     }
