@@ -62,6 +62,11 @@ networks:
 - `SMTP_USERNAME`: Gmail 계정
 - `SMTP_PASSWORD`: Gmail 앱 비밀번호
 
+### Sentry 설정
+에러 모니터링 기능을 사용하려면 Sentry DSN을 환경 변수로 설정해야 합니다.
+
+- `SENTRY_DSN`: Sentry 프로젝트 DSN
+
 ---
 
 ## API 문서

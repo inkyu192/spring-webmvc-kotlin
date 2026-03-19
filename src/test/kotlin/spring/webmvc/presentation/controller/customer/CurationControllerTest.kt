@@ -182,7 +182,12 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products.content[].id").description("상품 ID"),
                         PayloadDocumentation.fieldWithPath("products.content[].name").description("상품명"),
                         PayloadDocumentation.fieldWithPath("products.content[].description").description("상품 설명"),
-                        PayloadDocumentation.fieldWithPath("products.content[].price").description("상품 가격")
+                        PayloadDocumentation.fieldWithPath("products.content[].price").description("상품 가격"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isLowStock").description("품절 임박 여부")
                     )
                 )
             )

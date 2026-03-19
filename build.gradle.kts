@@ -70,6 +70,8 @@ dependencies {
 	implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.6.1")
 	implementation("com.linecorp.kotlin-jdsl:jpql-render:3.6.1")
 	implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.6.1")
+
+	implementation("io.sentry:sentry-spring-boot-starter-jakarta:8.35.0")
 }
 
 kotlin {

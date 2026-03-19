@@ -6,6 +6,7 @@ import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.entity.CurationProduct
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 
 data class CurationSummaryResult(
     val id: Long,
@@ -95,6 +96,7 @@ data class CurationProductResult(
     val name: String,
     val description: String,
     val price: Long,
+    val exposureAttribute: ProductExposureAttribute,
 ) {
     companion object {
         fun of(curationProduct: CurationProduct) = CurationProductResult(
@@ -102,6 +104,7 @@ data class CurationProductResult(
             name = curationProduct.product.name,
             description = curationProduct.product.description,
             price = curationProduct.product.price,
+            exposureAttribute = curationProduct.product.exposureAttribute,
         )
 
         fun of(product: Product) = CurationProductResult(
@@ -109,6 +112,7 @@ data class CurationProductResult(
             name = product.name,
             description = product.description,
             price = product.price,
+            exposureAttribute = product.exposureAttribute,
         )
     }
 }

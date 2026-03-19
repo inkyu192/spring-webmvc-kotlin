@@ -29,7 +29,7 @@ class ApplicationExceptionHandler(
         val detail = translationService.getMessage(e.translationCode, locale, e.translationArgs)
 
         return ProblemDetail.forStatusAndDetail(e.httpStatus, detail).apply {
-            type = URI.create("${appProperties.docsUrl}#$status")
+            type = URI.create("${appProperties.docsUrl}#${HttpStatus.valueOf(status).name}")
         }
     }
 
@@ -45,7 +45,7 @@ class ApplicationExceptionHandler(
         val detail = translationService.getMessage(translationCode, locale)
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail).apply {
-            type = URI.create("${appProperties.docsUrl}#$status")
+            type = URI.create("${appProperties.docsUrl}#${HttpStatus.valueOf(status).name}")
         }
     }
 
@@ -60,7 +60,7 @@ class ApplicationExceptionHandler(
         val detail = translationService.getMessage(translationCode, locale)
 
         return ProblemDetail.forStatusAndDetail(errorResponse.statusCode, detail).apply {
-            type = URI.create("${appProperties.docsUrl}#$status")
+            type = URI.create("${appProperties.docsUrl}#${HttpStatus.valueOf(status).name}")
         }
     }
 
@@ -71,7 +71,7 @@ class ApplicationExceptionHandler(
         val detail = translationService.getMessage(translationCode, locale)
 
         return ProblemDetail.forStatusAndDetail(exception.statusCode, detail).apply {
-            type = URI.create("${appProperties.docsUrl}#$status")
+            type = URI.create("${appProperties.docsUrl}#${HttpStatus.valueOf(status).name}")
             setProperty("fields", exception.bindingResult.fieldErrors.associate { fieldError ->
                 val fieldTranslationCode = "$translationCode.${fieldError.code}"
                 val args = fieldError.arguments?.drop(1)?.toTypedArray() ?: emptyArray()

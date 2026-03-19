@@ -1,6 +1,7 @@
 package spring.webmvc.presentation.exception.handler
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.sentry.Sentry
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.i18n.LocaleContextHolder
@@ -26,6 +27,7 @@ class AccessDeniedExceptionHandler(
         response: HttpServletResponse,
         exception: AccessDeniedException,
     ) {
+        Sentry.captureException(exception)
         val status = HttpStatus.FORBIDDEN
         val locale = LocaleContextHolder.getLocale()
         val detail = translationService.getMessageOrNull(
@@ -33,7 +35,7 @@ class AccessDeniedExceptionHandler(
             locale = locale,
         ) ?: translationService.getMessage(AccessDeniedException::class.java.simpleName, locale)
         val problemDetail = ProblemDetail.forStatusAndDetail(status, detail)
-            .apply { type = URI.create("${appProperties.docsUrl}#$status") }
+            .apply { type = URI.create("${appProperties.docsUrl}#${status.name}") }
 
         response.status = status.value()
         response.contentType = MediaType.APPLICATION_JSON_VALUE

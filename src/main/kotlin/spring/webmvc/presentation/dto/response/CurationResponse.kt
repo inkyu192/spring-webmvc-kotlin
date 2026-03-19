@@ -2,6 +2,7 @@ package spring.webmvc.presentation.dto.response
 
 import spring.webmvc.application.dto.result.*
 import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.vo.ProductExposureAttribute
 
 data class CurationListResponse(
     val size: Long,
@@ -82,6 +83,7 @@ data class CurationProductResponse(
     val name: String,
     val description: String,
     val price: Long,
+    val exposureAttribute: ProductExposureAttribute,
 ) {
     companion object {
         fun of(result: CurationProductResult) = CurationProductResponse(
@@ -89,6 +91,7 @@ data class CurationProductResponse(
             name = result.name,
             description = result.description,
             price = result.price,
+            exposureAttribute = result.exposureAttribute,
         )
     }
 }

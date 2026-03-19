@@ -108,7 +108,13 @@ class CurationControllerTest {
             id = 1L,
             name = product1.product.name,
             description = product1.product.description,
-            price = product1.product.price
+            price = product1.product.price,
+            exposureAttribute = ProductExposureAttribute(
+                isPromotional = false,
+                isNewArrival = false,
+                isFeatured = false,
+                isLowStock = false,
+            ),
         )
 
         val curationResult = CurationDetailResult(
@@ -164,7 +170,12 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products[].id").description("상품 ID"),
                         PayloadDocumentation.fieldWithPath("products[].name").description("상품명"),
                         PayloadDocumentation.fieldWithPath("products[].description").description("상품 설명"),
-                        PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격")
+                        PayloadDocumentation.fieldWithPath("products[].price").description("상품 가격"),
+                        PayloadDocumentation.fieldWithPath("products[].exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isLowStock").description("품절 임박 여부")
                     )
                 )
             )
@@ -265,7 +276,12 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products.content[].id").description("상품 ID"),
                         PayloadDocumentation.fieldWithPath("products.content[].name").description("상품명"),
                         PayloadDocumentation.fieldWithPath("products.content[].description").description("상품 설명"),
-                        PayloadDocumentation.fieldWithPath("products.content[].price").description("상품 가격")
+                        PayloadDocumentation.fieldWithPath("products.content[].price").description("상품 가격"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute").description("노출 속성"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isPromotional").description("프로모션 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isNewArrival").description("신상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isFeatured").description("추천 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isLowStock").description("품절 임박 여부")
                     )
                 )
             )

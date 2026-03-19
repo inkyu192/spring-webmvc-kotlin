@@ -1,6 +1,7 @@
 package spring.webmvc.presentation.exception.handler
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.sentry.Sentry
 import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -30,6 +31,7 @@ class JwtExceptionHandler(
         try {
             filterChain.doFilter(request, response)
         } catch (e: Exception) {
+            Sentry.captureException(e)
             val locale = LocaleContextHolder.getLocale()
             val status: HttpStatus
             val detail: String

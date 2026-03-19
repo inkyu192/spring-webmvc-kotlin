@@ -28,9 +28,8 @@ class TranslationService(
     }
 
     private fun resolveMessage(code: String, locale: Locale, args: Array<Any>): String? {
-        val snapshot = cache
-        val message = snapshot.getIfPresent("$code:${locale.language}")
-            ?: snapshot.getIfPresent("$code:${Locale.ENGLISH.language}")
+        val message = cache.getIfPresent("$code:${locale.language}")
+            ?: cache.getIfPresent("$code:${Locale.ENGLISH.language}")
             ?: return null
 
         return MessageFormat(message, locale).format(args)

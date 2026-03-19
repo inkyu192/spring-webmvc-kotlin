@@ -28,7 +28,7 @@ class CacheConfig {
             registerModule(JavaTimeModule())
             activateDefaultTyping(
                 BasicPolymorphicTypeValidator.builder().allowIfBaseType(Any::class.java).build(),
-                ObjectMapper.DefaultTyping.NON_FINAL,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
             )
         }
