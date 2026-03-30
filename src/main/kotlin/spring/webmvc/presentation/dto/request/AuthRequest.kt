@@ -38,20 +38,26 @@ data class SignInRequest(
     @field:EmailValidation
     val email: String,
     val password: String,
+    val deviceId: String,
+    val deviceName: String,
 ) {
     fun toCommand() = SignInCommand(
         email = Email.create(email),
         password = password,
+        deviceId = deviceId,
+        deviceName = deviceName,
     )
 }
 
 data class TokenRequest(
     val accessToken: String,
     val refreshToken: String,
+    val deviceId: String,
 ) {
     fun toCommand() = RefreshTokenCommand(
         accessToken = accessToken,
         refreshToken = refreshToken,
+        deviceId = deviceId,
     )
 }
 

@@ -7,7 +7,8 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CopyObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import spring.webmvc.infrastructure.exception.FailedAwsIntegrationException
+import software.amazon.awssdk.services.s3.model.S3Exception
+import spring.webmvc.infrastructure.exception.FailedAwsException
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.util.*
 
@@ -31,9 +32,9 @@ class S3Service(
 
         try {
             s3Client.putObject(request, RequestBody.fromInputStream(file.inputStream, file.size))
-        } catch (e: Exception) {
+        } catch (e: S3Exception) {
             logger.error("Failed to put object to S3", e)
-            throw FailedAwsIntegrationException(serviceName = "S3", throwable = e)
+            throw FailedAwsException(serviceName = e.awsErrorDetails().serviceName(), throwable = e)
         }
 
         return key
@@ -56,9 +57,9 @@ class S3Service(
 
         try {
             s3Client.copyObject(copyRequest)
-        } catch (e: Exception) {
+        } catch (e: S3Exception) {
             logger.error("Failed to copy object to S3", e)
-            throw FailedAwsIntegrationException(serviceName = "S3", throwable = e)
+            throw FailedAwsException(serviceName = e.awsErrorDetails().serviceName(), throwable = e)
         }
 
         return destinationKey

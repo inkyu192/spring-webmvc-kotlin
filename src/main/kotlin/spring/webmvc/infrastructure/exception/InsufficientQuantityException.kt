@@ -8,5 +8,5 @@ class InsufficientQuantityException(
     stock: Long,
 ) : AbstractHttpException(
     httpStatus = HttpStatus.CONFLICT,
-    translationArgs = arrayOf(productName, requestQuantity, stock),
+    messageArgs = arrayOf(productName, requestQuantity, stock),
 )

@@ -1,6 +1,6 @@
 package spring.webmvc.presentation.exception.handler
 
-import org.springframework.context.i18n.LocaleContextHolder
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -14,21 +14,35 @@ import org.springframework.web.method.annotation.MethodArgumentConversionNotSupp
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.resource.NoResourceFoundException
 import spring.webmvc.application.service.TranslationService
+import spring.webmvc.infrastructure.exception.AbstractExternalException
 import spring.webmvc.infrastructure.exception.AbstractHttpException
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
+import java.util.*
 
 @RestControllerAdvice
 class ApplicationExceptionHandler(
     private val appProperties: AppProperties,
     private val translationService: TranslationService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @ExceptionHandler(AbstractHttpException::class)
-    fun handleBusinessException(e: AbstractHttpException): ProblemDetail {
-        val locale = LocaleContextHolder.getLocale()
-        val detail = translationService.getMessage(e.translationCode, locale, e.translationArgs)
+    fun handleBusinessException(e: AbstractHttpException, locale: Locale): ProblemDetail {
+        val detail = translationService.getMessage(e.translationCode, locale, e.messageArgs)
 
         return ProblemDetail.forStatusAndDetail(e.httpStatus, detail).apply {
+            type = URI.create("${appProperties.docsUrl}#${HttpStatus.valueOf(status).name}")
+        }
+    }
+
+    @ExceptionHandler(AbstractExternalException::class)
+    fun handleExternalException(e: AbstractExternalException, locale: Locale): ProblemDetail {
+        logger.error("External service error: ${e.translationCode}", e)
+
+        val detail = translationService.getMessage(e.translationCode, locale, e.messageArgs)
+
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, detail).apply {
             type = URI.create("${appProperties.docsUrl}#${HttpStatus.valueOf(status).name}")
         }
     }
@@ -38,8 +52,7 @@ class ApplicationExceptionHandler(
         MethodArgumentTypeMismatchException::class,
         MethodArgumentConversionNotSupportedException::class,
     )
-    fun handleInvalidRequestBody(exception: Exception): ProblemDetail {
-        val locale = LocaleContextHolder.getLocale()
+    fun handleInvalidRequestBody(exception: Exception, locale: Locale): ProblemDetail {
 
         val translationCode = exception::class.java.simpleName
         val detail = translationService.getMessage(translationCode, locale)
@@ -54,8 +67,7 @@ class ApplicationExceptionHandler(
         HttpRequestMethodNotSupportedException::class,
         ServletRequestBindingException::class,
     )
-    fun handleResourceNotFound(errorResponse: ErrorResponse): ProblemDetail {
-        val locale = LocaleContextHolder.getLocale()
+    fun handleResourceNotFound(errorResponse: ErrorResponse, locale: Locale): ProblemDetail {
         val translationCode = errorResponse::class.java.simpleName
         val detail = translationService.getMessage(translationCode, locale)
 
@@ -65,8 +77,7 @@ class ApplicationExceptionHandler(
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationException(exception: MethodArgumentNotValidException): ProblemDetail {
-        val locale = LocaleContextHolder.getLocale()
+    fun handleValidationException(exception: MethodArgumentNotValidException, locale: Locale): ProblemDetail {
         val translationCode = exception::class.java.simpleName
         val detail = translationService.getMessage(translationCode, locale)
 

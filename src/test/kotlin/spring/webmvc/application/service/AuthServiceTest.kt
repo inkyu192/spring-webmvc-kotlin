@@ -14,16 +14,15 @@ import spring.webmvc.application.event.SendPasswordResetEmailEvent
 import spring.webmvc.application.event.SendVerifyEmailEvent
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserCredential
+import spring.webmvc.domain.model.entity.UserDevice
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
-import spring.webmvc.domain.repository.PermissionRepository
-import spring.webmvc.domain.repository.RoleRepository
-import spring.webmvc.domain.repository.UserCredentialRepository
-import spring.webmvc.domain.repository.UserRepository
+import spring.webmvc.domain.repository.*
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
+import spring.webmvc.infrastructure.exception.ExceededMaxDeviceException
 import spring.webmvc.infrastructure.exception.InvalidCredentialsException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
 import spring.webmvc.infrastructure.external.s3.FileType
@@ -36,6 +35,7 @@ class AuthServiceTest {
     private val tokenCacheRepository = mockk<TokenCacheRepository>()
     private val userRepository = mockk<UserRepository>()
     private val userCredentialRepository = mockk<UserCredentialRepository>()
+    private val userDeviceRepository = mockk<UserDeviceRepository>()
     private val passwordEncoder = mockk<PasswordEncoder>()
     private val authCacheRepository = mockk<AuthCacheRepository>()
     private val eventPublisher = mockk<ApplicationEventPublisher>()
@@ -47,6 +47,7 @@ class AuthServiceTest {
         tokenCacheRepository = tokenCacheRepository,
         userRepository = userRepository,
         userCredentialRepository = userCredentialRepository,
+        userDeviceRepository = userDeviceRepository,
         passwordEncoder = passwordEncoder,
         authCacheRepository = authCacheRepository,
         eventPublisher = eventPublisher,
@@ -61,6 +62,8 @@ class AuthServiceTest {
     private val userId = 1L
     private val accessToken = "accessToken"
     private val refreshToken = "refreshToken"
+    private val deviceId = "test-device-id"
+    private val deviceName = "Test Device"
 
     @BeforeEach
     fun setUp() {
@@ -83,6 +86,80 @@ class AuthServiceTest {
             )
         )
         userCredential.verify()
+    }
+
+    @Test
+    @DisplayName("중복된 이메일로 회원가입 시 DuplicateEntityException 발생")
+    fun signUpWithDuplicateEmail() {
+        val command = SignUpCommand(
+            email = email,
+            password = "password123",
+            name = "홍길동",
+            phone = Phone.create("010-1234-5678"),
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
+            profileImageKey = null,
+            roleIds = emptyList(),
+            permissionIds = emptyList(),
+        )
+
+        every { userCredentialRepository.existsByEmail(email) } returns true
+
+        Assertions.assertThatThrownBy { authService.signUp(command) }
+            .isInstanceOf(DuplicateEntityException::class.java)
+    }
+
+    @Test
+    @DisplayName("중복된 번호로 회원가입 시 DuplicateEntityException 발생")
+    fun signUpWithDuplicatePhone() {
+        val phone = Phone.create("010-1234-5678")
+        val command = SignUpCommand(
+            email = email,
+            password = "password123",
+            name = "홍길동",
+            phone = phone,
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
+            profileImageKey = null,
+            roleIds = emptyList(),
+            permissionIds = emptyList(),
+        )
+
+        every { userCredentialRepository.existsByEmail(email) } returns false
+        every { userRepository.existsByPhone(phone) } returns true
+
+        Assertions.assertThatThrownBy { authService.signUp(command) }
+            .isInstanceOf(DuplicateEntityException::class.java)
+    }
+
+    @Test
+    @DisplayName("프로필 이미지 없이 회원가입 성공")
+    fun signUpWithoutProfileImage() {
+        val command = SignUpCommand(
+            email = email,
+            password = "password123",
+            name = "홍길동",
+            phone = Phone.create("010-1234-5678"),
+            gender = Gender.MALE,
+            birthday = LocalDate.of(1990, 1, 1),
+            profileImageKey = null,
+            roleIds = emptyList(),
+            permissionIds = emptyList(),
+        )
+
+        every { userCredentialRepository.existsByEmail(email) } returns false
+        every { userRepository.existsByPhone(any()) } returns false
+        every { roleRepository.findAllById(emptyList()) } returns emptyList()
+        every { permissionRepository.findAllById(emptyList()) } returns emptyList()
+        every { passwordEncoder.encode(any()) } returns "encodedPassword"
+        every { userRepository.save(any()) } returns user
+        every { userCredentialRepository.save(any()) } returns userCredential
+        every { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) } just runs
+
+        val result = authService.signUp(command)
+
+        Assertions.assertThat(result).isNotNull
+        verify(exactly = 0) { s3Service.copyObject(any(), any(), any()) }
     }
 
     @Test
@@ -140,100 +217,10 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("프로필 이미지 없이 회원가입 성공")
-    fun signUpWithoutProfileImage() {
-        val command = SignUpCommand(
-            email = email,
-            password = "password123",
-            name = "홍길동",
-            phone = Phone.create("010-1234-5678"),
-            gender = Gender.MALE,
-            birthday = LocalDate.of(1990, 1, 1),
-            profileImageKey = null,
-            roleIds = emptyList(),
-            permissionIds = emptyList(),
-        )
-
-        every { userCredentialRepository.existsByEmail(email) } returns false
-        every { userRepository.existsByPhone(any()) } returns false
-        every { roleRepository.findAllById(emptyList()) } returns emptyList()
-        every { permissionRepository.findAllById(emptyList()) } returns emptyList()
-        every { passwordEncoder.encode(any()) } returns "encodedPassword"
-        every { userRepository.save(any()) } returns user
-        every { userCredentialRepository.save(any()) } returns userCredential
-        every { eventPublisher.publishEvent(SendVerifyEmailEvent(email)) } just runs
-
-        val result = authService.signUp(command)
-
-        Assertions.assertThat(result).isNotNull
-        verify(exactly = 0) { s3Service.copyObject(any(), any(), any()) }
-    }
-
-    @Test
-    @DisplayName("중복된 이메일로 회원가입 시 DuplicateEntityException 발생")
-    fun signUpWithDuplicateEmail() {
-        val command = SignUpCommand(
-            email = email,
-            password = "password123",
-            name = "홍길동",
-            phone = Phone.create("010-1234-5678"),
-            gender = Gender.MALE,
-            birthday = LocalDate.of(1990, 1, 1),
-            profileImageKey = null,
-            roleIds = emptyList(),
-            permissionIds = emptyList(),
-        )
-
-        every { userCredentialRepository.existsByEmail(email) } returns true
-
-        Assertions.assertThatThrownBy { authService.signUp(command) }
-            .isInstanceOf(DuplicateEntityException::class.java)
-    }
-
-    @Test
-    @DisplayName("중복된 번호로 회원가입 시 DuplicateEntityException 발생")
-    fun signUpWithDuplicatePhone() {
-        val phone = Phone.create("010-1234-5678")
-        val command = SignUpCommand(
-            email = email,
-            password = "password123",
-            name = "홍길동",
-            phone = phone,
-            gender = Gender.MALE,
-            birthday = LocalDate.of(1990, 1, 1),
-            profileImageKey = null,
-            roleIds = emptyList(),
-            permissionIds = emptyList(),
-        )
-
-        every { userCredentialRepository.existsByEmail(email) } returns false
-        every { userRepository.existsByPhone(phone) } returns true
-
-        Assertions.assertThatThrownBy { authService.signUp(command) }
-            .isInstanceOf(DuplicateEntityException::class.java)
-    }
-
-    @Test
-    @DisplayName("로그인 성공")
-    fun signIn() {
-        val command = SignInCommand(email = email, password = "password123")
-
-        every { userCredentialRepository.findByEmail(email) } returns userCredential
-        every { passwordEncoder.matches(command.password, "encodedPassword") } returns true
-        every { jwtProvider.createAccessToken(userId, emptyList()) } returns accessToken
-        every { jwtProvider.createRefreshToken() } returns refreshToken
-        every { tokenCacheRepository.addRefreshToken(userId, refreshToken) } just runs
-
-        val result = authService.signIn(command)
-
-        Assertions.assertThat(result.accessToken).isEqualTo(accessToken)
-        Assertions.assertThat(result.refreshToken).isEqualTo(refreshToken)
-    }
-
-    @Test
     @DisplayName("존재하지 않는 이메일로 로그인 시 NotFoundEntityException 발생")
     fun signInWithNonExistentEmail() {
-        val command = SignInCommand(email = email, password = "password123")
+        val command =
+            SignInCommand(email = email, password = "password123", deviceId = deviceId, deviceName = deviceName)
 
         every { userCredentialRepository.findByEmail(email) } returns null
 
@@ -244,7 +231,8 @@ class AuthServiceTest {
     @Test
     @DisplayName("잘못된 비밀번호로 로그인 시 InvalidCredentialsException 발생")
     fun signInWithWrongPassword() {
-        val command = SignInCommand(email = email, password = "wrongPassword")
+        val command =
+            SignInCommand(email = email, password = "wrongPassword", deviceId = deviceId, deviceName = deviceName)
 
         every { userCredentialRepository.findByEmail(email) } returns userCredential
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns false
@@ -256,7 +244,8 @@ class AuthServiceTest {
     @Test
     @DisplayName("이메일 인증 안된 계정으로 로그인 시 InvalidCredentialsException 발생")
     fun signInWithUnverifiedEmail() {
-        val command = SignInCommand(email = email, password = "password123")
+        val command =
+            SignInCommand(email = email, password = "password123", deviceId = deviceId, deviceName = deviceName)
         val unverifiedCredential = spyk(
             UserCredential.create(
                 user = user,
@@ -273,41 +262,91 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("디바이스 최대 개수 초과 시 ExceededMaxDeviceException 발생")
+    fun signInWithExceededMaxDevices() {
+        val command = SignInCommand(email, "password123", deviceId, deviceName)
+
+        every { user.id } returns userId
+        every { userCredential.verify() } just Runs
+
+        every { userCredentialRepository.findByEmail(email) } returns userCredential
+        every { passwordEncoder.matches("password123", "encodedPassword") } returns true
+        every { userDeviceRepository.findByUserIdAndDeviceId(userId, deviceId) } returns null
+        every { userDeviceRepository.countByUserId(userId) } returns UserDevice.MAX_DEVICES.toLong()
+
+        Assertions.assertThatThrownBy { authService.signIn(command) }
+            .isInstanceOf(ExceededMaxDeviceException::class.java)
+    }
+
+    @Test
+    @DisplayName("로그인 성공")
+    fun signIn() {
+        val command =
+            SignInCommand(email = email, password = "password123", deviceId = deviceId, deviceName = deviceName)
+
+        every { userCredentialRepository.findByEmail(email) } returns userCredential
+        every { passwordEncoder.matches(command.password, "encodedPassword") } returns true
+        every { userDeviceRepository.findByUserIdAndDeviceId(userId, deviceId) } returns null
+        every { userDeviceRepository.countByUserId(userId) } returns 0
+        every { userDeviceRepository.save(any()) } returns mockk()
+        every { jwtProvider.createAccessToken(userId, emptyList()) } returns accessToken
+        every { jwtProvider.createRefreshToken() } returns refreshToken
+        every { tokenCacheRepository.setRefreshToken(userId, deviceId, refreshToken) } just runs
+
+        val result = authService.signIn(command)
+
+        Assertions.assertThat(result.accessToken).isEqualTo(accessToken)
+        Assertions.assertThat(result.refreshToken).isEqualTo(refreshToken)
+    }
+
+    @Test
     @DisplayName("토큰 갱신 성공")
     fun refreshToken() {
-        val command = RefreshTokenCommand(accessToken = accessToken, refreshToken = refreshToken)
+        val command = RefreshTokenCommand(accessToken = accessToken, refreshToken = refreshToken, deviceId = deviceId)
         val claims = DefaultClaims(mapOf("userId" to userId))
         val newRefreshToken = "newRefreshToken"
 
         every { jwtProvider.parseAccessToken(accessToken) } throws ExpiredJwtException(null, claims, "Token expired")
         every { jwtProvider.parseRefreshToken(refreshToken) } returns mockk()
         every { userRepository.findById(userId) } returns user
-        every { tokenCacheRepository.getRefreshToken(userId, refreshToken) } returns refreshToken
-        every { tokenCacheRepository.removeRefreshToken(userId, refreshToken) } just runs
+        every { tokenCacheRepository.getRefreshToken(userId, deviceId) } returns refreshToken
+        every { tokenCacheRepository.removeRefreshToken(userId, deviceId) } just runs
         every { jwtProvider.createRefreshToken() } returns newRefreshToken
-        every { tokenCacheRepository.addRefreshToken(userId, newRefreshToken) } just runs
+        every { tokenCacheRepository.setRefreshToken(userId, deviceId, newRefreshToken) } just runs
         every { jwtProvider.createAccessToken(userId, emptyList()) } returns "newAccessToken"
 
         val result = authService.refreshToken(command)
 
         Assertions.assertThat(result.accessToken).isEqualTo("newAccessToken")
         Assertions.assertThat(result.refreshToken).isEqualTo(newRefreshToken)
-        verify { tokenCacheRepository.removeRefreshToken(userId, refreshToken) }
-        verify { tokenCacheRepository.addRefreshToken(userId, newRefreshToken) }
+        verify { tokenCacheRepository.removeRefreshToken(userId, deviceId) }
+        verify { tokenCacheRepository.setRefreshToken(userId, deviceId, newRefreshToken) }
     }
 
     @Test
     @DisplayName("유효하지 않은 refresh token으로 갱신 시 InvalidCredentialsException 발생")
     fun refreshTokenWithInvalidToken() {
-        val command = RefreshTokenCommand(accessToken = accessToken, refreshToken = "invalidRefreshToken")
+        val command =
+            RefreshTokenCommand(accessToken = accessToken, refreshToken = "invalidRefreshToken", deviceId = deviceId)
         val claims = DefaultClaims(mapOf("userId" to userId))
 
         every { jwtProvider.parseAccessToken(accessToken) } throws ExpiredJwtException(null, claims, "Token expired")
         every { jwtProvider.parseRefreshToken("invalidRefreshToken") } returns mockk()
-        every { userRepository.findById(userId) } returns user
-        every { tokenCacheRepository.getRefreshToken(userId, "invalidRefreshToken") } returns null
+        every { tokenCacheRepository.getRefreshToken(userId, deviceId) } returns null
 
         Assertions.assertThatThrownBy { authService.refreshToken(command) }
+            .isInstanceOf(InvalidCredentialsException::class.java)
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 토큰으로 회원가입 인증 확인 시 InvalidCredentialsException 발생")
+    fun confirmJoinVerifyWithInvalidToken() {
+        val token = "invalidToken"
+        val command = JoinVerifyConfirmCommand(token = token)
+
+        every { authCacheRepository.getJoinVerifyToken(token) } returns null
+
+        Assertions.assertThatThrownBy { authService.confirmJoinVerify(command) }
             .isInstanceOf(InvalidCredentialsException::class.java)
     }
 
@@ -346,15 +385,14 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 토큰으로 회원가입 인증 확인 시 InvalidCredentialsException 발생")
-    fun confirmJoinVerifyWithInvalidToken() {
-        val token = "invalidToken"
-        val command = JoinVerifyConfirmCommand(token = token)
+    @DisplayName("존재하지 않는 이메일로 비밀번호 재설정 요청 시 NotFoundEntityException 발생")
+    fun requestPasswordResetWithNonExistentEmail() {
+        val command = PasswordResetRequestCommand(email = email)
 
-        every { authCacheRepository.getJoinVerifyToken(token) } returns null
+        every { userCredentialRepository.findByEmail(email) } returns null
 
-        Assertions.assertThatThrownBy { authService.confirmJoinVerify(command) }
-            .isInstanceOf(InvalidCredentialsException::class.java)
+        Assertions.assertThatThrownBy { authService.requestPasswordReset(command) }
+            .isInstanceOf(NotFoundEntityException::class.java)
     }
 
     @Test
@@ -372,14 +410,15 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일로 비밀번호 재설정 요청 시 NotFoundEntityException 발생")
-    fun requestPasswordResetWithNonExistentEmail() {
-        val command = PasswordResetRequestCommand(email = email)
+    @DisplayName("유효하지 않은 토큰으로 비밀번호 재설정 확인 시 InvalidCredentialsException 발생")
+    fun confirmPasswordResetWithInvalidToken() {
+        val token = "invalidToken"
+        val command = PasswordResetConfirmCommand(token = token, password = "newPassword123")
 
-        every { userCredentialRepository.findByEmail(email) } returns null
+        every { authCacheRepository.getPasswordResetToken(token) } returns null
 
-        Assertions.assertThatThrownBy { authService.requestPasswordReset(command) }
-            .isInstanceOf(NotFoundEntityException::class.java)
+        Assertions.assertThatThrownBy { authService.confirmPasswordReset(command) }
+            .isInstanceOf(InvalidCredentialsException::class.java)
     }
 
     @Test
@@ -398,17 +437,5 @@ class AuthServiceTest {
         authService.confirmPasswordReset(command)
 
         Assertions.assertThat(userCredential.password).isEqualTo(encodedPassword)
-    }
-
-    @Test
-    @DisplayName("유효하지 않은 토큰으로 비밀번호 재설정 확인 시 InvalidCredentialsException 발생")
-    fun confirmPasswordResetWithInvalidToken() {
-        val token = "invalidToken"
-        val command = PasswordResetConfirmCommand(token = token, password = "newPassword123")
-
-        every { authCacheRepository.getPasswordResetToken(token) } returns null
-
-        Assertions.assertThatThrownBy { authService.confirmPasswordReset(command) }
-            .isInstanceOf(InvalidCredentialsException::class.java)
     }
 }

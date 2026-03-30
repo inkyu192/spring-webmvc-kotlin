@@ -6,5 +6,5 @@ import kotlin.reflect.KClass
 class DuplicateEntityException(kClass: KClass<*>, name: String) :
     AbstractHttpException(
         httpStatus = HttpStatus.CONFLICT,
-        translationArgs = arrayOf(kClass.java.simpleName, name),
+        messageArgs = arrayOf(kClass.java.simpleName, name),
     )

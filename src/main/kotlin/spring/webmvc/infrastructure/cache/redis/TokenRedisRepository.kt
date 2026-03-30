@@ -15,47 +15,44 @@ class TokenRedisRepository(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
-        private const val REFRESH_TOKEN_KEY = "user:%d:refresh-tokens"
-        private const val MAX_TOKENS = 3
+        private const val REFRESH_TOKEN_KEY = "user:%d:device:%s:refresh-token"
     }
 
-    override fun addRefreshToken(userId: Long, refreshToken: String) {
-        val key = REFRESH_TOKEN_KEY.format(userId)
+    override fun setRefreshToken(userId: Long, deviceId: String, refreshToken: String) {
+        val key = REFRESH_TOKEN_KEY.format(userId, deviceId)
 
         try {
-            val score = System.currentTimeMillis().toDouble()
-            redisTemplate.opsForZSet().add(key, refreshToken, score)
-
-            val size = redisTemplate.opsForZSet().zCard(key) ?: 0
-            if (size > MAX_TOKENS) {
-                redisTemplate.opsForZSet().removeRange(key, 0, size - MAX_TOKENS - 1)
-            }
-
             val ttl = appProperties.jwt.refreshToken.expiration.seconds
-            redisTemplate.expire(key, ttl, TimeUnit.SECONDS)
+            redisTemplate.opsForValue().set(key, refreshToken, ttl, TimeUnit.SECONDS)
         } catch (e: Exception) {
-            logger.error("Failed to add refresh token for userId={}: {}", userId, e.message, e)
+            logger.error("Failed to set refresh token for userId={}, deviceId={}: {}", userId, deviceId, e.message, e)
         }
     }
 
-    override fun getRefreshToken(userId: Long, refreshToken: String): String? {
-        val key = REFRESH_TOKEN_KEY.format(userId)
+    override fun getRefreshToken(userId: Long, deviceId: String): String? {
+        val key = REFRESH_TOKEN_KEY.format(userId, deviceId)
 
         return try {
-            if (redisTemplate.opsForZSet().score(key, refreshToken) != null) refreshToken else null
+            redisTemplate.opsForValue().get(key)
         } catch (e: Exception) {
-            logger.warn("Failed to get refresh token for userId={}: {}", userId, e.message)
+            logger.warn("Failed to get refresh token for userId={}, deviceId={}: {}", userId, deviceId, e.message)
             null
         }
     }
 
-    override fun removeRefreshToken(userId: Long, refreshToken: String) {
-        val key = REFRESH_TOKEN_KEY.format(userId)
+    override fun removeRefreshToken(userId: Long, deviceId: String) {
+        val key = REFRESH_TOKEN_KEY.format(userId, deviceId)
 
         try {
-            redisTemplate.opsForZSet().remove(key, refreshToken)
+            redisTemplate.delete(key)
         } catch (e: Exception) {
-            logger.error("Failed to remove refresh token for userId={}: {}", userId, e.message, e)
+            logger.error(
+                "Failed to remove refresh token for userId={}, deviceId={}: {}",
+                userId,
+                deviceId,
+                e.message,
+                e
+            )
         }
     }
 }

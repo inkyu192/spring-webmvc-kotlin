@@ -17,7 +17,6 @@ class UserCredential protected constructor(
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     var id: Long? = null
         protected set
 

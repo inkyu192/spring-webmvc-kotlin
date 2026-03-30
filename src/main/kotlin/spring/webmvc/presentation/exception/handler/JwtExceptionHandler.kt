@@ -1,8 +1,8 @@
 package spring.webmvc.presentation.exception.handler
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.sentry.Sentry
 import io.jsonwebtoken.JwtException
+import io.sentry.Sentry
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

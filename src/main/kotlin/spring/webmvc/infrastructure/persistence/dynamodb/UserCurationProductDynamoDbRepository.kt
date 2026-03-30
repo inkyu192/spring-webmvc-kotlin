@@ -5,8 +5,9 @@ import org.springframework.stereotype.Component
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
 import software.amazon.awssdk.enhanced.dynamodb.Key
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException
 import spring.webmvc.domain.model.entity.UserCurationProduct
-import spring.webmvc.infrastructure.exception.FailedAwsIntegrationException
+import spring.webmvc.infrastructure.exception.FailedAwsException
 
 @Component
 class UserCurationProductDynamoDbRepository(
@@ -25,11 +26,11 @@ class UserCurationProductDynamoDbRepository(
             .sortValue("CURATION#$curationId")
             .build()
 
-        return runCatching {
+        return try {
             table.getItem(key)
-        }.getOrElse { throwable ->
-            logger.error("Failed to get item from DynamoDB", throwable)
-            throw FailedAwsIntegrationException(serviceName = "DynamoDB", throwable = throwable)
+        } catch (e: DynamoDbException) {
+            logger.error("Failed to get item from DynamoDB", e)
+            throw FailedAwsException(serviceName = e.awsErrorDetails().serviceName(), throwable = e)
         }
     }
 }

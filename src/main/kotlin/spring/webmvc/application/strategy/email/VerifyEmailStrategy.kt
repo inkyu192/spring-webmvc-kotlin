@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.VerifyEmailCommand
-import spring.webmvc.application.enums.EmailTemplate
 import spring.webmvc.infrastructure.external.smtp.EmailSender
 
 @Component

@@ -20,11 +20,14 @@ data class SignUpCommand(
 data class SignInCommand(
     val email: Email,
     val password: String,
+    val deviceId: String,
+    val deviceName: String,
 )
 
 data class RefreshTokenCommand(
     val accessToken: String,
     val refreshToken: String,
+    val deviceId: String,
 )
 
 data class JoinVerifyRequestCommand(

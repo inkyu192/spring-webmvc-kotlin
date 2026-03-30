@@ -1,11 +1,9 @@
 package spring.webmvc.infrastructure.exception
 
-import org.springframework.http.HttpStatus
-
-abstract class AbstractHttpException(
-    val httpStatus: HttpStatus,
+abstract class AbstractExternalException(
     val messageArgs: Array<Any> = emptyArray(),
-) : RuntimeException() {
+    throwable: Throwable,
+) : RuntimeException(throwable) {
     open val translationCode: String
         get() = this::class.java.simpleName
 }

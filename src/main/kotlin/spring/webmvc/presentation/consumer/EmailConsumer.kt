@@ -1,12 +1,12 @@
-package spring.webmvc.application.consumer
+package spring.webmvc.presentation.consumer
 
 import io.awspring.cloud.sqs.annotation.SqsListener
 import org.slf4j.LoggerFactory
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Component
-import spring.webmvc.application.enums.EmailTemplate
 import spring.webmvc.application.strategy.email.EmailStrategy
+import spring.webmvc.application.strategy.email.EmailTemplate
 
 @Component
 class EmailConsumer(

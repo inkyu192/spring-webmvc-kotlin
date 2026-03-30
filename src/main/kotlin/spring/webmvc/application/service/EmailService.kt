@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import spring.webmvc.application.dto.command.PasswordResetEmailCommand
 import spring.webmvc.application.dto.command.VerifyEmailCommand
-import spring.webmvc.application.enums.EmailTemplate
+import spring.webmvc.application.strategy.email.EmailTemplate
 import spring.webmvc.infrastructure.external.sqs.SqsProducer
 
 @Service

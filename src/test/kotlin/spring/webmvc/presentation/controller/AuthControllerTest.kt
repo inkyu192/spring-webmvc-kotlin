@@ -113,7 +113,9 @@ class AuthControllerTest {
                     """
                         {
                           "email": "$email",
-                          "password": "$password"
+                          "password": "$password",
+                          "deviceId": "550e8400-e29b-41d4-a716-446655440000",
+                          "deviceName": "Chrome on MacOS"
                         }
                     """.trimIndent()
                 )
@@ -124,7 +126,9 @@ class AuthControllerTest {
                     "sign-in",
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("email").description("계정"),
-                        PayloadDocumentation.fieldWithPath("password").description("패스워드")
+                        PayloadDocumentation.fieldWithPath("password").description("패스워드"),
+                        PayloadDocumentation.fieldWithPath("deviceId").description("디바이스 ID (UUID)"),
+                        PayloadDocumentation.fieldWithPath("deviceName").description("디바이스 이름")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("accessToken").description("액세스 토큰"),
@@ -145,7 +149,8 @@ class AuthControllerTest {
                     """
                         {
                           "accessToken": "$accessToken",
-                          "refreshToken": "$refreshToken"
+                          "refreshToken": "$refreshToken",
+                          "deviceId": "550e8400-e29b-41d4-a716-446655440000"
                         }
                     """.trimIndent()
                 )
@@ -156,7 +161,8 @@ class AuthControllerTest {
                     "token-refresh",
                     PayloadDocumentation.requestFields(
                         PayloadDocumentation.fieldWithPath("accessToken").description("액세스 토큰"),
-                        PayloadDocumentation.fieldWithPath("refreshToken").description("리프레시 토큰")
+                        PayloadDocumentation.fieldWithPath("refreshToken").description("리프레시 토큰"),
+                        PayloadDocumentation.fieldWithPath("deviceId").description("디바이스 ID (UUID)")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("accessToken").description("액세스 토큰"),

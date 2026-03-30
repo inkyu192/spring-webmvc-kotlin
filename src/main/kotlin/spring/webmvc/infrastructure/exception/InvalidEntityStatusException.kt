@@ -10,5 +10,5 @@ class InvalidEntityStatusException(
     toStatus: String,
 ) : AbstractHttpException(
     httpStatus = HttpStatus.UNPROCESSABLE_ENTITY,
-    translationArgs = arrayOf(kClass.java.simpleName, id, fromStatus, toStatus),
+    messageArgs = arrayOf(kClass.java.simpleName, id, fromStatus, toStatus),
 )

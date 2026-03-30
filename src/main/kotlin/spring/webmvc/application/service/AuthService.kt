@@ -11,14 +11,13 @@ import spring.webmvc.application.event.SendPasswordResetEmailEvent
 import spring.webmvc.application.event.SendVerifyEmailEvent
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserCredential
+import spring.webmvc.domain.model.entity.UserDevice
 import spring.webmvc.domain.model.vo.Email
-import spring.webmvc.domain.repository.PermissionRepository
-import spring.webmvc.domain.repository.RoleRepository
-import spring.webmvc.domain.repository.UserCredentialRepository
-import spring.webmvc.domain.repository.UserRepository
+import spring.webmvc.domain.repository.*
 import spring.webmvc.domain.repository.cache.AuthCacheRepository
 import spring.webmvc.domain.repository.cache.TokenCacheRepository
 import spring.webmvc.infrastructure.exception.DuplicateEntityException
+import spring.webmvc.infrastructure.exception.ExceededMaxDeviceException
 import spring.webmvc.infrastructure.exception.InvalidCredentialsException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
 import spring.webmvc.infrastructure.external.s3.FileType
@@ -32,6 +31,7 @@ class AuthService(
     private val tokenCacheRepository: TokenCacheRepository,
     private val userRepository: UserRepository,
     private val userCredentialRepository: UserCredentialRepository,
+    private val userDeviceRepository: UserDeviceRepository,
     private val passwordEncoder: PasswordEncoder,
     private val authCacheRepository: AuthCacheRepository,
     private val eventPublisher: ApplicationEventPublisher,
@@ -83,6 +83,7 @@ class AuthService(
         return user
     }
 
+    @Transactional
     fun signIn(command: SignInCommand): TokenResult {
         val userCredential = userCredentialRepository.findByEmail(command.email)
             ?: throw NotFoundEntityException(kClass = UserCredential::class, id = command.email.value)
@@ -98,13 +99,15 @@ class AuthService(
         val user = userCredential.user
         val userId = checkNotNull(user.id)
 
+        handleDeviceLogin(user, command)
+
         val accessToken = jwtProvider.createAccessToken(
             userId = userId,
             permissions = user.getPermissionNames()
         )
         val refreshToken = jwtProvider.createRefreshToken()
 
-        tokenCacheRepository.addRefreshToken(userId = userId, refreshToken = refreshToken)
+        tokenCacheRepository.setRefreshToken(userId = userId, deviceId = command.deviceId, refreshToken = refreshToken)
 
         return TokenResult(accessToken = accessToken, refreshToken = refreshToken)
     }
@@ -114,16 +117,18 @@ class AuthService(
 
         val userId = extractUserId(command.accessToken)
 
-        tokenCacheRepository.getRefreshToken(userId = userId, refreshToken = command.refreshToken)
-            ?: throw InvalidCredentialsException()
+        val storedToken = tokenCacheRepository.getRefreshToken(userId = userId, deviceId = command.deviceId)
+        if (storedToken != command.refreshToken) {
+            throw InvalidCredentialsException()
+        }
 
         val user = userRepository.findById(userId)
             ?: throw NotFoundEntityException(kClass = User::class, id = userId)
 
-        tokenCacheRepository.removeRefreshToken(userId = userId, refreshToken = command.refreshToken)
+        tokenCacheRepository.removeRefreshToken(userId = userId, deviceId = command.deviceId)
 
         val refreshToken = jwtProvider.createRefreshToken()
-        tokenCacheRepository.addRefreshToken(userId = userId, refreshToken = refreshToken)
+        tokenCacheRepository.setRefreshToken(userId = userId, deviceId = command.deviceId, refreshToken = refreshToken)
 
         return TokenResult(
             accessToken = jwtProvider.createAccessToken(
@@ -132,6 +137,28 @@ class AuthService(
             ),
             refreshToken = refreshToken,
         )
+    }
+
+    private fun handleDeviceLogin(user: User, command: SignInCommand) {
+        val userId = checkNotNull(user.id)
+
+        val existingDevice = userDeviceRepository.findByUserIdAndDeviceId(userId, command.deviceId)
+        if (existingDevice != null) {
+            existingDevice.updateLastLoginAt()
+            return
+        }
+
+        if (userDeviceRepository.countByUserId(userId) >= UserDevice.MAX_DEVICES) {
+            throw ExceededMaxDeviceException(UserDevice.MAX_DEVICES)
+        }
+
+        val newDevice = UserDevice.create(
+            user = user,
+            deviceId = command.deviceId,
+            deviceName = command.deviceName,
+        )
+
+        userDeviceRepository.save(newDevice)
     }
 
     private fun extractUserId(accessToken: String): Long {
