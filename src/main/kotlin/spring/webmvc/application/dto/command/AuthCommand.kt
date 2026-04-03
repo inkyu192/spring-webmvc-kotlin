@@ -1,5 +1,6 @@
 package spring.webmvc.application.dto.command
 
+import spring.webmvc.domain.model.enums.DeviceType
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
@@ -22,6 +23,8 @@ data class SignInCommand(
     val password: String,
     val deviceId: String,
     val deviceName: String,
+    val deviceType: DeviceType,
+    val token: String,
 )
 
 data class RefreshTokenCommand(

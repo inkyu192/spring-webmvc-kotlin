@@ -35,7 +35,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("com.github.ben-manes.caffeine:caffeine")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -64,6 +63,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
 	implementation("software.amazon.awssdk:s3:2.31.25")
+	implementation("software.amazon.awssdk:ses:2.31.25")
 	implementation("software.amazon.awssdk:dynamodb-enhanced:2.31.25")
 	implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs:3.4.2")
 

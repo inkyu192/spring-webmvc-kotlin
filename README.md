@@ -56,19 +56,6 @@ networks:
     name: application-network
 ```
 
-### SMTP 설정
-이메일 발송 기능을 사용하려면 SMTP 서버 정보를 환경 변수로 설정해야 합니다.
-
-- `SMTP_USERNAME`: Gmail 계정
-- `SMTP_PASSWORD`: Gmail 앱 비밀번호
-
-### Sentry 설정
-에러 모니터링 기능을 사용하려면 Sentry DSN을 환경 변수로 설정해야 합니다.
-
-- `SENTRY_DSN`: Sentry 프로젝트 DSN
-
----
-
 ## API 문서
 - 이 프로젝트는 **Spring REST Docs**를 사용하여 API 문서를 생성합니다.
 - 먼저 빌드를 수행해야 문서가 생성됩니다.

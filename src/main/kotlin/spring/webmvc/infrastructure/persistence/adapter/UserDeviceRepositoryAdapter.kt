@@ -23,4 +23,7 @@ class UserDeviceRepositoryAdapter(
 
     override fun delete(userDevice: UserDevice) =
         jpaRepository.delete(userDevice)
+
+    override fun findAllByTokenNotNull(): List<UserDevice> =
+        jpaRepository.findAllByTokenNotNull()
 }

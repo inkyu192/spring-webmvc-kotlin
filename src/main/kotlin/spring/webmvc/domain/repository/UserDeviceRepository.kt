@@ -8,4 +8,5 @@ interface UserDeviceRepository {
     fun countByUserId(userId: Long): Long
     fun save(userDevice: UserDevice): UserDevice
     fun delete(userDevice: UserDevice)
+    fun findAllByTokenNotNull(): List<UserDevice>
 }

@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spring.webmvc.application.service.DeviceService
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserDevice
+import spring.webmvc.domain.model.enums.DeviceType
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Phone
 import spring.webmvc.infrastructure.config.ControllerTest
@@ -54,6 +55,8 @@ class DeviceControllerTest {
             user = user,
             deviceId = deviceId,
             deviceName = deviceName,
+            deviceType = DeviceType.WEB,
+            token = "test-fcm-token",
         )
     }
 
@@ -76,6 +79,8 @@ class DeviceControllerTest {
                         PayloadDocumentation.fieldWithPath("size").description("디바이스 수"),
                         PayloadDocumentation.fieldWithPath("devices[].deviceId").description("디바이스 ID"),
                         PayloadDocumentation.fieldWithPath("devices[].deviceName").description("디바이스 이름"),
+                        PayloadDocumentation.fieldWithPath("devices[].deviceType")
+                            .description("디바이스 타입 (IOS, ANDROID, WEB)"),
                         PayloadDocumentation.fieldWithPath("devices[].lastLoginAt").description("마지막 로그인 일시"),
                         PayloadDocumentation.fieldWithPath("devices[].createdAt").description("등록 일시"),
                     )

@@ -54,7 +54,6 @@ class UserControllerTest {
             null,
             listOf(
                 SimpleGrantedAuthority("USER_READ"),
-                SimpleGrantedAuthority("USER_WRITE"),
             ),
         )
 

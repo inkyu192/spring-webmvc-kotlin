@@ -10,6 +10,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.S3Configuration
+import software.amazon.awssdk.services.ses.SesClient
 import spring.webmvc.infrastructure.properties.AppProperties
 import java.net.URI
 
@@ -48,5 +49,13 @@ class AwsConfig(
     fun dynamoDbEnhancedClient(dynamoDbClient: DynamoDbClient): DynamoDbEnhancedClient =
         DynamoDbEnhancedClient.builder()
             .dynamoDbClient(dynamoDbClient)
+            .build()
+
+    @Bean
+    fun sesClient(awsCredentialsProvider: AwsCredentialsProvider): SesClient =
+        SesClient.builder()
+            .region(Region.AP_NORTHEAST_2)
+            .credentialsProvider(awsCredentialsProvider)
+            .endpointOverride(URI.create(appProperties.aws.ses.endpoint))
             .build()
 }

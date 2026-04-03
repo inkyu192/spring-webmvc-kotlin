@@ -64,6 +64,8 @@ CREATE TABLE user_device
     user_id       BIGINT       NOT NULL,
     device_id     VARCHAR(255) NOT NULL,
     device_name   VARCHAR(255) NOT NULL,
+    device_type   VARCHAR(50)  NOT NULL,
+    token         VARCHAR(512) NOT NULL,
     last_login_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     created_at    DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at    DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),

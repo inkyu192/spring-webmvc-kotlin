@@ -7,4 +7,5 @@ interface UserDeviceJpaRepository : JpaRepository<UserDevice, Long> {
     fun findByUserIdAndDeviceId(userId: Long, deviceId: String): UserDevice?
     fun findAllByUserId(userId: Long): List<UserDevice>
     fun countByUserId(userId: Long): Long
+    fun findAllByTokenNotNull(): List<UserDevice>
 }

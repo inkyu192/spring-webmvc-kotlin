@@ -144,6 +144,9 @@ class AuthService(
 
         val existingDevice = userDeviceRepository.findByUserIdAndDeviceId(userId, command.deviceId)
         if (existingDevice != null) {
+            if (existingDevice.token != command.token) {
+                existingDevice.updateToken(command.token)
+            }
             existingDevice.updateLastLoginAt()
             return
         }
@@ -156,6 +159,8 @@ class AuthService(
             user = user,
             deviceId = command.deviceId,
             deviceName = command.deviceName,
+            deviceType = command.deviceType,
+            token = command.token,
         )
 
         userDeviceRepository.save(newDevice)

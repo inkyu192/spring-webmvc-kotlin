@@ -19,7 +19,7 @@ class CurationController(
     private val curationService: CurationService,
 ) {
     @PostMapping
-    @PreAuthorize("hasAuthority('CURATION_WRITE')")
+    @PreAuthorize("hasAuthority('CURATION_CREATE')")
     @ResponseStatus(HttpStatus.CREATED)
     fun createCuration(
         @RequestBody @Validated request: CurationCreateRequest,

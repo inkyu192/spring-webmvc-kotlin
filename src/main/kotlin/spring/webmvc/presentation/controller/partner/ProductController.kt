@@ -49,7 +49,7 @@ class ProductController(
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
+    @PreAuthorize("hasAuthority('PRODUCT_CREATE')")
     @ResponseStatus(HttpStatus.CREATED)
     fun createProduct(
         @RequestBody @Validated request: ProductCreateRequest,
@@ -61,7 +61,7 @@ class ProductController(
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
+    @PreAuthorize("hasAuthority('PRODUCT_UPDATE')")
     fun updateProduct(
         @PathVariable id: Long,
         @RequestBody @Validated request: ProductUpdateRequest,
@@ -73,7 +73,7 @@ class ProductController(
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PRODUCT_WRITE')")
+    @PreAuthorize("hasAuthority('PRODUCT_DELETE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteProduct(
         @PathVariable id: Long,

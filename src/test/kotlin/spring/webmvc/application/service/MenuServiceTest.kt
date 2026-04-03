@@ -28,7 +28,9 @@ class MenuServiceTest {
 
         val authorities = listOf(
             SimpleGrantedAuthority("PRODUCT_READ"),
-            SimpleGrantedAuthority("PRODUCT_WRITE"),
+            SimpleGrantedAuthority("PRODUCT_CREATE"),
+            SimpleGrantedAuthority("PRODUCT_UPDATE"),
+            SimpleGrantedAuthority("PRODUCT_DELETE"),
         )
         val authentication = UsernamePasswordAuthenticationToken("1", null, authorities)
         SecurityContextHolder.getContext().authentication = authentication
@@ -72,7 +74,14 @@ class MenuServiceTest {
         }
 
         every {
-            menuRepository.findAllWithRecursiveByPermissions(setOf("PRODUCT_READ", "PRODUCT_WRITE"))
+            menuRepository.findAllWithRecursiveByPermissions(
+                setOf(
+                    "PRODUCT_READ",
+                    "PRODUCT_CREATE",
+                    "PRODUCT_UPDATE",
+                    "PRODUCT_DELETE"
+                )
+            )
         } returns listOf(parentMenu, childMenu1, childMenu2)
 
         every { translationService.getMessage("menu.products", locale) } returns "상품"
@@ -118,7 +127,14 @@ class MenuServiceTest {
         }
 
         every {
-            menuRepository.findAllWithRecursiveByPermissions(setOf("PRODUCT_READ", "PRODUCT_WRITE"))
+            menuRepository.findAllWithRecursiveByPermissions(
+                setOf(
+                    "PRODUCT_READ",
+                    "PRODUCT_CREATE",
+                    "PRODUCT_UPDATE",
+                    "PRODUCT_DELETE"
+                )
+            )
         } returns listOf(parentMenu, childMenu)
 
         every { translationService.getMessage("menu.products", enLocale) } returns "Products"

@@ -15,6 +15,7 @@ import spring.webmvc.application.event.SendVerifyEmailEvent
 import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.model.entity.UserCredential
 import spring.webmvc.domain.model.entity.UserDevice
+import spring.webmvc.domain.model.enums.DeviceType
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
@@ -220,7 +221,14 @@ class AuthServiceTest {
     @DisplayName("존재하지 않는 이메일로 로그인 시 NotFoundEntityException 발생")
     fun signInWithNonExistentEmail() {
         val command =
-            SignInCommand(email = email, password = "password123", deviceId = deviceId, deviceName = deviceName)
+            SignInCommand(
+                email = email,
+                password = "password123",
+                deviceId = deviceId,
+                deviceName = deviceName,
+                deviceType = DeviceType.WEB,
+                token = "test-fcm-token"
+            )
 
         every { userCredentialRepository.findByEmail(email) } returns null
 
@@ -232,7 +240,14 @@ class AuthServiceTest {
     @DisplayName("잘못된 비밀번호로 로그인 시 InvalidCredentialsException 발생")
     fun signInWithWrongPassword() {
         val command =
-            SignInCommand(email = email, password = "wrongPassword", deviceId = deviceId, deviceName = deviceName)
+            SignInCommand(
+                email = email,
+                password = "wrongPassword",
+                deviceId = deviceId,
+                deviceName = deviceName,
+                deviceType = DeviceType.WEB,
+                token = "test-fcm-token"
+            )
 
         every { userCredentialRepository.findByEmail(email) } returns userCredential
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns false
@@ -245,7 +260,14 @@ class AuthServiceTest {
     @DisplayName("이메일 인증 안된 계정으로 로그인 시 InvalidCredentialsException 발생")
     fun signInWithUnverifiedEmail() {
         val command =
-            SignInCommand(email = email, password = "password123", deviceId = deviceId, deviceName = deviceName)
+            SignInCommand(
+                email = email,
+                password = "password123",
+                deviceId = deviceId,
+                deviceName = deviceName,
+                deviceType = DeviceType.WEB,
+                token = "test-fcm-token"
+            )
         val unverifiedCredential = spyk(
             UserCredential.create(
                 user = user,
@@ -264,7 +286,7 @@ class AuthServiceTest {
     @Test
     @DisplayName("디바이스 최대 개수 초과 시 ExceededMaxDeviceException 발생")
     fun signInWithExceededMaxDevices() {
-        val command = SignInCommand(email, "password123", deviceId, deviceName)
+        val command = SignInCommand(email, "password123", deviceId, deviceName, DeviceType.WEB, "test-fcm-token")
 
         every { user.id } returns userId
         every { userCredential.verify() } just Runs
@@ -282,7 +304,14 @@ class AuthServiceTest {
     @DisplayName("로그인 성공")
     fun signIn() {
         val command =
-            SignInCommand(email = email, password = "password123", deviceId = deviceId, deviceName = deviceName)
+            SignInCommand(
+                email = email,
+                password = "password123",
+                deviceId = deviceId,
+                deviceName = deviceName,
+                deviceType = DeviceType.WEB,
+                token = "test-fcm-token"
+            )
 
         every { userCredentialRepository.findByEmail(email) } returns userCredential
         every { passwordEncoder.matches(command.password, "encodedPassword") } returns true

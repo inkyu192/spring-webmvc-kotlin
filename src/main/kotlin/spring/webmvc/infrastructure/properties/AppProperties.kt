@@ -39,6 +39,7 @@ class AppProperties(
         val s3: S3Properties,
         val dynamodb: DynamoDbProperties,
         val cloudfront: CloudFrontProperties,
+        val ses: SesProperties,
     ) {
         data class S3Properties(
             val endpoint: String,
@@ -51,6 +52,11 @@ class AppProperties(
 
         data class CloudFrontProperties(
             val domain: String,
+        )
+
+        data class SesProperties(
+            val endpoint: String,
+            val senderEmail: String,
         )
     }
 

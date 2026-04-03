@@ -2,6 +2,7 @@ package spring.webmvc.presentation.dto.request
 
 import jakarta.validation.constraints.Pattern
 import spring.webmvc.application.dto.command.*
+import spring.webmvc.domain.model.enums.DeviceType
 import spring.webmvc.domain.model.enums.Gender
 import spring.webmvc.domain.model.vo.Email
 import spring.webmvc.domain.model.vo.Phone
@@ -40,12 +41,16 @@ data class SignInRequest(
     val password: String,
     val deviceId: String,
     val deviceName: String,
+    val deviceType: DeviceType,
+    val token: String,
 ) {
     fun toCommand() = SignInCommand(
         email = Email.create(email),
         password = password,
         deviceId = deviceId,
         deviceName = deviceName,
+        deviceType = deviceType,
+        token = token,
     )
 }
 

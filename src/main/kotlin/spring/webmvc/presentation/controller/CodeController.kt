@@ -1,5 +1,6 @@
 package spring.webmvc.presentation.controller
 
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -12,5 +13,6 @@ class CodeController(
     private val codeService: CodeService,
 ) {
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     fun findCodes() = codeService.findCodes().let { CodeListResponse.of(results = it) }
 }

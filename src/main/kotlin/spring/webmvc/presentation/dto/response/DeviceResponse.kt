@@ -1,6 +1,7 @@
 package spring.webmvc.presentation.dto.response
 
 import spring.webmvc.domain.model.entity.UserDevice
+import spring.webmvc.domain.model.enums.DeviceType
 import java.time.Instant
 
 data class DeviceListResponse(
@@ -18,6 +19,7 @@ data class DeviceListResponse(
 data class DeviceResponse(
     val deviceId: String,
     val deviceName: String,
+    val deviceType: DeviceType,
     val lastLoginAt: Instant,
     val createdAt: Instant,
 ) {
@@ -25,6 +27,7 @@ data class DeviceResponse(
         fun of(userDevice: UserDevice) = DeviceResponse(
             deviceId = userDevice.deviceId,
             deviceName = userDevice.deviceName,
+            deviceType = userDevice.deviceType,
             lastLoginAt = userDevice.lastLoginAt,
             createdAt = userDevice.createdAt,
         )

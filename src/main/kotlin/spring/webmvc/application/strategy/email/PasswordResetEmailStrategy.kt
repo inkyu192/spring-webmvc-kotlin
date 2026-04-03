@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.stereotype.Component
 import spring.webmvc.application.dto.command.PasswordResetEmailCommand
-import spring.webmvc.infrastructure.external.smtp.EmailSender
+import spring.webmvc.infrastructure.external.ses.EmailSender
 
 @Component
 class PasswordResetEmailStrategy(
