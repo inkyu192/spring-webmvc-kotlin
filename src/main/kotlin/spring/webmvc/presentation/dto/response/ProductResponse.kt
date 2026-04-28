@@ -3,7 +3,6 @@ package spring.webmvc.presentation.dto.response
 import spring.webmvc.application.dto.result.*
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import java.time.Instant
 
 data class ProductSummaryResponse(
@@ -14,7 +13,7 @@ data class ProductSummaryResponse(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureAttribute: ProductExposureAttribute,
+    val exposureAttribute: ProductExposureAttributeResponse,
     val createdAt: Instant,
 ) {
     companion object {
@@ -26,7 +25,7 @@ data class ProductSummaryResponse(
             description = result.description,
             price = result.price,
             quantity = result.quantity,
-            exposureAttribute = result.exposureAttribute,
+            exposureAttribute = ProductExposureAttributeResponse.of(result.exposureAttribute),
             createdAt = result.createdAt,
         )
     }
@@ -40,7 +39,7 @@ data class ProductDetailResponse(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureAttribute: ProductExposureAttribute,
+    val exposureAttribute: ProductExposureAttributeResponse,
     val createdAt: Instant,
     val attribute: ProductAttributeResponse,
 ) {
@@ -53,7 +52,7 @@ data class ProductDetailResponse(
             description = result.description,
             price = result.price,
             quantity = result.quantity,
-            exposureAttribute = result.exposureAttribute,
+            exposureAttribute = ProductExposureAttributeResponse.of(result.exposureAttribute),
             createdAt = result.createdAt,
             attribute = ProductAttributeResponse.of(result.attribute),
         )

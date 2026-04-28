@@ -3,7 +3,7 @@ plugins {
 	kotlin("plugin.spring") version "1.9.25"
 	kotlin("plugin.jpa") version "1.9.25"
 	kotlin("kapt")  version "1.9.25"
-	id("org.springframework.boot") version "3.5.8"
+	id("org.springframework.boot") version "3.5.13"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.asciidoctor.jvm.convert") version "4.0.5"
 }

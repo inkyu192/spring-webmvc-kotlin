@@ -9,30 +9,22 @@ import java.time.LocalDate
 @Entity
 @Table(name = "users")
 class User protected constructor(
-    name: String,
-    phone: Phone,
-    gender: Gender,
-    birthday: LocalDate,
+    @field:Convert(converter = CryptoAttributeConverter::class)
+    val name: String,
+
+    @field:Embedded
+    val phone: Phone,
+
+    @field:Enumerated(EnumType.STRING)
+    val gender: Gender,
+
+    val birthday: LocalDate,
+
     profileImage: String?,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
-        protected set
-
-    @Convert(converter = CryptoAttributeConverter::class)
-    var name = name
-        protected set
-
-    @Embedded
-    var phone = phone
-        protected set
-
-    @Enumerated(EnumType.STRING)
-    var gender = gender
-        protected set
-
-    var birthday = birthday
         protected set
 
     var profileImage: String? = profileImage

@@ -13,7 +13,7 @@ class MySQLTestContainerConfig {
 
     companion object {
         @Container
-        private val mysql = MySQLContainer("mysql:8.4.7").apply { start() }
+        private val mysql = MySQLContainer("mysql:8.4").apply { start() }
     }
 
     @Bean

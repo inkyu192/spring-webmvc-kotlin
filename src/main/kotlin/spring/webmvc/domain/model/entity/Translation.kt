@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
 @Entity
-class Translation(
+class Translation protected constructor(
     val code: String,
 
     val locale: String,
@@ -17,4 +17,16 @@ class Translation(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
         protected set
+
+    companion object {
+        fun create(
+            code: String,
+            locale: String,
+            message: String,
+        ) = Translation(
+            code = code,
+            locale = locale,
+            message = message,
+        )
+    }
 }

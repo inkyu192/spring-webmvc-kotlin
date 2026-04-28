@@ -232,15 +232,19 @@ CREATE TABLE order_product
 
 CREATE TABLE curation
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    title      VARCHAR(255) NOT NULL,
-    category   VARCHAR(50)  NOT NULL,
-    is_exposed BIT(1)       NOT NULL,
-    sort_order BIGINT       NOT NULL,
-    created_by BIGINT,
-    updated_by BIGINT,
-    created_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    updated_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title              VARCHAR(255) NOT NULL,
+    placement          VARCHAR(50)  NOT NULL,
+    type               VARCHAR(20)  NOT NULL DEFAULT 'MANUAL',
+    attribute          JSON,
+    exposure_attribute JSON,
+    is_exposed         BIT(1)       NOT NULL,
+    sort_order         BIGINT       NOT NULL,
+    created_by         BIGINT,
+    updated_by         BIGINT,
+    created_at         DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at         DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    INDEX              idx_curation_type(type)
 );
 
 CREATE TABLE curation_product

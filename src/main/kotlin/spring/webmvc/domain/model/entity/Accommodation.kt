@@ -4,18 +4,27 @@ import jakarta.persistence.*
 import java.time.Instant
 
 @Entity
-class Accommodation(
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+class Accommodation protected constructor(
+    @field:MapsId
+    @field:OneToOne(fetch = FetchType.LAZY)
+    @field:JoinColumn(name = "product_id")
     val product: Product,
 
-    var place: String,
-    var checkInTime: Instant,
-    var checkOutTime: Instant,
+    place: String,
+    checkInTime: Instant,
+    checkOutTime: Instant,
 ) {
     @Id
     var productId: Long? = null
+        protected set
+
+    var place = place
+        protected set
+
+    var checkInTime = checkInTime
+        protected set
+
+    var checkOutTime = checkOutTime
         protected set
 
     companion object {

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.application.service.ProductService
 import spring.webmvc.domain.model.enums.ProductStatus
+import spring.webmvc.infrastructure.security.SecurityContextUtil
 import spring.webmvc.presentation.dto.response.CursorPageResponse
 import spring.webmvc.presentation.dto.response.ProductDetailResponse
 import spring.webmvc.presentation.dto.response.ProductSummaryResponse
@@ -18,13 +19,14 @@ class ProductController(
         @RequestParam(required = false) cursorId: Long?,
         @RequestParam(required = false) name: String?,
     ): CursorPageResponse<ProductSummaryResponse> {
+        val userId = SecurityContextUtil.getUserIdOrNull()
         val query = ProductCursorPageQuery(
             cursorId = cursorId,
             name = name,
             status = ProductStatus.SELLING,
         )
 
-        val page = productService.findProductsWithCursorPage(query = query)
+        val page = productService.findProductsWithCursorPage(query = query, userId = userId)
 
         return CursorPageResponse.of(page) { ProductSummaryResponse.of(result = it) }
     }
@@ -33,7 +35,8 @@ class ProductController(
     fun findProduct(
         @PathVariable id: Long,
     ): ProductDetailResponse {
-        val result = productService.findProductCached(id)
+        val userId = SecurityContextUtil.getUserIdOrNull()
+        val result = productService.findProductCached(userId = userId, id = id)
 
         productService.incrementProductViewCount(id)
 

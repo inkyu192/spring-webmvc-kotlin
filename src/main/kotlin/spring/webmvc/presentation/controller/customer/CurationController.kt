@@ -2,7 +2,7 @@ package spring.webmvc.presentation.controller.customer
 
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
-import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.enums.CurationPlacement
 import spring.webmvc.infrastructure.security.SecurityContextUtil
 import spring.webmvc.presentation.dto.response.CurationDetailCursorPageResponse
 import spring.webmvc.presentation.dto.response.CurationListResponse
@@ -14,9 +14,9 @@ class CurationController(
 ) {
     @GetMapping
     fun findCurations(
-        @RequestParam category: CurationCategory,
+        @RequestParam placement: CurationPlacement,
     ): CurationListResponse {
-        val results = curationService.findCurationsCached(category)
+        val results = curationService.findCurationsCached(placement)
 
         return CurationListResponse.of(results = results)
     }

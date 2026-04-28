@@ -4,19 +4,31 @@ import jakarta.persistence.*
 import java.time.Instant
 
 @Entity
-class Transport(
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+class Transport protected constructor(
+    @field:MapsId
+    @field:OneToOne(fetch = FetchType.LAZY)
+    @field:JoinColumn(name = "product_id")
     val product: Product,
 
-    var departureLocation: String,
-    var arrivalLocation: String,
-    var departureTime: Instant,
-    var arrivalTime: Instant,
+    departureLocation: String,
+    arrivalLocation: String,
+    departureTime: Instant,
+    arrivalTime: Instant,
 ) {
     @Id
     var productId: Long? = null
+        protected set
+
+    var departureLocation = departureLocation
+        protected set
+
+    var arrivalLocation = arrivalLocation
+        protected set
+
+    var departureTime = departureTime
+        protected set
+
+    var arrivalTime = arrivalTime
         protected set
 
     companion object {

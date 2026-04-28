@@ -7,7 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import spring.webmvc.application.service.CurationService
-import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.enums.CurationPlacement
 import spring.webmvc.presentation.dto.request.CurationCreateRequest
 import spring.webmvc.presentation.dto.response.CurationDetailOffsetPageResponse
 import spring.webmvc.presentation.dto.response.CurationDetailResponse
@@ -33,9 +33,9 @@ class CurationController(
     @GetMapping
     @PreAuthorize("hasAuthority('CURATION_READ')")
     fun findCurations(
-        @RequestParam category: CurationCategory,
+        @RequestParam placement: CurationPlacement,
     ): CurationListResponse {
-        val results = curationService.findCurations(category)
+        val results = curationService.findCurations(placement)
 
         return CurationListResponse.of(results = results)
     }

@@ -3,9 +3,9 @@ package spring.webmvc.application.dto.result
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.Transport
+import spring.webmvc.domain.model.entity.UserProductBadge
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import java.time.Instant
 
 data class ProductSummaryResult(
@@ -16,11 +16,11 @@ data class ProductSummaryResult(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureAttribute: ProductExposureAttribute,
+    val exposureAttribute: ProductExposureAttributeResult,
     val createdAt: Instant,
 ) {
     companion object {
-        fun of(product: Product) = ProductSummaryResult(
+        fun of(product: Product, badge: UserProductBadge? = null) = ProductSummaryResult(
             id = checkNotNull(product.id),
             category = product.category,
             status = product.status,
@@ -28,7 +28,7 @@ data class ProductSummaryResult(
             description = product.description,
             price = product.price,
             quantity = product.quantity,
-            exposureAttribute = product.exposureAttribute,
+            exposureAttribute = ProductExposureAttributeResult.of(product.exposureAttribute, badge),
             createdAt = product.createdAt,
         )
     }
@@ -42,7 +42,7 @@ data class ProductDetailResult(
     val description: String,
     val price: Long,
     val quantity: Long,
-    val exposureAttribute: ProductExposureAttribute,
+    val exposureAttribute: ProductExposureAttributeResult,
     val createdAt: Instant,
     val attribute: ProductAttributeResult,
 ) {
@@ -50,6 +50,7 @@ data class ProductDetailResult(
         fun of(
             product: Product,
             attributeResult: ProductAttributeResult,
+            badge: UserProductBadge? = null,
         ) = ProductDetailResult(
             id = checkNotNull(product.id),
             category = product.category,
@@ -58,7 +59,7 @@ data class ProductDetailResult(
             description = product.description,
             price = product.price,
             quantity = product.quantity,
-            exposureAttribute = product.exposureAttribute,
+            exposureAttribute = ProductExposureAttributeResult.of(product.exposureAttribute, badge),
             createdAt = product.createdAt,
             attribute = attributeResult,
         )

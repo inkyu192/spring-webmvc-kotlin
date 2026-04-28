@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import spring.webmvc.application.dto.query.ProductCursorPageQuery
 import spring.webmvc.domain.model.entity.Accommodation
+import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.config.RepositoryTest
@@ -27,7 +28,7 @@ class ProductQuerydslRepositoryTest(
 
     @BeforeEach
     fun setUp() {
-        val p1 = spring.webmvc.domain.model.entity.Product.create(
+        val p1 = Product.create(
             category = ProductCategory.ACCOMMODATION,
             name = "product1",
             description = "description",
@@ -47,7 +48,7 @@ class ProductQuerydslRepositoryTest(
             checkOutTime = java.time.Instant.now().plusSeconds(86400)
         )
 
-        val p2 = spring.webmvc.domain.model.entity.Product.create(
+        val p2 = Product.create(
             category = ProductCategory.ACCOMMODATION,
             name = "product2",
             description = "description",
@@ -67,7 +68,7 @@ class ProductQuerydslRepositoryTest(
             checkOutTime = java.time.Instant.now().plusSeconds(86400)
         )
 
-        val p3 = spring.webmvc.domain.model.entity.Product.create(
+        val p3 = Product.create(
             category = ProductCategory.ACCOMMODATION,
             name = "product3",
             description = "description",
@@ -87,7 +88,7 @@ class ProductQuerydslRepositoryTest(
             checkOutTime = java.time.Instant.now().plusSeconds(86400)
         )
 
-        val p4 = spring.webmvc.domain.model.entity.Product.create(
+        val p4 = Product.create(
             category = ProductCategory.ACCOMMODATION,
             name = "product4",
             description = "description",

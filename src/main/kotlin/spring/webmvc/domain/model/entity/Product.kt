@@ -8,24 +8,40 @@ import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.exception.InvalidEntityStatusException
 
 @Entity
-class Product(
-    @Enumerated(EnumType.STRING)
+class Product protected constructor(
+    @field:Enumerated(EnumType.STRING)
     val category: ProductCategory,
 
-    @Enumerated(EnumType.STRING)
-    var status: ProductStatus,
-
-    var name: String,
-    var description: String,
-    var price: Long,
-    var quantity: Long,
-
-    @Convert(converter = ProductExposureAttributeConverter::class)
-    var exposureAttribute: ProductExposureAttribute,
+    status: ProductStatus,
+    name: String,
+    description: String,
+    price: Long,
+    quantity: Long,
+    exposureAttribute: ProductExposureAttribute,
 ) : BaseCreator() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
+        protected set
+
+    @Enumerated(EnumType.STRING)
+    var status = status
+        protected set
+
+    var name = name
+        protected set
+
+    var description = description
+        protected set
+
+    var price = price
+        protected set
+
+    var quantity = quantity
+        protected set
+
+    @Convert(converter = ProductExposureAttributeConverter::class)
+    var exposureAttribute = exposureAttribute
         protected set
 
     companion object {

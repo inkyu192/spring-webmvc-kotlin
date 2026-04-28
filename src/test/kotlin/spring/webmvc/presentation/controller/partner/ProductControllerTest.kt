@@ -205,6 +205,10 @@ class ProductControllerTest {
                             .description("추천 상품 여부").optional(),
                         PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isLowStock")
                             .description("품절 임박 여부").optional(),
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isRecommended")
+                            .description("추천 여부").optional(),
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isPersonalPick")
+                            .description("개인 추천 여부").optional(),
                         PayloadDocumentation.fieldWithPath("content[].createdAt").description("생성일시")
                     )
                 )
@@ -245,6 +249,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부")
+                            .optional(),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부")
+                            .optional(),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
@@ -293,6 +301,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부")
+                            .optional(),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부")
+                            .optional(),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
@@ -384,6 +396,8 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
@@ -472,6 +486,8 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
@@ -567,6 +583,8 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
@@ -660,6 +678,8 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isNewArrival").description("신상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isFeatured").description("추천 상품 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),

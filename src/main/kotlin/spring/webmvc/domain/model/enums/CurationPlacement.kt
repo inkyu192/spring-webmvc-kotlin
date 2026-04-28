@@ -1,9 +1,7 @@
 package spring.webmvc.domain.model.enums
 
-enum class CurationCategory {
+enum class CurationPlacement {
     HOME,
-    CATEGORY,
-    EVENT,
     PROMOTION,
-    MY_PAGE,
+    PRODUCT,
 }

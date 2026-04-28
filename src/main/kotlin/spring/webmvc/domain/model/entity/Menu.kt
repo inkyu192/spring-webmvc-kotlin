@@ -4,28 +4,19 @@ import jakarta.persistence.*
 
 @Entity
 class Menu protected constructor(
-    translationCode: String,
-    path: String?,
-    sortOrder: Long?,
-    parent: Menu?,
+    val translationCode: String,
+
+    val path: String?,
+
+    val sortOrder: Long?,
+
+    @field:ManyToOne(fetch = FetchType.LAZY)
+    @field:JoinColumn(name = "parent_id")
+    val parent: Menu?,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
-        protected set
-
-    var translationCode = translationCode
-        protected set
-
-    var path = path
-        protected set
-
-    var sortOrder = sortOrder
-        protected set
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    var parent = parent
         protected set
 
     companion object {

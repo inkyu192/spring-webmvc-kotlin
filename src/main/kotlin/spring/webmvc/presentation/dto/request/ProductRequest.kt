@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Min
 import spring.webmvc.application.dto.command.*
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
-import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import java.time.Instant
 
 data class ProductCreateRequest(
@@ -32,7 +31,7 @@ data class ProductCreateRequest(
     )
     val attribute: ProductAttributePutRequest,
 
-    val exposureAttribute: ProductExposureAttribute,
+    val exposureAttribute: ProductExposureAttributeRequest,
 ) {
     fun toCommand() = ProductCreateCommand(
         category = category,
@@ -41,7 +40,7 @@ data class ProductCreateRequest(
         price = price,
         quantity = quantity,
         attribute = attribute.toCommand(),
-        exposureAttribute = exposureAttribute,
+        exposureAttribute = exposureAttribute.toVO(),
     )
 }
 
@@ -63,7 +62,7 @@ data class ProductUpdateRequest(
     )
     val attribute: ProductAttributePutRequest,
 
-    val exposureAttribute: ProductExposureAttribute,
+    val exposureAttribute: ProductExposureAttributeRequest,
 ) {
     fun toCommand(id: Long) = ProductUpdateCommand(
         id = id,
@@ -73,7 +72,7 @@ data class ProductUpdateRequest(
         price = price,
         quantity = quantity,
         attribute = attribute.toCommand(),
-        exposureAttribute = exposureAttribute,
+        exposureAttribute = exposureAttribute.toVO(),
     )
 }
 

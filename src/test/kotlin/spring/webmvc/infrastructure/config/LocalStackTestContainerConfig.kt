@@ -11,7 +11,7 @@ class LocalStackTestContainerConfig {
     companion object {
         @Container
         val localStackContainer: LocalStackContainer =
-            LocalStackContainer(DockerImageName.parse("localstack/localstack:3.8.1"))
+            LocalStackContainer(DockerImageName.parse("localstack/localstack:3.8"))
                 .withServices(
                     LocalStackContainer.Service.S3,
                     LocalStackContainer.Service.DYNAMODB,

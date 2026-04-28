@@ -4,14 +4,11 @@ import jakarta.persistence.*
 
 @Entity
 class Role protected constructor(
-    name: String,
+    val name: String,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
-        protected set
-
-    var name = name
         protected set
 
     @OneToMany(mappedBy = "role", cascade = [CascadeType.ALL], orphanRemoval = true)

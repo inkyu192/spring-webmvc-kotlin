@@ -1,10 +1,17 @@
 package spring.webmvc.application.dto.command
 
-import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.enums.CurationLayout
+import spring.webmvc.domain.model.enums.CurationPlacement
+import spring.webmvc.domain.model.enums.CurationType
+import spring.webmvc.domain.model.vo.CurationAttribute
+import spring.webmvc.domain.model.vo.CurationExposureAttribute
 
 data class CurationCreateCommand(
     val title: String,
-    val category: CurationCategory,
+    val placement: CurationPlacement,
+    val type: CurationType = CurationType.MANUAL,
+    val attribute: CurationAttribute = CurationAttribute(keyword = null),
+    val exposureAttribute: CurationExposureAttribute = CurationExposureAttribute(layout = CurationLayout.CAROUSEL),
     val isExposed: Boolean,
     val sortOrder: Long,
     val products: List<CurationProductCreateCommand>,

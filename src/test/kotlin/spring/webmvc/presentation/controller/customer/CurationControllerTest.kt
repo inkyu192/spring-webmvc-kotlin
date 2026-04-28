@@ -17,7 +17,7 @@ import spring.webmvc.application.dto.result.CurationSummaryResult
 import spring.webmvc.application.service.CurationService
 import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.*
-import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.enums.CurationPlacement
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.vo.ProductExposureAttribute
 import spring.webmvc.infrastructure.config.ControllerTest
@@ -38,7 +38,7 @@ class CurationControllerTest {
         curation1 = spyk(
             Curation.create(
                 title = "여름 휴가 패키지",
-                category = CurationCategory.HOME,
+                placement = CurationPlacement.HOME,
                 isExposed = true,
                 sortOrder = 1L
             )
@@ -61,7 +61,7 @@ class CurationControllerTest {
         ).apply { every { id } returns 1L }
 
         product1 = spyk(
-            Accommodation(
+            Accommodation.create(
                 product = mockProduct1,
                 place = "제주도",
                 checkInTime = java.time.Instant.now(),
@@ -86,7 +86,7 @@ class CurationControllerTest {
         ).apply { every { id } returns 2L }
 
         product2 = spyk(
-            Transport(
+            Transport.create(
                 product = mockProduct2,
                 departureLocation = "Seoul",
                 arrivalLocation = "Busan",
@@ -98,29 +98,35 @@ class CurationControllerTest {
 
     @Test
     fun findCurations() {
-        val category = CurationCategory.HOME
+        val placement = CurationPlacement.HOME
         val curationResult1 = CurationSummaryResult.of(curation1)
 
         val result = listOf(curationResult1)
 
-        every { curationService.findCurationsCached(category) } returns result
+        every { curationService.findCurationsCached(placement) } returns result
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/customer/curations")
-                .queryParam("category", category.name)
+                .queryParam("placement", placement.name)
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andDo(
                 MockMvcRestDocumentation.document(
                     "customer-curation-list",
                     RequestDocumentation.queryParameters(
-                        RequestDocumentation.parameterWithName("category").description("큐레이션 카테고리")
+                        RequestDocumentation.parameterWithName("placement").description("큐레이션 배치")
                     ),
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("size").description("큐레이션 수"),
                         PayloadDocumentation.fieldWithPath("curations[].id").description("큐레이션 ID"),
                         PayloadDocumentation.fieldWithPath("curations[].title").description("큐레이션 제목"),
-                        PayloadDocumentation.fieldWithPath("curations[].category").description("큐레이션 카테고리")
+                        PayloadDocumentation.fieldWithPath("curations[].placement").description("큐레이션 배치"),
+                        PayloadDocumentation.fieldWithPath("curations[].type")
+                            .description("큐레이션 타입 (MANUAL, SEARCH, PERSONALIZED)"),
+                        PayloadDocumentation.fieldWithPath("curations[].exposureAttribute")
+                            .description("큐레이션 노출 속성"),
+                        PayloadDocumentation.fieldWithPath("curations[].exposureAttribute.layout")
+                            .description("큐레이션 레이아웃 (GRID, CAROUSEL, LIST)")
                     )
                 )
             )
@@ -175,7 +181,13 @@ class CurationControllerTest {
                     PayloadDocumentation.responseFields(
                         PayloadDocumentation.fieldWithPath("id").description("큐레이션 ID"),
                         PayloadDocumentation.fieldWithPath("title").description("큐레이션 제목"),
-                        PayloadDocumentation.fieldWithPath("category").description("큐레이션 카테고리"),
+                        PayloadDocumentation.fieldWithPath("placement").description("큐레이션 배치"),
+                        PayloadDocumentation.fieldWithPath("type")
+                            .description("큐레이션 타입 (MANUAL, SEARCH, PERSONALIZED)"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute")
+                            .description("큐레이션 노출 속성"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.layout")
+                            .description("큐레이션 레이아웃 (GRID, CAROUSEL, LIST)"),
                         PayloadDocumentation.fieldWithPath("products.size").description("페이지 크기"),
                         PayloadDocumentation.fieldWithPath("products.hasNext").description("다음 페이지 존재 여부"),
                         PayloadDocumentation.fieldWithPath("products.nextCursorId").description("다음 커서 ID"),
@@ -191,7 +203,11 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isFeatured")
                             .description("추천 상품 여부"),
                         PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isLowStock")
-                            .description("품절 임박 여부")
+                            .description("품절 임박 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isRecommended")
+                            .description("추천 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isPersonalPick")
+                            .description("개인 추천 여부")
                     )
                 )
             )

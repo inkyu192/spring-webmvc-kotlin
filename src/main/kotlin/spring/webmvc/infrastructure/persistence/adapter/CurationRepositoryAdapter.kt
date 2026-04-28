@@ -3,7 +3,7 @@ package spring.webmvc.infrastructure.persistence.adapter
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import spring.webmvc.domain.model.entity.Curation
-import spring.webmvc.domain.model.enums.CurationCategory
+import spring.webmvc.domain.model.enums.CurationPlacement
 import spring.webmvc.domain.repository.CurationRepository
 import spring.webmvc.infrastructure.persistence.jpa.CurationJpaRepository
 
@@ -13,8 +13,8 @@ class CurationRepositoryAdapter(
 ) : CurationRepository {
     override fun findById(id: Long): Curation? = jpaRepository.findByIdOrNull(id)
 
-    override fun findAllByCategory(category: CurationCategory) =
-        jpaRepository.findByCategoryAndIsExposedIsTrueOrderBySortOrder(category)
+    override fun findAllByPlacement(placement: CurationPlacement) =
+        jpaRepository.findByPlacementAndIsExposedIsTrueOrderBySortOrder(placement)
 
     override fun save(curation: Curation): Curation = jpaRepository.save(curation)
 }
