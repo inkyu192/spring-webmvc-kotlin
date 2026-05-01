@@ -118,11 +118,11 @@ data class CurationProductResponse(
 }
 
 data class CurationAttributeResponse(
-    val keyword: String?,
+    val tagIds: List<Long>,
 ) {
     companion object {
         fun of(attribute: CurationAttribute) = CurationAttributeResponse(
-            keyword = attribute.keyword,
+            tagIds = attribute.tagIds,
         )
     }
 }

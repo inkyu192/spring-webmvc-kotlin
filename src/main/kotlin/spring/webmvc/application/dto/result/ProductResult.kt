@@ -2,6 +2,7 @@ package spring.webmvc.application.dto.result
 
 import spring.webmvc.domain.model.entity.Accommodation
 import spring.webmvc.domain.model.entity.Product
+import spring.webmvc.domain.model.entity.Tag
 import spring.webmvc.domain.model.entity.Transport
 import spring.webmvc.domain.model.entity.UserProductBadge
 import spring.webmvc.domain.model.enums.ProductCategory
@@ -45,12 +46,14 @@ data class ProductDetailResult(
     val exposureAttribute: ProductExposureAttributeResult,
     val createdAt: Instant,
     val attribute: ProductAttributeResult,
+    val tags: List<TagResult>,
 ) {
     companion object {
         fun of(
             product: Product,
             attributeResult: ProductAttributeResult,
             badge: UserProductBadge? = null,
+            tags: List<Tag> = emptyList(),
         ) = ProductDetailResult(
             id = checkNotNull(product.id),
             category = product.category,
@@ -62,6 +65,7 @@ data class ProductDetailResult(
             exposureAttribute = ProductExposureAttributeResult.of(product.exposureAttribute, badge),
             createdAt = product.createdAt,
             attribute = attributeResult,
+            tags = tags.map { TagResult.of(it) },
         )
     }
 }
@@ -94,6 +98,18 @@ data class AccommodationResult(
             place = accommodation.place,
             checkInTime = accommodation.checkInTime,
             checkOutTime = accommodation.checkOutTime,
+        )
+    }
+}
+
+data class TagResult(
+    val id: Long,
+    val name: String,
+) {
+    companion object {
+        fun of(tag: Tag) = TagResult(
+            id = checkNotNull(tag.id),
+            name = tag.name,
         )
     }
 }

@@ -124,7 +124,7 @@ class CurationControllerTest {
             title = "인기상품",
             placement = CurationPlacement.HOME,
             type = CurationType.MANUAL,
-            attribute = CurationAttribute(keyword = null),
+            attribute = CurationAttribute(tagIds = emptyList()),
             exposureAttribute = CurationExposureAttributeResult(layout = CurationLayout.CAROUSEL),
             products = listOf(productResult)
         )
@@ -175,7 +175,7 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("type")
                             .description("큐레이션 타입 (MANUAL, SEARCH, PERSONALIZED)"),
                         PayloadDocumentation.fieldWithPath("attribute").description("큐레이션 속성 (타입별 추가 정보)").optional(),
-                        PayloadDocumentation.fieldWithPath("attribute.keyword").description("검색 키워드 (SEARCH 타입일 경우 사용)")
+                        PayloadDocumentation.fieldWithPath("attribute.tagIds").description("검색 태그 ID 목록 (SEARCH 타입일 경우 사용)")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("exposureAttribute").description("큐레이션 노출 속성"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.layout")
@@ -297,7 +297,7 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("type")
                             .description("큐레이션 타입 (MANUAL, SEARCH, PERSONALIZED)"),
                         PayloadDocumentation.fieldWithPath("attribute").description("큐레이션 속성 (타입별 추가 정보)").optional(),
-                        PayloadDocumentation.fieldWithPath("attribute.keyword").description("검색 키워드 (SEARCH 타입일 경우 사용)")
+                        PayloadDocumentation.fieldWithPath("attribute.tagIds").description("검색 태그 ID 목록 (SEARCH 타입일 경우 사용)")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("exposureAttribute").description("큐레이션 노출 속성"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.layout")

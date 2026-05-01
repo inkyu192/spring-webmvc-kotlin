@@ -42,6 +42,7 @@ data class ProductDetailResponse(
     val exposureAttribute: ProductExposureAttributeResponse,
     val createdAt: Instant,
     val attribute: ProductAttributeResponse,
+    val tags: List<TagResponse>,
 ) {
     companion object {
         fun of(result: ProductDetailResult) = ProductDetailResponse(
@@ -55,6 +56,7 @@ data class ProductDetailResponse(
             exposureAttribute = ProductExposureAttributeResponse.of(result.exposureAttribute),
             createdAt = result.createdAt,
             attribute = ProductAttributeResponse.of(result.attribute),
+            tags = result.tags.map { TagResponse.of(it) },
         )
     }
 }
@@ -94,6 +96,18 @@ data class AccommodationResponse(
             place = result.place,
             checkInTime = result.checkInTime,
             checkOutTime = result.checkOutTime,
+        )
+    }
+}
+
+data class TagResponse(
+    val id: Long,
+    val name: String,
+) {
+    companion object {
+        fun of(result: TagResult) = TagResponse(
+            id = result.id,
+            name = result.name,
         )
     }
 }

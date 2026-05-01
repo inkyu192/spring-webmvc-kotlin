@@ -10,7 +10,7 @@ data class CurationCreateCommand(
     val title: String,
     val placement: CurationPlacement,
     val type: CurationType = CurationType.MANUAL,
-    val attribute: CurationAttribute = CurationAttribute(keyword = null),
+    val attribute: CurationAttribute = CurationAttribute(tagIds = emptyList()),
     val exposureAttribute: CurationExposureAttribute = CurationExposureAttribute(layout = CurationLayout.CAROUSEL),
     val isExposed: Boolean,
     val sortOrder: Long,

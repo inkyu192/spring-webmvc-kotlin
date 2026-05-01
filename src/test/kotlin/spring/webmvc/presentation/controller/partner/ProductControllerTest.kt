@@ -14,6 +14,7 @@ import org.springframework.http.MediaType
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
+import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.test.web.servlet.MockMvc
@@ -132,11 +133,13 @@ class ProductControllerTest {
 
         transportResult = ProductDetailResult.of(
             product = transport.product,
-            attributeResult = TransportResult.of(transport)
+            attributeResult = TransportResult.of(transport),
+            tags = emptyList()
         )
         accommodationResult = ProductDetailResult.of(
             product = accommodation.product,
-            attributeResult = AccommodationResult.of(accommodation)
+            attributeResult = AccommodationResult.of(accommodation),
+            tags = emptyList()
         )
     }
 
@@ -259,7 +262,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
                         PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
                         PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간"),
+                        PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
                     )
                 )
             )
@@ -310,7 +316,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간"),
+                        PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
                     )
                 )
             )
@@ -403,7 +412,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
                         PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
                         PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간"),
+                        PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
                     )
                 )
             )
@@ -492,7 +504,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간"),
+                        PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
                     )
                 )
             )
@@ -590,7 +605,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
                         PayloadDocumentation.fieldWithPath("attribute.arrivalLocation").description("도착지"),
                         PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
-                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간")
+                        PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간"),
+                        PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
                     )
                 )
             )
@@ -684,7 +702,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
-                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간")
+                        PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간"),
+                        PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
                     )
                 )
             )

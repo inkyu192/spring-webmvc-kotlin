@@ -19,6 +19,7 @@ import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.ProductTagRepository
 import spring.webmvc.domain.repository.UserProductBadgeRepository
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
 
@@ -27,6 +28,7 @@ import spring.webmvc.infrastructure.exception.NotFoundEntityException
 class ProductService(
     productStrategies: List<ProductAttributeStrategy>,
     private val productRepository: ProductRepository,
+    private val productTagRepository: ProductTagRepository,
     private val userProductBadgeRepository: UserProductBadgeRepository,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
@@ -81,8 +83,14 @@ class ProductService(
         } else {
             null
         }
+        val tags = productTagRepository.findTagsByProductId(id)
 
-        return ProductDetailResult.of(product = product, attributeResult = attributeResult, badge = badge)
+        return ProductDetailResult.of(
+            product = product,
+            attributeResult = attributeResult,
+            badge = badge,
+            tags = tags,
+        )
     }
 
     fun incrementProductViewCount(id: Long) {
@@ -108,7 +116,7 @@ class ProductService(
 
         val attributeResult = strategy.create(product = product, command = command.attribute)
 
-        return ProductDetailResult.of(product = product, attributeResult = attributeResult)
+        return ProductDetailResult.of(product = product, attributeResult = attributeResult, tags = emptyList())
     }
 
     @Transactional
@@ -137,7 +145,7 @@ class ProductService(
 
         val attributeResult = strategy.update(productId = command.id, command = command.attribute)
 
-        return ProductDetailResult.of(product = product, attributeResult = attributeResult)
+        return ProductDetailResult.of(product = product, attributeResult = attributeResult, tags = emptyList())
     }
 
     @Transactional

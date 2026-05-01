@@ -7,10 +7,12 @@ data class ProductOffsetPageQuery(
     val pageable: Pageable,
     val name: String?,
     val status: ProductStatus?,
+    val tagIds: List<Long> = emptyList(),
 )
 
 data class ProductCursorPageQuery(
     val cursorId: Long?,
     val name: String?,
     val status: ProductStatus?,
+    val tagIds: List<Long> = emptyList(),
 )

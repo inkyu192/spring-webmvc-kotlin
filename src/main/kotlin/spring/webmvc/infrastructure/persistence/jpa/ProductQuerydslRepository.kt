@@ -9,6 +9,7 @@ import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.entity.QProduct.product
+import spring.webmvc.domain.model.entity.QProductTag.productTag
 import spring.webmvc.domain.model.enums.ProductStatus
 
 @Repository
@@ -20,12 +21,20 @@ class ProductQuerydslRepository(
     }
 
     fun findAllWithCursorPage(query: ProductCursorPageQuery): CursorPage<Product> {
-        val content = jpaQueryFactory
+        val baseQuery = jpaQueryFactory
             .selectFrom(product)
+            .distinct()
+
+        if (query.tagIds.isNotEmpty()) {
+            baseQuery.innerJoin(productTag).on(productTag.product.eq(product))
+        }
+
+        val content = baseQuery
             .where(
                 loeProductId(query.cursorId),
                 likeName(query.name),
                 eqStatus(query.status),
+                inTagIds(query.tagIds),
             )
             .orderBy(product.id.desc())
             .limit(DEFAULT_PAGE_SIZE + 1)
@@ -35,20 +44,32 @@ class ProductQuerydslRepository(
     }
 
     fun findAllWithOffsetPage(query: ProductOffsetPageQuery): Page<Product> {
-        val count = jpaQueryFactory
-            .select(product.count())
+        val countQuery = jpaQueryFactory
+            .select(product.countDistinct())
             .from(product)
+
+        val contentQuery = jpaQueryFactory
+            .selectFrom(product)
+            .distinct()
+
+        if (query.tagIds.isNotEmpty()) {
+            countQuery.innerJoin(productTag).on(productTag.product.eq(product))
+            contentQuery.innerJoin(productTag).on(productTag.product.eq(product))
+        }
+
+        val count = countQuery
             .where(
                 likeName(query.name),
                 eqStatus(query.status),
+                inTagIds(query.tagIds),
             )
             .fetchOne() ?: 0L
 
-        val content = jpaQueryFactory
-            .selectFrom(product)
+        val content = contentQuery
             .where(
                 likeName(query.name),
                 eqStatus(query.status),
+                inTagIds(query.tagIds),
             )
             .orderBy(product.id.desc())
             .limit(query.pageable.pageSize.toLong())
@@ -63,4 +84,7 @@ class ProductQuerydslRepository(
     private fun likeName(name: String?) = name?.let { product.name.like("%$name%") }
 
     private fun eqStatus(status: ProductStatus?) = status?.let { product.status.eq(status) }
+
+    private fun inTagIds(tagIds: List<Long>) =
+        if (tagIds.isEmpty()) null else productTag.tag.id.`in`(tagIds)
 }

@@ -1,6 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS translation;
+DROP TABLE IF EXISTS product_tag;
+DROP TABLE IF EXISTS tag;
 DROP TABLE IF EXISTS curation_product;
 DROP TABLE IF EXISTS curation;
 DROP TABLE IF EXISTS order_product;
@@ -187,6 +189,24 @@ CREATE TABLE product
     updated_by         BIGINT,
     created_at         DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at         DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+);
+
+CREATE TABLE tag
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(255) NOT NULL UNIQUE,
+    created_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+);
+
+CREATE TABLE product_tag
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    tag_id     BIGINT NOT NULL,
+    CONSTRAINT fk_product_tag_product FOREIGN KEY (product_id) REFERENCES product (id),
+    CONSTRAINT fk_product_tag_tag FOREIGN KEY (tag_id) REFERENCES tag (id),
+    UNIQUE KEY uk_product_tag (product_id, tag_id)
 );
 
 CREATE TABLE transport

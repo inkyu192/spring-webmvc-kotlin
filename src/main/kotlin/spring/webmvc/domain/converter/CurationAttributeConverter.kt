@@ -17,5 +17,5 @@ class CurationAttributeConverter(
 
     override fun convertToEntityAttribute(dbData: String?): CurationAttribute =
         dbData?.let { objectMapper.readValue<CurationAttribute>(it) }
-            ?: CurationAttribute(keyword = null)
+            ?: CurationAttribute(tagIds = emptyList())
 }

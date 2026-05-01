@@ -517,6 +517,32 @@ VALUES ('Gender', 'ko', '성별', NOW(6), NOW(6)),
        ('menu.curations.management', 'ko', '큐레이션관리', NOW(6), NOW(6)),
        ('menu.curations.management', 'en', 'Curation Management', NOW(6), NOW(6));
 
+INSERT INTO tag (id, name, created_at, updated_at)
+VALUES (1, '동남아', NOW(6), NOW(6)),
+       (2, '일본', NOW(6), NOW(6)),
+       (3, '유럽', NOW(6), NOW(6)),
+       (4, '특가', NOW(6), NOW(6)),
+       (5, '럭셔리', NOW(6), NOW(6)),
+       (6, '가족여행', NOW(6), NOW(6)),
+       (7, '비즈니스', NOW(6), NOW(6)),
+       (8, '제주', NOW(6), NOW(6));
+
+INSERT INTO product_tag (product_id, tag_id)
+VALUES -- 동남아 항공권
+       (3, 1), (5, 1), (9, 1), (10, 1), (11, 1), (12, 1), (16, 1),
+       -- 일본 항공권
+       (1, 2), (2, 2),
+       -- 유럽 항공권
+       (8, 3), (20, 3), (21, 3), (22, 3), (23, 3),
+       -- 특가 상품
+       (2, 4), (5, 4), (9, 4), (10, 4), (13, 4), (29, 4), (36, 4), (37, 4), (42, 4),
+       -- 럭셔리 숙박
+       (33, 5), (34, 5), (38, 5),
+       -- 제주 숙박
+       (27, 8), (35, 8), (40, 8), (48, 8);
+
+ALTER TABLE tag AUTO_INCREMENT = 51;
+ALTER TABLE product_tag AUTO_INCREMENT = 101;
 ALTER TABLE permission AUTO_INCREMENT = 51;
 ALTER TABLE role AUTO_INCREMENT = 51;
 ALTER TABLE menu AUTO_INCREMENT = 51;

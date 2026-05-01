@@ -43,9 +43,9 @@ data class CurationProductCreateRequest(
 }
 
 data class CurationAttributeRequest(
-    val keyword: String? = null,
+    val tagIds: List<Long> = emptyList(),
 ) {
-    fun toAttribute() = CurationAttribute(keyword = keyword)
+    fun toAttribute() = CurationAttribute(tagIds = tagIds)
 }
 
 data class CurationExposureAttributeRequest(

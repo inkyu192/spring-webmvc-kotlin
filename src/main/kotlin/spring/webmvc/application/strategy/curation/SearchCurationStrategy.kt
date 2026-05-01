@@ -27,20 +27,20 @@ class SearchCurationStrategy(
         userId: Long?,
         cursorId: Long?
     ): CurationCursorPageResult {
-        val keyword = curation.attribute.keyword
-            ?: return emptyCursorResult(curation)
+        val tagIds = curation.attribute.tagIds
+        if (tagIds.isEmpty()) return emptyCursorResult(curation)
 
         val query = ProductCursorPageQuery(
             cursorId = cursorId,
-            name = keyword,
+            name = null,
             status = ProductStatus.SELLING,
+            tagIds = tagIds,
         )
 
         val page = productRepository.findAllWithCursorPage(query)
 
         val badgeMap = if (userId != null) {
             val productIds = page.content.mapNotNull { it.id }
-
             userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
                 .associateBy { it.sk.removePrefix("PRODUCT#").toLong() }
         } else {
@@ -51,13 +51,14 @@ class SearchCurationStrategy(
     }
 
     override fun findProductsWithOffsetPage(curation: Curation, pageable: Pageable): CurationOffsetPageResult {
-        val keyword = curation.attribute.keyword
-            ?: return CurationOffsetPageResult.empty(curation)
+        val tagIds = curation.attribute.tagIds
+        if (tagIds.isEmpty()) return CurationOffsetPageResult.empty(curation)
 
         val query = ProductOffsetPageQuery(
             pageable = pageable,
-            name = keyword,
+            name = null,
             status = null,
+            tagIds = tagIds,
         )
         val page = productRepository.findAllWithOffsetPage(query)
         return CurationOffsetPageResult.ofProducts(curation = curation, page = page)

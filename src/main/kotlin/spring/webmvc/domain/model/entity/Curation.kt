@@ -46,7 +46,7 @@ class Curation protected constructor(
             title: String,
             placement: CurationPlacement,
             type: CurationType = CurationType.MANUAL,
-            attribute: CurationAttribute = CurationAttribute(keyword = null),
+            attribute: CurationAttribute = CurationAttribute(tagIds = emptyList()),
             exposureAttribute: CurationExposureAttribute = CurationExposureAttribute(layout = CurationLayout.CAROUSEL),
             isExposed: Boolean,
             sortOrder: Long,
