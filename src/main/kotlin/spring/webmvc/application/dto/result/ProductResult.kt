@@ -1,10 +1,6 @@
 package spring.webmvc.application.dto.result
 
-import spring.webmvc.domain.model.entity.Accommodation
-import spring.webmvc.domain.model.entity.Product
-import spring.webmvc.domain.model.entity.Tag
-import spring.webmvc.domain.model.entity.Transport
-import spring.webmvc.domain.model.entity.UserProductBadge
+import spring.webmvc.domain.model.entity.*
 import spring.webmvc.domain.model.enums.ProductCategory
 import spring.webmvc.domain.model.enums.ProductStatus
 import java.time.Instant
@@ -21,7 +17,12 @@ data class ProductSummaryResult(
     val createdAt: Instant,
 ) {
     companion object {
-        fun of(product: Product, badge: UserProductBadge? = null) = ProductSummaryResult(
+        fun of(
+            product: Product,
+            badge: UserProductBadge? = null,
+            isRecentlyViewed: Boolean = false,
+            isWished: Boolean = false,
+        ) = ProductSummaryResult(
             id = checkNotNull(product.id),
             category = product.category,
             status = product.status,
@@ -29,7 +30,12 @@ data class ProductSummaryResult(
             description = product.description,
             price = product.price,
             quantity = product.quantity,
-            exposureAttribute = ProductExposureAttributeResult.of(product.exposureAttribute, badge),
+            exposureAttribute = ProductExposureAttributeResult.of(
+                product.exposureAttribute,
+                badge,
+                isRecentlyViewed,
+                isWished
+            ),
             createdAt = product.createdAt,
         )
     }
@@ -54,6 +60,7 @@ data class ProductDetailResult(
             attributeResult: ProductAttributeResult,
             badge: UserProductBadge? = null,
             tags: List<Tag> = emptyList(),
+            isWished: Boolean = false,
         ) = ProductDetailResult(
             id = checkNotNull(product.id),
             category = product.category,
@@ -62,7 +69,11 @@ data class ProductDetailResult(
             description = product.description,
             price = product.price,
             quantity = product.quantity,
-            exposureAttribute = ProductExposureAttributeResult.of(product.exposureAttribute, badge),
+            exposureAttribute = ProductExposureAttributeResult.of(
+                product.exposureAttribute,
+                badge,
+                isWished = isWished
+            ),
             createdAt = product.createdAt,
             attribute = attributeResult,
             tags = tags.map { TagResult.of(it) },

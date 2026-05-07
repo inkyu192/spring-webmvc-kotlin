@@ -5,9 +5,9 @@ import java.time.Instant
 
 @Entity
 class Accommodation protected constructor(
-    @field:MapsId
-    @field:OneToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "product_id")
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     val product: Product,
 
     place: String,

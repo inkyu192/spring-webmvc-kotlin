@@ -10,11 +10,15 @@ data class ProductExposureAttributeResult(
     val isLowStock: Boolean,
     val isRecommended: Boolean,
     val isPersonalPick: Boolean,
+    val isRecentlyViewed: Boolean,
+    val isWished: Boolean,
 ) {
     companion object {
         fun of(
             vo: ProductExposureAttribute,
             badge: UserProductBadge? = null,
+            isRecentlyViewed: Boolean = false,
+            isWished: Boolean = false,
         ) = ProductExposureAttributeResult(
             isPromotional = vo.isPromotional,
             isNewArrival = vo.isNewArrival,
@@ -22,6 +26,8 @@ data class ProductExposureAttributeResult(
             isLowStock = vo.isLowStock,
             isRecommended = badge?.isRecommended ?: false,
             isPersonalPick = badge?.isPersonalPick ?: false,
+            isRecentlyViewed = isRecentlyViewed,
+            isWished = isWished,
         )
     }
 }

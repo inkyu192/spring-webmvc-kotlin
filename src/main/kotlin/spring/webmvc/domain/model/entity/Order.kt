@@ -8,6 +8,7 @@ import java.time.Instant
 @Entity
 @Table(name = "orders")
 class Order protected constructor(
+    val orderNumber: String,
     val orderedAt: Instant,
     status: OrderStatus,
 
@@ -32,7 +33,8 @@ class Order protected constructor(
         get() = _orderProducts.toList()
 
     companion object {
-        fun create(user: User) = Order(
+        fun create(orderNumber: String, user: User) = Order(
+            orderNumber = orderNumber,
             orderedAt = Instant.now(),
             status = OrderStatus.ORDER,
             user = user,

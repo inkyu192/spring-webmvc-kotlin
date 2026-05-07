@@ -48,5 +48,8 @@ class OrderRepositoryAdapter(
     override fun findByIdAndUserId(id: Long, userId: Long) =
         jpaRepository.findByIdAndUserId(id = id, userId = userId)
 
+    override fun findMaxOrderNumberByDate(date: String): String? =
+        jpaRepository.findMaxOrderNumberByDate(date = date)
+
     override fun save(order: Order): Order = jpaRepository.save(order)
 }

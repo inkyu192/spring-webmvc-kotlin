@@ -12,12 +12,14 @@ import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.enums.CurationType
 import spring.webmvc.domain.model.enums.ProductStatus
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.RecentlyViewedProductRepository
 import spring.webmvc.domain.repository.UserProductBadgeRepository
 
 @Component
 class SearchCurationStrategy(
     private val productRepository: ProductRepository,
     private val userProductBadgeRepository: UserProductBadgeRepository,
+    private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
 ) : CurationProductStrategy {
 
     override fun type(): CurationType = CurationType.SEARCH
@@ -39,15 +41,22 @@ class SearchCurationStrategy(
 
         val page = productRepository.findAllWithCursorPage(query)
 
-        val badgeMap = if (userId != null) {
+        var badgeMap: Map<Long, spring.webmvc.domain.model.entity.UserProductBadge> = emptyMap()
+        var recentlyViewedIds: Set<Long> = emptySet()
+
+        if (userId != null) {
             val productIds = page.content.mapNotNull { it.id }
-            userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
+            badgeMap = userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
                 .associateBy { it.sk.removePrefix("PRODUCT#").toLong() }
-        } else {
-            emptyMap()
+            recentlyViewedIds = recentlyViewedProductRepository.findProductIdsByUserIdWithinDays(userId)
         }
 
-        return CurationCursorPageResult.of(curation = curation, products = page.content, badgeMap = badgeMap)
+        return CurationCursorPageResult.of(
+            curation = curation,
+            products = page.content,
+            badgeMap = badgeMap,
+            recentlyViewedIds = recentlyViewedIds
+        )
     }
 
     override fun findProductsWithOffsetPage(curation: Curation, pageable: Pageable): CurationOffsetPageResult {

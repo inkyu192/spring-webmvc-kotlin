@@ -10,8 +10,8 @@ class Menu protected constructor(
 
     val sortOrder: Long?,
 
-    @field:ManyToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "parent_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     val parent: Menu?,
 ) : BaseTime() {
     @Id

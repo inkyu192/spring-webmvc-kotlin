@@ -64,19 +64,27 @@ data class CurationCursorPageResult(
             curation: Curation,
             page: CursorPage<CurationProduct>,
             badgeMap: Map<Long, UserProductBadge> = emptyMap(),
+            recentlyViewedIds: Set<Long> = emptySet(),
         ) = CurationCursorPageResult(
             id = checkNotNull(curation.id),
             title = curation.title,
             placement = curation.placement,
             type = curation.type,
             exposureAttribute = CurationExposureAttributeResult.of(curation.exposureAttribute),
-            productPage = page.map { CurationProductResult.of(curationProduct = it, badge = badgeMap[it.product.id]) },
+            productPage = page.map {
+                CurationProductResult.of(
+                    curationProduct = it,
+                    badge = badgeMap[it.product.id],
+                    isRecentlyViewed = it.product.id in recentlyViewedIds
+                )
+            },
         )
 
         fun of(
             curation: Curation,
             products: List<Product>,
             badgeMap: Map<Long, UserProductBadge> = emptyMap(),
+            recentlyViewedIds: Set<Long> = emptySet(),
         ) = CurationCursorPageResult(
             id = checkNotNull(curation.id),
             title = curation.title,
@@ -84,7 +92,13 @@ data class CurationCursorPageResult(
             type = curation.type,
             exposureAttribute = CurationExposureAttributeResult.of(curation.exposureAttribute),
             productPage = CursorPage(
-                content = products.map { CurationProductResult.of(product = it, badge = badgeMap[it.id]) },
+                content = products.map {
+                    CurationProductResult.of(
+                        product = it,
+                        badge = badgeMap[it.id],
+                        isRecentlyViewed = it.id in recentlyViewedIds
+                    )
+                },
                 size = products.size.toLong(),
                 hasNext = false,
                 nextCursorId = null,
@@ -149,20 +163,32 @@ data class CurationProductResult(
     val exposureAttribute: ProductExposureAttributeResult,
 ) {
     companion object {
-        fun of(curationProduct: CurationProduct, badge: UserProductBadge? = null) = CurationProductResult(
+        fun of(
+            curationProduct: CurationProduct,
+            badge: UserProductBadge? = null,
+            isRecentlyViewed: Boolean = false,
+        ) = CurationProductResult(
             id = checkNotNull(curationProduct.product.id),
             name = curationProduct.product.name,
             description = curationProduct.product.description,
             price = curationProduct.product.price,
-            exposureAttribute = ProductExposureAttributeResult.of(curationProduct.product.exposureAttribute, badge),
+            exposureAttribute = ProductExposureAttributeResult.of(
+                curationProduct.product.exposureAttribute,
+                badge,
+                isRecentlyViewed
+            ),
         )
 
-        fun of(product: Product, badge: UserProductBadge? = null) = CurationProductResult(
+        fun of(
+            product: Product,
+            badge: UserProductBadge? = null,
+            isRecentlyViewed: Boolean = false,
+        ) = CurationProductResult(
             id = checkNotNull(product.id),
             name = product.name,
             description = product.description,
             price = product.price,
-            exposureAttribute = ProductExposureAttributeResult.of(product.exposureAttribute, badge),
+            exposureAttribute = ProductExposureAttributeResult.of(product.exposureAttribute, badge, isRecentlyViewed),
         )
     }
 }

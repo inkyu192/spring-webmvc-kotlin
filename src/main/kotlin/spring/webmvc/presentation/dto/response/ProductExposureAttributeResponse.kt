@@ -9,6 +9,8 @@ data class ProductExposureAttributeResponse(
     val isLowStock: Boolean,
     val isRecommended: Boolean,
     val isPersonalPick: Boolean,
+    val isRecentlyViewed: Boolean,
+    val isWished: Boolean,
 ) {
     companion object {
         fun of(result: ProductExposureAttributeResult) = ProductExposureAttributeResponse(
@@ -18,6 +20,8 @@ data class ProductExposureAttributeResponse(
             isLowStock = result.isLowStock,
             isRecommended = result.isRecommended,
             isPersonalPick = result.isPersonalPick,
+            isRecentlyViewed = result.isRecentlyViewed,
+            isWished = result.isWished,
         )
     }
 }

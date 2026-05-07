@@ -39,6 +39,7 @@ class ProductController(
         val result = productService.findProductCached(userId = userId, id = id)
 
         productService.incrementProductViewCount(id)
+        userId?.let { productService.recordRecentlyViewed(it, id) }
 
         return ProductDetailResponse.of(result)
     }

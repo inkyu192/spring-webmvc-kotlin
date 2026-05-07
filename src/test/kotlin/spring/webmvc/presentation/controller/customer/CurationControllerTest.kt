@@ -207,7 +207,11 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isRecommended")
                             .description("추천 여부"),
                         PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isPersonalPick")
-                            .description("개인 추천 여부")
+                            .description("개인 추천 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isRecentlyViewed")
+                            .description("최근 본 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isWished")
+                            .description("찜 여부")
                     )
                 )
             )

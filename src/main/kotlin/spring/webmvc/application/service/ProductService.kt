@@ -14,13 +14,12 @@ import spring.webmvc.application.dto.query.ProductOffsetPageQuery
 import spring.webmvc.application.dto.result.ProductDetailResult
 import spring.webmvc.application.dto.result.ProductSummaryResult
 import spring.webmvc.application.event.ProductViewEvent
+import spring.webmvc.application.event.RecentlyViewedEvent
 import spring.webmvc.application.strategy.product.ProductAttributeStrategy
 import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Product
 import spring.webmvc.domain.model.enums.ProductCategory
-import spring.webmvc.domain.repository.ProductRepository
-import spring.webmvc.domain.repository.ProductTagRepository
-import spring.webmvc.domain.repository.UserProductBadgeRepository
+import spring.webmvc.domain.repository.*
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
 
 @Service
@@ -30,6 +29,8 @@ class ProductService(
     private val productRepository: ProductRepository,
     private val productTagRepository: ProductTagRepository,
     private val userProductBadgeRepository: UserProductBadgeRepository,
+    private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    private val wishlistRepository: WishlistRepository,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     private val productAttributeStrategyMap: Map<ProductCategory, ProductAttributeStrategy>
@@ -50,17 +51,27 @@ class ProductService(
         userId: Long? = null
     ): CursorPage<ProductSummaryResult> {
         val page = productRepository.findAllWithCursorPage(query = query)
+        val productIds = page.content.mapNotNull { it.id }
 
-        val badgeMap = if (userId != null) {
-            val productIds = page.content.mapNotNull { it.id }
+        var badgeMap: Map<Long, spring.webmvc.domain.model.entity.UserProductBadge> = emptyMap()
+        var recentlyViewedIds: Set<Long> = emptySet()
+        var wishedIds: Set<Long> = emptySet()
 
-            userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
+        if (userId != null) {
+            badgeMap = userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
                 .associateBy { it.sk.removePrefix("PRODUCT#").toLong() }
-        } else {
-            emptyMap()
+            recentlyViewedIds = recentlyViewedProductRepository.findProductIdsByUserIdWithinDays(userId)
+            wishedIds = wishlistRepository.findProductIdsByUserId(userId)
         }
 
-        return page.map { ProductSummaryResult.of(product = it, badge = badgeMap[it.id]) }
+        return page.map { product ->
+            ProductSummaryResult.of(
+                product = product,
+                badge = badgeMap[product.id],
+                isRecentlyViewed = product.id in recentlyViewedIds,
+                isWished = product.id in wishedIds,
+            )
+        }
     }
 
     fun findProductsWithOffsetPage(query: ProductOffsetPageQuery): Page<ProductSummaryResult> =
@@ -78,11 +89,14 @@ class ProductService(
         }
 
         val attributeResult = strategy.findByProductId(productId = id)
-        val badge = if (userId != null) {
-            userProductBadgeRepository.findByUserIdAndProductId(userId, id)
-        } else {
-            null
+        var badge: spring.webmvc.domain.model.entity.UserProductBadge? = null
+        var isWished = false
+
+        if (userId != null) {
+            badge = userProductBadgeRepository.findByUserIdAndProductId(userId, id)
+            isWished = wishlistRepository.findByUserIdAndProductId(userId, id) != null
         }
+
         val tags = productTagRepository.findTagsByProductId(id)
 
         return ProductDetailResult.of(
@@ -90,11 +104,35 @@ class ProductService(
             attributeResult = attributeResult,
             badge = badge,
             tags = tags,
+            isWished = isWished,
         )
     }
 
     fun incrementProductViewCount(id: Long) {
         ProductViewEvent(productId = id).let { eventPublisher.publishEvent(it) }
+    }
+
+    fun recordRecentlyViewed(userId: Long, productId: Long) {
+        RecentlyViewedEvent(userId = userId, productId = productId)
+            .let { eventPublisher.publishEvent(it) }
+    }
+
+    fun findRecentlyViewedProducts(userId: Long, cursorId: Long?): CursorPage<ProductSummaryResult> {
+        val page = recentlyViewedProductRepository.findAllByUserIdWithCursorPage(userId, cursorId)
+
+        val productIds = page.content.mapNotNull { it.product.id }
+        val badgeMap = userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
+            .associateBy { it.sk.removePrefix("PRODUCT#").toLong() }
+        val wishedIds = wishlistRepository.findProductIdsByUserId(userId)
+
+        return page.map { recentlyViewed ->
+            ProductSummaryResult.of(
+                product = recentlyViewed.product,
+                badge = badgeMap[recentlyViewed.product.id],
+                isRecentlyViewed = true,
+                isWished = recentlyViewed.product.id in wishedIds,
+            )
+        }
     }
 
     @Transactional

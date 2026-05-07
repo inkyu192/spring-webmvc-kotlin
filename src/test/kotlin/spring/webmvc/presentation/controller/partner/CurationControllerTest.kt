@@ -116,6 +116,8 @@ class CurationControllerTest {
                 isLowStock = false,
                 isRecommended = false,
                 isPersonalPick = false,
+                isRecentlyViewed = false,
+                isWished = false,
             ),
         )
 
@@ -175,7 +177,8 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("type")
                             .description("큐레이션 타입 (MANUAL, SEARCH, PERSONALIZED)"),
                         PayloadDocumentation.fieldWithPath("attribute").description("큐레이션 속성 (타입별 추가 정보)").optional(),
-                        PayloadDocumentation.fieldWithPath("attribute.tagIds").description("검색 태그 ID 목록 (SEARCH 타입일 경우 사용)")
+                        PayloadDocumentation.fieldWithPath("attribute.tagIds")
+                            .description("검색 태그 ID 목록 (SEARCH 타입일 경우 사용)")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("exposureAttribute").description("큐레이션 노출 속성"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.layout")
@@ -196,7 +199,11 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isRecommended")
                             .description("추천 여부"),
                         PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isPersonalPick")
-                            .description("개인 추천 여부")
+                            .description("개인 추천 여부"),
+                        PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isRecentlyViewed")
+                            .description("최근 본 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products[].exposureAttribute.isWished")
+                            .description("찜 여부")
                     )
                 )
             )
@@ -297,7 +304,8 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("type")
                             .description("큐레이션 타입 (MANUAL, SEARCH, PERSONALIZED)"),
                         PayloadDocumentation.fieldWithPath("attribute").description("큐레이션 속성 (타입별 추가 정보)").optional(),
-                        PayloadDocumentation.fieldWithPath("attribute.tagIds").description("검색 태그 ID 목록 (SEARCH 타입일 경우 사용)")
+                        PayloadDocumentation.fieldWithPath("attribute.tagIds")
+                            .description("검색 태그 ID 목록 (SEARCH 타입일 경우 사용)")
                             .optional(),
                         PayloadDocumentation.fieldWithPath("exposureAttribute").description("큐레이션 노출 속성"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.layout")
@@ -324,7 +332,11 @@ class CurationControllerTest {
                         PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isRecommended")
                             .description("추천 여부"),
                         PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isPersonalPick")
-                            .description("개인 추천 여부")
+                            .description("개인 추천 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isRecentlyViewed")
+                            .description("최근 본 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("products.content[].exposureAttribute.isWished")
+                            .description("찜 여부")
                     )
                 )
             )

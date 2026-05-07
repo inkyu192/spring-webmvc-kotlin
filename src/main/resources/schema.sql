@@ -1,6 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS translation;
+DROP TABLE IF EXISTS wishlist;
+DROP TABLE IF EXISTS recently_viewed_product;
 DROP TABLE IF EXISTS product_tag;
 DROP TABLE IF EXISTS tag;
 DROP TABLE IF EXISTS curation_product;
@@ -230,12 +232,13 @@ CREATE TABLE accommodation
 
 CREATE TABLE orders
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    ordered_at DATETIME(6)  NOT NULL,
-    status     VARCHAR(255) NOT NULL,
-    user_id    BIGINT       NOT NULL,
-    created_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    updated_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_number VARCHAR(20)  NOT NULL UNIQUE,
+    ordered_at   DATETIME(6)  NOT NULL,
+    status       VARCHAR(255) NOT NULL,
+    user_id      BIGINT       NOT NULL,
+    created_at   DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at   DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
@@ -248,6 +251,32 @@ CREATE TABLE order_product
     product_id  BIGINT NOT NULL,
     CONSTRAINT fk_order_product_order FOREIGN KEY (order_id) REFERENCES orders (id),
     CONSTRAINT fk_order_product_product FOREIGN KEY (product_id) REFERENCES product (id)
+);
+
+CREATE TABLE recently_viewed_product
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    BIGINT      NOT NULL,
+    product_id BIGINT      NOT NULL,
+    viewed_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    UNIQUE KEY uk_user_product (user_id, product_id),
+    INDEX      idx_user_viewed_at(user_id, viewed_at DESC),
+    CONSTRAINT fk_recently_viewed_product_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_recently_viewed_product_product FOREIGN KEY (product_id) REFERENCES product (id)
+);
+
+CREATE TABLE wishlist
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    BIGINT      NOT NULL,
+    product_id BIGINT      NOT NULL,
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    UNIQUE KEY uk_wishlist_user_product (user_id, product_id),
+    INDEX      idx_wishlist_user_id(user_id),
+    CONSTRAINT fk_wishlist_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES product (id)
 );
 
 CREATE TABLE curation

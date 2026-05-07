@@ -13,16 +13,16 @@ import spring.webmvc.domain.model.vo.CurationExposureAttribute
 class Curation protected constructor(
     val title: String,
 
-    @field:Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     val placement: CurationPlacement,
 
-    @field:Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     val type: CurationType,
 
-    @field:Convert(converter = CurationAttributeConverter::class)
+    @Convert(converter = CurationAttributeConverter::class)
     val attribute: CurationAttribute,
 
-    @field:Convert(converter = CurationExposureAttributeConverter::class)
+    @Convert(converter = CurationExposureAttributeConverter::class)
     val exposureAttribute: CurationExposureAttribute,
 
     val isExposed: Boolean,

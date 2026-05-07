@@ -206,6 +206,10 @@ class ProductControllerTest {
                             .description("추천 여부"),
                         PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isPersonalPick")
                             .description("개인 추천 여부"),
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isRecentlyViewed")
+                            .description("최근 본 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("content[].exposureAttribute.isWished")
+                            .description("찜 여부"),
                         PayloadDocumentation.fieldWithPath("content[].createdAt").description("생성일시")
                     )
                 )
@@ -216,6 +220,7 @@ class ProductControllerTest {
     fun findTransport() {
         every { productService.findProductCached(userId = any(), id = productId) } returns transportResult
         every { productService.incrementProductViewCount(id = productId) } just Runs
+        every { productService.recordRecentlyViewed(any(), any()) } just Runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/customer/products/{id}", productId)
@@ -246,6 +251,9 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecentlyViewed")
+                            .description("최근 본 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isWished").description("찜 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.departureLocation").description("출발지"),
@@ -253,8 +261,10 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("attribute.departureTime").description("출발 시간"),
                         PayloadDocumentation.fieldWithPath("attribute.arrivalTime").description("도착 시간"),
                         PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
-                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
-                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID")
+                            .optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명")
+                            .optional()
                     )
                 )
             )
@@ -266,6 +276,7 @@ class ProductControllerTest {
 
         every { productService.findProductCached(userId = any(), id = productId) } returns accommodationResult
         every { productService.incrementProductViewCount(id = productId) } just Runs
+        every { productService.recordRecentlyViewed(any(), any()) } just Runs
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/customer/products/{id}", productId)
@@ -296,14 +307,19 @@ class ProductControllerTest {
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isLowStock").description("품절 임박 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isRecommended").description("추천 여부"),
                         PayloadDocumentation.fieldWithPath("exposureAttribute.isPersonalPick").description("개인 추천 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isRecentlyViewed")
+                            .description("최근 본 상품 여부"),
+                        PayloadDocumentation.fieldWithPath("exposureAttribute.isWished").description("찜 여부"),
                         PayloadDocumentation.fieldWithPath("createdAt").description("생성일시"),
                         PayloadDocumentation.fieldWithPath("attribute").description("상세 정보"),
                         PayloadDocumentation.fieldWithPath("attribute.place").description("장소"),
                         PayloadDocumentation.fieldWithPath("attribute.checkInTime").description("체크인 시간"),
                         PayloadDocumentation.fieldWithPath("attribute.checkOutTime").description("체크아웃 시간"),
                         PayloadDocumentation.fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록"),
-                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
-                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명").optional()
+                        PayloadDocumentation.fieldWithPath("tags[].id").type(JsonFieldType.NUMBER).description("태그 ID")
+                            .optional(),
+                        PayloadDocumentation.fieldWithPath("tags[].name").type(JsonFieldType.STRING).description("태그명")
+                            .optional()
                     )
                 )
             )

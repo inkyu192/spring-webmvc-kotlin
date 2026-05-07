@@ -7,12 +7,14 @@ import spring.webmvc.application.dto.result.CurationOffsetPageResult
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.enums.CurationType
 import spring.webmvc.domain.repository.CurationProductRepository
+import spring.webmvc.domain.repository.RecentlyViewedProductRepository
 import spring.webmvc.domain.repository.UserProductBadgeRepository
 
 @Component
 class ManualCurationStrategy(
     private val curationProductRepository: CurationProductRepository,
     private val userProductBadgeRepository: UserProductBadgeRepository,
+    private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
 ) : CurationProductStrategy {
 
     override fun type(): CurationType = CurationType.MANUAL
@@ -27,16 +29,22 @@ class ManualCurationStrategy(
             cursorId = cursorId,
         )
 
-        val badgeMap = if (userId != null) {
-            val productIds = page.content.mapNotNull { it.product.id }
+        var badgeMap: Map<Long, spring.webmvc.domain.model.entity.UserProductBadge> = emptyMap()
+        var recentlyViewedIds: Set<Long> = emptySet()
 
-            userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
+        if (userId != null) {
+            val productIds = page.content.mapNotNull { it.product.id }
+            badgeMap = userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
                 .associateBy { it.sk.removePrefix("PRODUCT#").toLong() }
-        } else {
-            emptyMap()
+            recentlyViewedIds = recentlyViewedProductRepository.findProductIdsByUserIdWithinDays(userId)
         }
 
-        return CurationCursorPageResult.of(curation = curation, page = page, badgeMap = badgeMap)
+        return CurationCursorPageResult.of(
+            curation = curation,
+            page = page,
+            badgeMap = badgeMap,
+            recentlyViewedIds = recentlyViewedIds
+        )
     }
 
     override fun findProductsWithOffsetPage(curation: Curation, pageable: Pageable): CurationOffsetPageResult {

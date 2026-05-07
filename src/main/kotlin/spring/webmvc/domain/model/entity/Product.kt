@@ -9,7 +9,7 @@ import spring.webmvc.infrastructure.exception.InvalidEntityStatusException
 
 @Entity
 class Product protected constructor(
-    @field:Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     val category: ProductCategory,
 
     status: ProductStatus,

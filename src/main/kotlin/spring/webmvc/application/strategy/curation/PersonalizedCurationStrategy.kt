@@ -8,6 +8,7 @@ import spring.webmvc.domain.dto.CursorPage
 import spring.webmvc.domain.model.entity.Curation
 import spring.webmvc.domain.model.enums.CurationType
 import spring.webmvc.domain.repository.ProductRepository
+import spring.webmvc.domain.repository.RecentlyViewedProductRepository
 import spring.webmvc.domain.repository.UserCurationProductRepository
 import spring.webmvc.domain.repository.UserProductBadgeRepository
 
@@ -16,6 +17,7 @@ class PersonalizedCurationStrategy(
     private val userCurationProductRepository: UserCurationProductRepository,
     private val productRepository: ProductRepository,
     private val userProductBadgeRepository: UserProductBadgeRepository,
+    private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
 ) : CurationProductStrategy {
 
     override fun type(): CurationType = CurationType.PERSONALIZED
@@ -42,8 +44,14 @@ class PersonalizedCurationStrategy(
 
         val badgeMap = userProductBadgeRepository.findByUserIdAndProductIds(userId, productIds)
             .associateBy { it.sk.removePrefix("PRODUCT#").toLong() }
+        val recentlyViewedIds = recentlyViewedProductRepository.findProductIdsByUserIdWithinDays(userId)
 
-        return CurationCursorPageResult.of(curation = curation, products = products, badgeMap = badgeMap)
+        return CurationCursorPageResult.of(
+            curation = curation,
+            products = products,
+            badgeMap = badgeMap,
+            recentlyViewedIds = recentlyViewedIds
+        )
     }
 
     override fun findProductsWithOffsetPage(curation: Curation, pageable: Pageable): CurationOffsetPageResult {

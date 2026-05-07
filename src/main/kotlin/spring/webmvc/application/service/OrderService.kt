@@ -16,27 +16,37 @@ import spring.webmvc.domain.model.entity.User
 import spring.webmvc.domain.repository.OrderRepository
 import spring.webmvc.domain.repository.ProductRepository
 import spring.webmvc.domain.repository.UserRepository
+import spring.webmvc.domain.repository.cache.OrderCacheRepository
 import spring.webmvc.domain.repository.cache.ProductCacheRepository
 import spring.webmvc.infrastructure.exception.InsufficientQuantityException
 import spring.webmvc.infrastructure.exception.NotFoundEntityException
+import spring.webmvc.infrastructure.exception.OrderNumberGenerationException
 import spring.webmvc.infrastructure.security.SecurityContextUtil
 import java.time.Duration
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Service
 @Transactional(readOnly = true)
 class OrderService(
+    private val orderCacheRepository: OrderCacheRepository,
     private val productCacheRepository: ProductCacheRepository,
     private val userRepository: UserRepository,
     private val productRepository: ProductRepository,
     private val orderRepository: OrderRepository,
 ) {
+    companion object {
+        private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd")
+    }
+
     @Transactional
     fun createOrder(command: OrderCreateCommand): OrderDetailResult {
         val user = userRepository.findById(id = command.userId)
             ?: throw NotFoundEntityException(kClass = User::class, id = command.userId)
         val productMap = productRepository.findAllById(ids = command.products.map { it.id }).associateBy { it.id }
 
-        val order = Order.create(user = user)
+        val orderNumber = generateOrderNumber()
+        val order = Order.create(orderNumber = orderNumber, user = user)
         val processedProducts = mutableListOf<OrderProductCreateCommand>()
 
         try {
@@ -145,5 +155,31 @@ class OrderService(
         order.cancel()
 
         return OrderDetailResult.of(order)
+    }
+
+    private fun generateOrderNumber(): String {
+        val date = LocalDate.now().format(DATE_FORMATTER)
+
+        val seq = orderCacheRepository.incrementSequence(date)
+            ?: throw OrderNumberGenerationException()
+
+        val finalSeq = if (seq == 1L) {
+            val lastSeq = recoverSequenceFromDb(date)
+            if (lastSeq > 0) {
+                orderCacheRepository.setSequence(date, lastSeq + 1)
+                lastSeq + 1
+            } else {
+                seq
+            }
+        } else {
+            seq
+        }
+
+        return "$date${finalSeq.toString().padStart(8, '0')}"
+    }
+
+    private fun recoverSequenceFromDb(date: String): Long {
+        val maxOrderNumber = orderRepository.findMaxOrderNumberByDate(date)
+        return maxOrderNumber?.takeLast(8)?.toLongOrNull() ?: 0L
     }
 }

@@ -8,12 +8,14 @@ import java.time.Instant
 
 data class OrderSummaryResponse(
     val id: Long,
+    val orderNumber: String,
     val orderedAt: Instant,
     val status: OrderStatus,
 ) {
     companion object {
         fun of(result: OrderSummaryResult) = OrderSummaryResponse(
             id = result.id,
+            orderNumber = result.orderNumber,
             orderedAt = result.orderedAt,
             status = result.status,
         )
@@ -22,6 +24,7 @@ data class OrderSummaryResponse(
 
 data class OrderDetailResponse(
     val id: Long,
+    val orderNumber: String,
     val orderedAt: Instant,
     val status: OrderStatus,
     val products: List<OrderProductResponse>,
@@ -29,6 +32,7 @@ data class OrderDetailResponse(
     companion object {
         fun of(result: OrderDetailResult) = OrderDetailResponse(
             id = result.id,
+            orderNumber = result.orderNumber,
             orderedAt = result.orderedAt,
             status = result.status,
             products = result.products.map { OrderProductResponse.of(result = it) },

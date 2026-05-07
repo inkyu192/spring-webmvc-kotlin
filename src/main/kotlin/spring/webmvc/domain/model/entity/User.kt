@@ -9,13 +9,13 @@ import java.time.LocalDate
 @Entity
 @Table(name = "users")
 class User protected constructor(
-    @field:Convert(converter = CryptoAttributeConverter::class)
+    @Convert(converter = CryptoAttributeConverter::class)
     val name: String,
 
-    @field:Embedded
+    @Embedded
     val phone: Phone,
 
-    @field:Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     val gender: Gender,
 
     val birthday: LocalDate,

@@ -26,5 +26,6 @@ interface OrderRepository {
 
     fun findById(id: Long): Order?
     fun findByIdAndUserId(id: Long, userId: Long): Order?
+    fun findMaxOrderNumberByDate(date: String): String?
     fun save(order: Order): Order
 }
